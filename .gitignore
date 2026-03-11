@@ -1,0 +1,13 @@
+.env
+superpage.sql
+plan.md
+superpage_stack.md
+
+# Application folders
+cache/
+logs/
+uploads/
+
+# System files
+.DS_Store
+Thumbs.db
