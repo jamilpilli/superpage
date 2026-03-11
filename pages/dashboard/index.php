@@ -47,6 +47,84 @@ render_dashboard_header("Início");
 ?>
 
     <?php if ($currentSite): ?>
+        <?php
+        $sqlToday = "SELECT COUNT(DISTINCT visitor_ip) as total FROM site_analytics WHERE site_id = :sid AND DATE(created_at) = CURDATE()";
+        $sqlMonth = "SELECT COUNT(id) as total FROM site_analytics WHERE site_id = :sid AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())";
+        
+        $sqlContacts = "SELECT COUNT(id) as total FROM site_contacts WHERE site_id = :sid";
+        $sqlNewContacts = "SELECT COUNT(id) as total FROM site_contacts WHERE site_id = :sid AND status = 'new'";
+        
+        // Evita quebrar a dash caso a migration não tenha rodado
+        $visitsToday = 0;
+        $visitsMonth = 0;
+        $totalContacts = 0;
+        $newContacts = 0;
+        $devices = ['Mobile' => 0, 'Desktop' => 0];
+        $referrers = [];
+        $dailyVisits = array_fill(1, 31, 0); // Para o gráfico, dias de 1 a 31
+        
+        try {
+            $visitsToday = db_fetch_one($sqlToday, [':sid' => $currentSite['id']])['total'] ?? 0;
+            $visitsMonth = db_fetch_one($sqlMonth, [':sid' => $currentSite['id']])['total'] ?? 0;
+            $totalContacts = db_fetch_one($sqlContacts, [':sid' => $currentSite['id']])['total'] ?? 0;
+            $newContacts = db_fetch_one($sqlNewContacts, [':sid' => $currentSite['id']])['total'] ?? 0;
+            
+            // Dispositivos do mês
+            $devQuery = db_fetch_all("SELECT device_type, COUNT(*) as qtd FROM site_analytics WHERE site_id = :sid AND MONTH(created_at) = MONTH(CURDATE()) GROUP BY device_type", [':sid' => $currentSite['id']]);
+            foreach ($devQuery as $dq) {
+                if(isset($devices[$dq['device_type']])) {
+                    $devices[$dq['device_type']] = $dq['qtd'];
+                }
+            }
+            
+            // Origem (Top 4)
+            $refQuery = db_fetch_all("
+                SELECT 
+                    CASE 
+                        WHEN referrer_url LIKE '%google%' THEN 'Google Orgânico'
+                        WHEN referrer_url LIKE '%instagram.com%' THEN 'Instagram'
+                        WHEN referrer_url LIKE '%facebook.com%' THEN 'Facebook'
+                        WHEN referrer_url = '' OR referrer_url IS NULL THEN 'Tráfego Direto'
+                        ELSE 'Outros'
+                    END as source,
+                    COUNT(*) as qtd
+                FROM site_analytics 
+                WHERE site_id = :sid AND MONTH(created_at) = MONTH(CURDATE())
+                GROUP BY source
+                ORDER BY qtd DESC
+                LIMIT 4
+            ", [':sid' => $currentSite['id']]);
+            
+            foreach ($refQuery as $rq) {
+                $referrers[$rq['source']] = $rq['qtd'];
+            }
+            
+            // Chart Data (Dias do Mês atual)
+            $chartQuery = db_fetch_all("
+                SELECT DAY(created_at) as dia, COUNT(*) as qtd 
+                FROM site_analytics 
+                WHERE site_id = :sid AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())
+                GROUP BY DAY(created_at)
+            ", [':sid' => $currentSite['id']]);
+            
+            foreach ($chartQuery as $cq) {
+                $dailyVisits[$cq['dia']] = $cq['qtd'];
+            }
+            
+        } catch (\PDOException $e) {
+            // Se der erro (ex: tabela não existe), os zeros são mantidos
+        }
+        
+        // O maximo do grafico pro calculo do %. Se vazio, bota 1 pra n quebrar divisão.
+        $maxDaily = max($dailyVisits);
+        $maxDaily = $maxDaily > 0 ? $maxDaily : 1;
+        
+        // Percentual para o Grafico de Pizza
+        $totalDevices = array_sum($devices);
+        if ($totalDevices == 0) $totalDevices = 1; // evitar divisão por 0
+        $pctMobile = round(($devices['Mobile'] / $totalDevices) * 100);
+        $pctDesktop = round(($devices['Desktop'] / $totalDevices) * 100);
+        ?>
         
         <!-- Dashboard do Site Selecionado (Mocks) -->
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6 text-left">
@@ -57,28 +135,30 @@ render_dashboard_header("Início");
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
                     <p class="text-sm font-medium text-gray-500">Visitantes Hoje</p>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <p class="text-3xl font-bold text-gray-900">142</p>
-                        <p class="text-sm font-medium text-green-600 flex items-center"><svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> 12%</p>
+                        <p class="text-3xl font-bold text-gray-900"><?= number_format($visitsToday, 0, ',', '.') ?></p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
                     <p class="text-sm font-medium text-gray-500">Acessos no Mês</p>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <p class="text-3xl font-bold text-gray-900">4.891</p>
-                        <p class="text-sm font-medium text-green-600 flex items-center"><svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg> 5.4%</p>
+                        <p class="text-3xl font-bold text-gray-900"><?= number_format($visitsMonth, 0, ',', '.') ?></p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
                     <p class="text-sm font-medium text-gray-500">Contatos Recebidos</p>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <p class="text-3xl font-bold text-gray-900">23</p>
-                        <p class="text-sm font-medium text-red-600 flex items-center"><svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg> 2%</p>
+                        <p class="text-3xl font-bold text-gray-900"><?= number_format($totalContacts, 0, ',', '.') ?></p>
+                        <?php if ($newContacts > 0): ?>
+                            <p class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full"><?= $newContacts ?> novos</p>
+                        <?php else: ?>
+                            <p class="text-xs text-gray-400 font-medium">--</p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
                     <p class="text-sm font-medium text-gray-500">Tempo Médio</p>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <p class="text-3xl font-bold text-gray-900">1m 45s</p>
+                        <p class="text-3xl font-bold text-gray-900">N/A</p>
                     </div>
                 </div>
             </div>
@@ -88,30 +168,35 @@ render_dashboard_header("Início");
                 <!-- Gráfico de Acessos -->
                 <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-base font-bold text-gray-900">Acessos do Mês</h3>
-                        <select class="text-sm border-gray-300 rounded-md shadow-sm opacity-70"><option>Últimos 30 dias</option></select>
+                        <h3 class="text-base font-bold text-gray-900">Acessos do Mês Atual</h3>
+                        <span class="text-sm text-gray-500 text-right opacity-70">Gráfico Diário</span>
                     </div>
                     <!-- Mock do Gráfico -->
-                    <div class="flex-1 flex items-end justify-between gap-2 h-48 border-b border-gray-100 pb-2 relative">
+                    <div class="flex-1 flex items-end justify-between gap-[2px] h-48 border-b border-gray-100 pb-2 relative">
                         <!-- Linhas Guia -->
-                        <div class="absolute inset-0 flex flex-col justify-between pt-2 pb-0">
+                        <div class="absolute inset-0 flex flex-col justify-between pt-2 pb-0 opacity-50 pointer-events-none z-0">
+                            <div class="border-t border-gray-100 w-full h-0"></div>
                             <div class="border-t border-gray-100 w-full h-0"></div>
                             <div class="border-t border-gray-100 w-full h-0"></div>
                             <div class="border-t border-gray-100 w-full h-0"></div>
                         </div>
                         <?php 
-                        // Bar char mock
-                        $heights = [30, 45, 25, 60, 80, 50, 40, 75, 90, 65, 55, 30, 20, 40, 85];
-                        foreach ($heights as $idx => $h): ?>
-                            <div class="w-full bg-indigo-100 hover:bg-indigo-300 transition-colors rounded-t cursor-pointer relative z-10 group" style="height: <?= $h ?>%;">
-                                <div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded pointer-events-none"><?= $h * 15 ?></div>
+                        // Bar char real: os 31 dias possíveis
+                        for ($d = 1; $d <= date('t'); $d++): 
+                            $v_qtd = $dailyVisits[$d];
+                            $h = ($v_qtd / $maxDaily) * 100;
+                            // Previne barra muito minúscula visualmente
+                            if ($v_qtd > 0 && $h < 5) $h = 5;
+                        ?>
+                            <div class="w-full bg-indigo-100 hover:bg-indigo-400 transition-colors rounded-t cursor-pointer relative z-10 group" style="height: <?= $h ?>%;">
+                                <div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded pointer-events-none"><?= $v_qtd ?></div>
                             </div>
-                        <?php endforeach; ?>
+                        <?php endfor; ?>
                     </div>
-                    <div class="flex justify-between text-xs text-gray-400 mt-2">
-                        <span>01 Mar</span>
-                        <span>15 Mar</span>
-                        <span>30 Mar</span>
+                    <div class="flex justify-between text-xs text-gray-400 mt-2 font-medium">
+                        <span>Dia 1</span>
+                        <span>Dia 15</span>
+                        <span>Fim do Mês</span>
                     </div>
                 </div>
 
@@ -123,16 +208,8 @@ render_dashboard_header("Início");
                     </h3>
                     <div class="space-y-4">
                         <div class="bg-indigo-50 rounded-lg p-3 text-sm border border-indigo-100">
-                            <span class="font-bold text-indigo-800 block mb-1">Dica de SEO</span>
-                            <span class="text-indigo-600 block leading-tight">Melhore seu "Sobre Nós" adicionando 2 imagens novas.</span>
-                        </div>
-                        <div class="bg-orange-50 rounded-lg p-3 text-sm border border-orange-100">
-                            <span class="font-bold text-orange-800 block mb-1">Configuração Incompleta</span>
-                            <span class="text-orange-600 block leading-tight">Seu botão de WhatsApp no rodapé está sem número vinculado.</span>
-                        </div>
-                        <div class="flex items-center text-sm text-gray-500 py-2">
-                            <span class="w-2 h-2 bg-gray-300 rounded-full mr-3"></span>
-                            Visita de bot do Google identificada ontem às 14h.
+                            <span class="font-bold text-indigo-800 block mb-1">Estatísticas Reais Ativadas</span>
+                            <span class="text-indigo-600 block leading-tight">O painel agora está acompanhando o tráfego do seu site em tempo real!</span>
                         </div>
                     </div>
                 </div>
@@ -142,114 +219,104 @@ render_dashboard_header("Início");
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 <!-- Últimos Contatos -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 col-span-1 md:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 col-span-1 md:col-span-1 border-opacity-50">
                     <div class="flex justify-between items-center mb-5">
                         <h3 class="text-base font-bold text-gray-900">Últimos Contatos</h3>
-                        <a href="#" class="text-xs text-indigo-600 hover:underline">Ver Tabela Completa</a>
+                        <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSite['id'] ?>" class="text-xs text-indigo-600 hover:underline">Ver Tabela</a>
                     </div>
+                    <?php 
+                    $recentContacts = [];
+                    try {
+                        $recentContacts = db_fetch_all("SELECT name, status, created_at FROM site_contacts WHERE site_id = :sid ORDER BY created_at DESC LIMIT 5", [':sid' => $currentSite['id']]);
+                    } catch(\PDOException $e) {}
+                    
+                    if (empty($recentContacts)): 
+                    ?>
+                    <div class="pt-6 pb-6 text-center">
+                        <svg class="h-10 w-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                        <p class="text-sm text-gray-400">Nenhum formulário de contato preenchido ainda.</p>
+                    </div>
+                    <?php else: ?>
                     <ul class="divide-y divide-gray-100 space-y-3 pt-2">
-                        <?php 
-                        $mockLeads = [
-                            ['nome' => 'Mariana Silva', 'status' => 'Novo', 'tempo' => '2 horas atrás'],
-                            ['nome' => 'João Nogueira', 'status' => 'Lido', 'tempo' => 'ontem'],
-                            ['nome' => 'Pedro Álvares', 'status' => 'Lido', 'tempo' => 'ontem'],
-                            ['nome' => 'Tech Solutions', 'status' => 'Novo', 'tempo' => 'há 2 dias'],
-                            ['nome' => 'Carlos B.', 'status' => 'Lido', 'tempo' => 'há 3 dias']
-                        ];
-                        foreach($mockLeads as $lead): ?>
+                        <?php foreach($recentContacts as $lead): 
+                            $dateStr = date('d/m H:i', strtotime($lead['created_at']));
+                        ?>
                             <li class="flex items-center justify-between pointer-events-none">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs uppercase">
-                                        <?= substr($lead['nome'], 0, 1) ?>
+                                        <?= substr($lead['name'], 0, 1) ?>
                                     </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900"><?= $lead['nome'] ?></p>
-                                        <p class="text-xs text-gray-400"><?= $lead['tempo'] ?></p>
+                                    <div class="ml-3 truncate max-w-[120px]">
+                                        <p class="text-sm font-medium text-gray-900 truncate"><?= htmlspecialchars($lead['name']) ?></p>
+                                        <p class="text-xs text-gray-400 truncate"><?= $dateStr ?></p>
                                     </div>
                                 </div>
                                 <div>
-                                    <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-full <?= $lead['status'] == 'Novo' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500' ?>"><?= $lead['status'] ?></span>
+                                    <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-full <?= $lead['status'] === 'new' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500' ?>"><?= $lead['status'] === 'new' ? 'Novo' : 'Lido' ?></span>
                                 </div>
                             </li>
                         <?php endforeach; ?>
                     </ul>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Origem do Tráfego -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col">
-                    <h3 class="text-base font-bold text-gray-900 mb-6">Origem do Tráfego</h3>
+                    <h3 class="text-base font-bold text-gray-900 mb-6">Origem do Tráfego (Mês)</h3>
                     <div class="space-y-5 flex-1 justify-center flex flex-col">
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="font-medium text-gray-700">Google Orgânico</span>
-                                <span class="text-gray-500">65%</span>
+                        <?php if (empty($referrers)): ?>
+                            <p class="text-sm text-gray-400 text-center">Dados insuficientes.</p>
+                        <?php else: 
+                            $colors = ['bg-indigo-600', 'bg-green-500', 'bg-pink-500', 'bg-orange-400'];
+                            $i = 0;
+                            foreach($referrers as $sourceName => $sourceQtd):
+                                $srcPct = round(($sourceQtd / $visitsMonth) * 100);
+                                $colorClass = $colors[$i % count($colors)];
+                        ?>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="font-medium text-gray-700"><?= $sourceName ?></span>
+                                    <span class="text-gray-500"><?= $srcPct ?>%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="<?= $colorClass ?> h-2 rounded-full" style="width: <?= $srcPct ?>%"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 65%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="font-medium text-gray-700">Tráfego Direto (Link)</span>
-                                <span class="text-gray-500">20%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 20%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="font-medium text-gray-700">Redes Sociais (Insta)</span>
-                                <span class="text-gray-500">12%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="bg-pink-500 h-2 rounded-full" style="width: 12%"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="font-medium text-gray-700">Outros Referenciadores</span>
-                                <span class="text-gray-500">3%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2">
-                                <div class="bg-gray-400 h-2 rounded-full" style="width: 3%"></div>
-                            </div>
-                        </div>
-
+                        <?php $i++; endforeach; endif; ?>
                     </div>
                 </div>
 
                 <!-- Gráfico de Dispositivos -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col items-center text-center">
-                    <h3 class="text-base font-bold text-gray-900 mb-6 w-full text-left">Dispositivos</h3>
+                    <h3 class="text-base font-bold text-gray-900 mb-6 w-full text-left">Dispositivos (Mês)</h3>
                     
-                    <!-- Mock de Grafico de Pizza simples via CSS -->
-                    <div class="w-40 h-40 rounded-full relative shadow-inner my-auto" 
-                         style="background: conic-gradient(from 0deg, 
-                                  #4f46e5 0% 75%, 
-                                  #10b981 75% 95%, 
-                                  #f3f4f6 95% 100%);">
-                        <div class="absolute inset-4 bg-white rounded-full flex items-center justify-center flex-col">
-                            <span class="text-xl font-bold text-gray-900">75%</span>
-                            <span class="text-xs text-gray-500">Mobile</span>
+                    <?php if ($visitsMonth > 0): ?>
+                        <!-- Grafico de Pizza simples via CSS -->
+                        <div class="w-40 h-40 rounded-full relative shadow-inner my-auto" 
+                             style="background: conic-gradient(from 0deg, 
+                                      #4f46e5 0% <?= $pctMobile ?>%, 
+                                      #10b981 <?= $pctMobile ?>% <?= $pctMobile + $pctDesktop ?>%, 
+                                      #f3f4f6 <?= $pctMobile + $pctDesktop ?>% 100%);">
+                            <div class="absolute inset-4 bg-white rounded-full flex items-center justify-center flex-col shadow-sm">
+                                <span class="text-xl font-bold text-gray-900 text-indigo-600"><?= max($pctMobile, $pctDesktop) ?>%</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-tighter"><?= $pctMobile >= $pctDesktop ? 'Mobile' : 'Desktop' ?></span>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="flex justify-center flex-wrap gap-4 w-full mt-6 text-sm">
-                        <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-indigo-600 mr-2"></span>Celular (75%)</div>
-                        <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>Desktop (20%)</div>
-                        <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-100 mr-2"></span>Tablet (5%)</div>
-                    </div>
+                        
+                        <div class="flex justify-center flex-wrap gap-4 w-full mt-6 text-sm">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-indigo-600 mr-2 shadow-sm"></span>Celular (<?= $pctMobile ?>%)</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-500 mr-2 shadow-sm"></span>Desktop (<?= $pctDesktop ?>%)</div>
+                        </div>
+                    <?php else: ?>
+                        <div class="w-40 h-40 rounded-full bg-gray-50 border-4 border-gray-100 flex items-center justify-center relative my-auto">
+                            <span class="text-sm text-gray-400">Sem dados</span>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
             </div>
         </div>
-
-    <?php elseif ($totalSites > 0): ?>
+    <?php elseif ($totalSites > 0): ?>    <?php elseif ($totalSites > 0): ?>
         <div class="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
             <svg class="h-20 w-20 text-indigo-200 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />

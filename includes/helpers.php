@@ -27,7 +27,9 @@ function redirect($url) {
     // Tratamento para ambiente de desenvolvimento XAMPP
     $baseDir = '/superpage';
     if (str_starts_with($url, '/') && strpos($_SERVER['REQUEST_URI'], $baseDir) === 0) {
-        $url = rtrim($baseDir, '/') . $url;
+        if (strpos($url, $baseDir) !== 0) {
+            $url = rtrim($baseDir, '/') . $url;
+        }
     }
     header("Location: $url");
     exit;

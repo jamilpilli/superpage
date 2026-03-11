@@ -37,7 +37,25 @@ if (!$page) {
     exit;
 }
 
-// 3. Buscamos os Blocos Configurados
+// 3. Processar formulário de Contato, se houver
+$contactSuccess = false;
+$contactError = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
+    try {
+        db_insert('site_contacts', [
+            'site_id' => $site['id'],
+            'name' => trim($_POST['name'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'phone' => trim($_POST['phone'] ?? ''),
+            'message' => trim($_POST['message'] ?? '')
+        ]);
+        $contactSuccess = "Sua mensagem foi enviada com sucesso!";
+    } catch (\PDOException $e) {
+        $contactError = "Ocorreu um erro ao enviar sua mensagem. Tente novamente.";
+    }
+}
+
+// 4. Buscamos os Blocos Configurados
 $all_blocks = db_fetch_all("SELECT * FROM blocks WHERE page_id = :pid ORDER BY sort_order ASC", [':pid' => $page['id']]);
 $blocks = [];
 foreach ($all_blocks as $b) {
@@ -71,8 +89,31 @@ foreach ($fontsToLoad as $f) {
 }
 $googleFontsUrl = 'https://fonts.googleapis.com/css2?' . implode('&', $fontVars) . '&display=swap';
 
-// 5. Renderização HTML Final
+// 4.5 Registrar Visita (Analytics)
 $isPreview = isset($_GET['preview']) && $_GET['preview'] === 'true';
+
+if (!$isPreview) {
+    try {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $deviceType = 'Desktop';
+        if (preg_match('/Mobile|Android|iPhone|iPad/i', $userAgent)) {
+            $deviceType = 'Mobile';
+        }
+        
+        db_insert('site_analytics', [
+            'site_id' => $site['id'],
+            'page_id' => $page['id'],
+            'visitor_ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $userAgent,
+            'device_type' => $deviceType,
+            'referrer_url' => $_SERVER['HTTP_REFERER'] ?? ''
+        ]);
+    } catch (\PDOException $e) {
+        // Ignorar se a tabela 'site_analytics' ainda não existir
+    }
+}
+
+// 5. Renderização HTML Final
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -400,7 +441,21 @@ else: ?>
                 echo "</div></section>";
                 break;
             case 'contact':
-                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-gray-50'><div class='max-w-3xl mx-auto'><div class='text-center mb-10'><h2 class='text-3xl font-bold font-title' style='color: var(--color-primary);'>" . $blockTitle . "</h2></div><div class='bg-white rounded-lg shadow-xl p-8 border border-gray-100'><form action='#' method='POST' class='space-y-6'><div><label class='block text-sm font-medium text-gray-700'>Nome Completo</label><input type='text' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div><label class='block text-sm font-medium text-gray-700'>E-mail</label><input type='email' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div><label class='block text-sm font-medium text-gray-700'>Telefone</label><input type='tel' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div></div><div><label class='block text-sm font-medium text-gray-700'>Mensagem</label><textarea required rows='4' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></textarea></div><div class='text-center md:text-left'><button type='button' class='inline-block w-auto text-white font-bold py-3 px-10 {$btnRadiusClass} shadow focus:outline-none transition hover:opacity-90' style='background-color: var(--color-primary);' onclick='alert(\"Formulário salvo no banco (simulação).\")'>" . $btnText . "</button></div></form></div></div></section>";
+                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-gray-50'><div class='max-w-3xl mx-auto'><div class='text-center mb-10'><h2 class='text-3xl font-bold font-title' style='color: var(--color-primary);'>" . $blockTitle . "</h2></div><div class='bg-white rounded-lg shadow-xl p-8 border border-gray-100'>";
+                
+                if ($contactSuccess) {
+                    echo "<div class='bg-green-50 justify-between text-green-700 p-4 rounded mb-6 text-sm flex border border-green-100 shadow-sm'><span>{$contactSuccess}</span></div>";
+                }
+                if ($contactError) {
+                    echo "<div class='bg-red-50 justify-between text-red-700 p-4 rounded mb-6 text-sm flex border border-red-100 shadow-sm'><span>{$contactError}</span></div>";
+                }
+                
+                echo "<form action='#{$blockSlug}' method='POST' class='space-y-6'>
+                <input type='hidden' name='contact_submit' value='1'>
+                <div><label class='block text-sm font-medium text-gray-700'>Nome Completo</label><input type='text' name='name' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div>
+                <div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div><label class='block text-sm font-medium text-gray-700'>E-mail</label><input type='email' name='email' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div><label class='block text-sm font-medium text-gray-700'>Telefone</label><input type='tel' name='phone' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div></div>
+                <div><label class='block text-sm font-medium text-gray-700'>Mensagem</label><textarea required name='message' rows='4' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></textarea></div>
+                <div class='text-center md:text-left'><button type='submit' class='inline-block w-auto text-white font-bold py-3 px-10 {$btnRadiusClass} shadow focus:outline-none transition hover:opacity-90' style='background-color: var(--color-primary);'>" . $btnText . "</button></div></form></div></div></section>";
                 break;
             case 'footer':
                 $footerPhoneHtml = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "flex items-center justify-center text-white opacity-90 font-medium hover:opacity-100 transition mt-4");

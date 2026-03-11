@@ -19,6 +19,16 @@ function render_dashboard_header($title = "Dashboard") {
             }
         }
     }
+
+    $unreadContactsCount = 0;
+    if ($currentSiteId) {
+        try {
+            $unreadResult = db_fetch_one("SELECT COUNT(*) as total FROM site_contacts WHERE site_id = :sid AND status = 'new'", [':sid' => $currentSiteId]);
+            $unreadContactsCount = (int)($unreadResult['total'] ?? 0);
+        } catch (\PDOException $e) {
+            // Tabela pode não existir
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -78,7 +88,7 @@ function render_dashboard_header($title = "Dashboard") {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex space-x-8 h-12 items-center text-sm font-medium text-gray-700 relative">
                     <?php if ($currentSiteId): ?>
-                        <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= (strpos($_SERVER['REQUEST_URI'], '/content') === false && strpos($_SERVER['REQUEST_URI'], '/site_settings') === false) ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
+                        <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= (strpos($_SERVER['REQUEST_URI'], '/content') === false && strpos($_SERVER['REQUEST_URI'], '/site_settings') === false && strpos($_SERVER['REQUEST_URI'], '/contacts') === false) ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
                             Início
                         </a>
                         <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/content') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
@@ -92,6 +102,14 @@ function render_dashboard_header($title = "Dashboard") {
                         </button>
                         <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/site_settings') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
                             Configurações
+                        </a>
+                        <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/contacts') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition gap-2">
+                            Contatos
+                            <?php if ($unreadContactsCount > 0): ?>
+                                <span class="flex-shrink-0 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                                    <?= $unreadContactsCount > 9 ? '9+' : $unreadContactsCount ?>
+                                </span>
+                            <?php endif; ?>
                         </a>
                         
                         <div class="flex-1 flex justify-end">
