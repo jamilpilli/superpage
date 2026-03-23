@@ -4,13 +4,13 @@
 function render_dashboard_header($title = "Dashboard") {
     global $currentSite; // Armazenar o site atual
     $user = get_logged_user();
-    
+
     // Buscar sites ativos do usuário para popular o dropdown
     $sites = db_fetch_all("SELECT id, slug, domain, design FROM sites WHERE user_id = :uid AND status != 'inactive' ORDER BY created_at DESC", [':uid' => $user['id']]);
-    
+
     $currentSiteId = isset($_GET['site_id']) ? (int)$_GET['site_id'] : null;
     $currentSite = null;
-    
+
     if ($currentSiteId) {
         foreach ($sites as $s) {
             if ($s['id'] == $currentSiteId) {
@@ -29,9 +29,18 @@ function render_dashboard_header($title = "Dashboard") {
             // Tabela pode não existir
         }
     }
+
+    // Determinar item ativo na sidebar
+    $isContent      = strpos($_SERVER['REQUEST_URI'], '/content') !== false;
+    $isSiteSettings = strpos($_SERVER['REQUEST_URI'], '/site_settings') !== false;
+    $isContacts     = strpos($_SERVER['REQUEST_URI'], '/contacts') !== false;
+    $isHome         = !$isContent && !$isSiteSettings && !$isContacts;
+
+    $navActive   = 'flex items-center gap-3 bg-[#5B4FE9]/20 text-[#a9a4ff] rounded-full px-4 py-2 border-l-4 border-[#5B4FE9] translate-x-1 transition-all duration-200';
+    $navInactive = 'flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-white rounded-full transition-all';
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,269 +48,514 @@ function render_dashboard_header($title = "Dashboard") {
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#757485",
+                        "primary-fixed": "#9a94ff",
+                        "secondary-fixed-dim": "#d5b6ff",
+                        "tertiary-fixed-dim": "#ef7dba",
+                        "surface-variant": "#242437",
+                        "surface-tint": "#a9a4ff",
+                        "secondary-fixed": "#e0c7ff",
+                        "secondary-container": "#6107ba",
+                        "surface-container-low": "#121220",
+                        "error-dim": "#d73357",
+                        "tertiary": "#ff98cd",
+                        "tertiary-fixed": "#fe8bc8",
+                        "tertiary-container": "#f885c2",
+                        "on-tertiary-container": "#5a003d",
+                        "primary-container": "#9a94ff",
+                        "on-background": "#e9e6f9",
+                        "surface-container-high": "#1e1e2f",
+                        "primary-dim": "#685ef7",
+                        "inverse-surface": "#fcf8ff",
+                        "surface-bright": "#2a2a3f",
+                        "inverse-on-surface": "#545363",
+                        "secondary": "#b785ff",
+                        "outline-variant": "#474656",
+                        "on-primary-container": "#17007d",
+                        "primary": "#a9a4ff",
+                        "on-error-container": "#ffb2b9",
+                        "on-primary-fixed-variant": "#1e0097",
+                        "background": "#0d0d1a",
+                        "on-surface-variant": "#aba9bb",
+                        "secondary-dim": "#914feb",
+                        "on-secondary-fixed": "#490090",
+                        "on-secondary-container": "#dfc6ff",
+                        "on-secondary": "#2f0060",
+                        "surface-container-lowest": "#000000",
+                        "error-container": "#a70138",
+                        "error": "#ff6e84",
+                        "on-primary-fixed": "#000000",
+                        "surface": "#0d0d1a",
+                        "on-surface": "#e9e6f9",
+                        "on-primary": "#20009e",
+                        "primary-fixed-dim": "#8b84ff",
+                        "surface-container-highest": "#242437",
+                        "on-tertiary-fixed-variant": "#6d104c",
+                        "on-tertiary-fixed": "#360023",
+                        "on-error": "#490013",
+                        "surface-dim": "#0d0d1a",
+                        "on-secondary-fixed-variant": "#6b1fc4",
+                        "surface-container": "#181828",
+                        "inverse-primary": "#5245e0",
+                        "on-tertiary": "#690c49",
+                        "tertiary-dim": "#e878b5"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0d0d1a;
+            color: #e9e6f9;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(36, 36, 55, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="min-h-screen flex flex-col" x-data="{ siteMenuOpen: false }">
-        
-        <!-- Header Principal -->
-        <nav class="bg-indigo-600 shadow border-b border-indigo-700 relative z-40">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center space-x-6">
-                        <a href="<?= BASE_URL ?>/dashboard" class="flex-shrink-0 flex items-center">
-                            <span class="text-white font-bold text-xl"><?= APP_NAME ?> painel</span>
-                        </a>
-                        
-                        <!-- Dropdown Meus Sites -->
-                        <div class="relative">
-                            <button @click="siteMenuOpen = !siteMenuOpen" @click.away="siteMenuOpen = false" class="text-indigo-100 hover:text-white flex items-center space-x-1 focus:outline-none font-medium text-sm transition">
-                                <span class="max-w-xs truncate"><?= $currentSite ? htmlspecialchars($currentSite['domain'] ?: $currentSite['slug']) : 'Meus Sites' ?></span>
-                                <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': siteMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
-                            
-                            <div x-show="siteMenuOpen" style="display: none;" class="origin-top-left absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 z-50">
-                                <a href="<?= BASE_URL ?>/dashboard/create_site" class="block px-4 py-3 text-sm text-indigo-700 font-bold border-b border-gray-100 hover:bg-indigo-50 transition">
-                                    + Novo Site
-                                </a>
-                                <?php foreach ($sites as $site): ?>
-                                    <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $site['id'] ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-700 transition <?= $currentSiteId == $site['id'] ? 'bg-gray-50 font-bold border-l-2 border-indigo-600 text-indigo-700' : '' ?>">
-                                        <?= htmlspecialchars($site['domain'] ?: $site['slug'] . ' .superpage') ?>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-indigo-100 text-sm hidden md:inline-block border-r border-indigo-500 pr-4 mr-1 lg:pr-6 lg:mr-2">Olá, <?= htmlspecialchars($user['name']) ?></span>
-                        <a href="<?= BASE_URL ?>/dashboard/settings" class="text-white hover:text-indigo-200 text-sm font-medium transition">Minha Conta</a>
-                        <?php if ($user['role'] === 'admin'): ?>
-                            <a href="<?= BASE_URL ?>/hub" class="text-indigo-200 hover:text-white text-sm font-bold transition whitespace-nowrap ml-4">HUB</a>
-                        <?php endif; ?>
-                        <a href="<?= BASE_URL ?>/auth/logout" class="text-white hover:text-indigo-200 text-sm font-medium border border-transparent hover:border-indigo-400 px-3 py-1 rounded transition ml-2">Sair</a>
-                    </div>
+<body class="dark overflow-x-hidden" x-data="{ siteMenuOpen: false }">
+
+    <!-- Sidebar fixa — visível apenas em desktop -->
+    <nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
+        <div class="mb-8 px-4">
+            <a href="<?= BASE_URL ?>/dashboard" class="block">
+                <h1 class="text-lg font-bold text-[#a9a4ff] font-headline"><?= APP_NAME ?></h1>
+                <p class="text-xs text-slate-400">Client Panel</p>
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <?php if ($currentSiteId): ?>
+                <!-- Home -->
+                <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSiteId ?>" class="<?= $isHome ? $navActive : $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">home</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Home</span>
+                </a>
+                <!-- Edit Content -->
+                <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSiteId ?>" class="<?= $isContent ? $navActive : $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">edit_note</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Content</span>
+                </a>
+                <!-- Edit Design -->
+                <button type="button" @click="$dispatch('open-design-modal')" class="<?= $navInactive ?> w-full text-left">
+                    <span class="material-symbols-outlined text-xl">palette</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Design</span>
+                </button>
+                <!-- Edit Structure -->
+                <button type="button" @click="$dispatch('open-structure-modal')" class="<?= $navInactive ?> w-full text-left">
+                    <span class="material-symbols-outlined text-xl">account_tree</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Structure</span>
+                </button>
+                <!-- Settings -->
+                <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $currentSiteId ?>" class="<?= $isSiteSettings ? $navActive : $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">settings</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Settings</span>
+                </a>
+                <!-- Contacts + badge -->
+                <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>" class="<?= $isContacts ? $navActive : $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">contacts</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Contacts</span>
+                    <?php if ($unreadContactsCount > 0): ?>
+                        <span class="ml-auto flex-shrink-0 min-w-[20px] h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 animate-pulse">
+                            <?= $unreadContactsCount > 9 ? '9+' : $unreadContactsCount ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+                <!-- Preview Site -->
+                <a href="<?= BASE_URL ?>/<?= $currentSite['slug'] ?>?preview=true" target="_blank" class="<?= $navInactive ?> mt-2">
+                    <span class="material-symbols-outlined text-xl">open_in_new</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Preview Site</span>
+                </a>
+            <?php else: ?>
+                <!-- Sem site seleccionado: links gerais -->
+                <a href="<?= BASE_URL ?>/dashboard" class="<?= $isHome ? $navActive : $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">grid_view</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">My Sites</span>
+                </a>
+                <a href="<?= BASE_URL ?>/dashboard/create_site" class="<?= $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">add_circle</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Create New Site</span>
+                </a>
+                <a href="<?= BASE_URL ?>/dashboard/settings" class="<?= $navInactive ?>">
+                    <span class="material-symbols-outlined text-xl">account_circle</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">My Account</span>
+                </a>
+            <?php endif; ?>
+        </div>
+
+        <!-- Perfil + links de sistema no rodapé da sidebar -->
+        <div class="mt-auto px-4 space-y-2">
+            <div class="flex items-center gap-3 p-3 bg-[#181828] rounded-xl">
+                <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/30 flex items-center justify-center text-[#a9a4ff] font-bold text-sm flex-shrink-0">
+                    <?= strtoupper(substr($user['name'], 0, 1)) ?>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-white truncate"><?= htmlspecialchars($user['name']) ?></p>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><?= htmlspecialchars($user['role']) ?></p>
                 </div>
             </div>
-        </nav>
+            <?php if ($user['role'] === 'admin'): ?>
+                <a href="<?= BASE_URL ?>/hub" class="flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-[#a9a4ff] rounded-full transition-all">
+                    <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
+                    <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Hub Admin</span>
+                </a>
+            <?php endif; ?>
+            <a href="<?= BASE_URL ?>/auth/logout" class="flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-white rounded-full transition-all">
+                <span class="material-symbols-outlined text-xl">logout</span>
+                <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Sign Out</span>
+            </a>
+        </div>
+    </nav>
 
-        <!-- Submenu Funcional de Edição -->
-        <div class="bg-white shadow relative z-30">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex space-x-8 h-12 items-center text-sm font-medium text-gray-700 relative">
-                    <?php if ($currentSiteId): ?>
-                        <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= (strpos($_SERVER['REQUEST_URI'], '/content') === false && strpos($_SERVER['REQUEST_URI'], '/site_settings') === false && strpos($_SERVER['REQUEST_URI'], '/contacts') === false) ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
-                            Início
-                        </a>
-                        <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/content') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
-                            Editar Conteúdo
-                        </a>
-                        <button type="button" @click="$dispatch('open-design-modal')" class="hover:text-indigo-600 border-b-2 border-transparent h-full flex items-center transition">
-                            Editar Design
-                        </button>
-                        <button type="button" @click="$dispatch('open-structure-modal')" class="hover:text-indigo-600 border-b-2 border-transparent h-full flex items-center transition">
-                            Editar Estrutura
-                        </button>
-                        <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/site_settings') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition">
-                            Configurações
-                        </a>
-                        <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>" class="hover:text-indigo-600 <?= strpos($_SERVER['REQUEST_URI'], '/contacts') !== false ? 'text-indigo-600 border-b-2 border-indigo-600' : 'border-b-2 border-transparent' ?> h-full flex items-center transition gap-2">
-                            Contatos
-                            <?php if ($unreadContactsCount > 0): ?>
-                                <span class="flex-shrink-0 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                                    <?= $unreadContactsCount > 9 ? '9+' : $unreadContactsCount ?>
-                                </span>
+    <!-- Topbar sticky com backdrop-blur -->
+    <header class="flex justify-between items-center w-full px-4 sm:px-6 h-16 sticky top-0 z-50 backdrop-blur-xl bg-[#0d0d1a]/80 shadow-[0_4px_30px_rgba(169,164,255,0.06)] border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <!-- Logo -->
+            <a href="<?= BASE_URL ?>/dashboard" class="flex-shrink-0">
+                <span class="text-xl font-black text-white tracking-tighter font-headline"><?= APP_NAME ?></span>
+            </a>
+
+            <span class="text-slate-600 font-light select-none hidden sm:inline">|</span>
+
+            <!-- Site selector dropdown -->
+            <div class="relative">
+                <button @click="siteMenuOpen = !siteMenuOpen" @click.away="siteMenuOpen = false"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
+                    <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
+                    <span class="max-w-[120px] sm:max-w-[180px] truncate">
+                        <?= $currentSite ? htmlspecialchars($currentSite['domain'] ?: $currentSite['slug']) : 'Select your page' ?>
+                    </span>
+                    <svg class="w-4 h-4 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': siteMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <div x-show="siteMenuOpen" style="display: none;"
+                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
+                    <a href="<?= BASE_URL ?>/dashboard/create_site"
+                       class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
+                        <span class="material-symbols-outlined text-base" style="font-size:18px">add_circle</span>
+                        New Site
+                    </a>
+                    <?php foreach ($sites as $site): ?>
+                        <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $site['id'] ?>"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition <?= $currentSiteId == $site['id'] ? 'text-[#a9a4ff] font-semibold' : 'text-slate-300' ?>">
+                            <?php if ($currentSiteId == $site['id']): ?>
+                                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:16px">check_circle</span>
+                            <?php else: ?>
+                                <span class="material-symbols-outlined text-slate-600" style="font-size:16px">circle</span>
                             <?php endif; ?>
+                            <?= htmlspecialchars($site['domain'] ?: $site['slug'] . '.superpage') ?>
                         </a>
-                        
-                        <div class="flex-1 flex justify-end">
-                            <a href="<?= BASE_URL ?>/<?= $currentSite['slug'] ?>?preview=true" target="_blank" class="text-indigo-600 hover:text-indigo-800 font-bold ml-6 h-full flex items-center text-xs uppercase tracking-wide">
-                                Visualizar ↗
-                            </a>
-                        </div>
-                    <?php else: ?>
-                        <span class="text-gray-400 italic">Selecione um site no painel superior para ver o menu de edição.</span>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center gap-1 sm:gap-2">
+            <!-- Badge de notificações -->
+            <?php if ($currentSiteId): ?>
+                <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>"
+                   class="relative p-2 hover:bg-white/10 rounded-full transition-all" title="Contacts">
+                    <span class="material-symbols-outlined text-[#a9a4ff]">notifications</span>
+                    <?php if ($unreadContactsCount > 0): ?>
+                        <span class="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 animate-pulse">
+                            <?= $unreadContactsCount > 9 ? '9+' : $unreadContactsCount ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+            <?php endif; ?>
+        </div>
+    </header>
+
+    <!-- Área de conteúdo principal -->
+    <main class="md:ml-64 p-6 lg:p-10 min-h-[calc(100vh-4rem)] pb-24 md:pb-10">
 <?php
     if (isset($_SESSION['flash_success'])) {
-        echo '<div class="bg-green-50 justify-between text-green-700 p-4 rounded mb-6 text-sm flex border border-green-100 shadow-sm max-w-3xl mx-auto"><span>' . $_SESSION['flash_success'] . '</span></div>';
+        echo '<div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-xl mb-6 text-sm flex items-center gap-3 max-w-3xl"><span class="material-symbols-outlined text-xl flex-shrink-0">check_circle</span><span>' . $_SESSION['flash_success'] . '</span></div>';
         unset($_SESSION['flash_success']);
     }
     if (isset($_SESSION['flash_error'])) {
-        echo '<div class="bg-red-50 justify-between text-red-700 p-4 rounded mb-6 text-sm flex border border-red-100 shadow-sm max-w-3xl mx-auto"><span>' . $_SESSION['flash_error'] . '</span></div>';
+        echo '<div class="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-6 text-sm flex items-center gap-3 max-w-3xl"><span class="material-symbols-outlined text-xl flex-shrink-0">error</span><span>' . $_SESSION['flash_error'] . '</span></div>';
         unset($_SESSION['flash_error']);
     }
 }
 
 function render_dashboard_footer() {
     global $currentSite;
+
+    // Re-detectar estado ativo para o bottom nav
+    $isContent      = strpos($_SERVER['REQUEST_URI'], '/content') !== false;
+    $isSiteSettings = strpos($_SERVER['REQUEST_URI'], '/site_settings') !== false;
+    $isContacts     = strpos($_SERVER['REQUEST_URI'], '/contacts') !== false;
+    $isHome         = !$isContent && !$isSiteSettings && !$isContacts;
+
+    $bnActive   = 'flex flex-col items-center gap-0.5 text-[#a9a4ff] text-[10px] font-medium px-3 py-1';
+    $bnInactive = 'flex flex-col items-center gap-0.5 text-slate-500 text-[10px] hover:text-slate-300 transition-colors px-3 py-1';
 ?>
-        </main>
-        
-        <!-- Footer do Dashboard -->
-        <footer class="bg-white border-t border-gray-200 py-4 mt-auto relative z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
-                &copy; <?= date('Y') ?> <?= APP_NAME ?>. Todos os direitos reservados.
-            </div>
-        </footer>
+    </main>
+
+    <!-- Bottom nav mobile -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#121220]/95 backdrop-blur-xl border-t border-white/10 z-50 flex justify-around items-center h-16">
+        <?php if ($currentSite): ?>
+            <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSite['id'] ?>" class="<?= $isHome ? $bnActive : $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span>Home</span>
+            </a>
+            <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?>" class="<?= $isContent ? $bnActive : $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">edit_note</span>
+                <span>Content</span>
+            </a>
+            <button type="button" @click="$dispatch('open-design-modal')" class="<?= $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">palette</span>
+                <span>Design</span>
+            </button>
+            <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSite['id'] ?>" class="<?= $isContacts ? $bnActive : $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">contacts</span>
+                <span>Contacts</span>
+            </a>
+        <?php else: ?>
+            <a href="<?= BASE_URL ?>/dashboard" class="<?= $bnActive ?>">
+                <span class="material-symbols-outlined text-2xl">grid_view</span>
+                <span>My Sites</span>
+            </a>
+            <a href="<?= BASE_URL ?>/dashboard/create_site" class="<?= $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">add_circle</span>
+                <span>New Site</span>
+            </a>
+            <a href="<?= BASE_URL ?>/dashboard/settings" class="<?= $bnInactive ?>">
+                <span class="material-symbols-outlined text-2xl">account_circle</span>
+                <span>Account</span>
+            </a>
+        <?php endif; ?>
+    </nav>
 
         <?php if ($currentSite): ?>
-            <?php 
+            <?php
                 $design = json_decode($currentSite['design'] ?? '{}', true) ?: [];
                 $primaryColor = $design['primary_color'] ?? '#4f46e5';
                 $titleFont = $design['title_font'] ?? 'Inter';
                 $textFont = $design['text_font'] ?? 'Inter';
                 $buttonStyle = $design['button_style'] ?? 'rounded';
             ?>
-            <!-- Modal Editar Design Global -->
-            <div x-data="{ isModalOpen: false, primaryColor: '<?= $primaryColor ?>', titleFont: '<?= $titleFont ?>', textFont: '<?= $textFont ?>', buttonStyle: '<?= $buttonStyle ?>' }" 
+            <!-- Design Modal (Kinetic) -->
+            <div x-data="{
+                     isModalOpen: false,
+                     primaryColor: '<?= $primaryColor ?>',
+                     titleFont: '<?= $titleFont ?>',
+                     textFont: '<?= $textFont ?>',
+                     buttonStyle: '<?= $buttonStyle ?>',
+                     loadFont(font) {
+                         if (!font) return;
+                         const id = 'gf-' + font.replace(/\s+/g, '-');
+                         if (!document.getElementById(id)) {
+                             const link = document.createElement('link');
+                             link.id = id;
+                             link.rel = 'stylesheet';
+                             link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
+                             document.head.appendChild(link);
+                         }
+                     }
+                 }"
+                 x-init="loadFont(titleFont); loadFont(textFont); $watch('titleFont', v => loadFont(v)); $watch('textFont', v => loadFont(v))"
                  @open-design-modal.window="isModalOpen = true">
-                <div x-show="isModalOpen" style="display: none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div x-show="isModalOpen" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="isModalOpen = false"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        <div x-show="isModalOpen" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <form method="POST" action="<?= BASE_URL ?>/dashboard">
-                                <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-                                <input type="hidden" name="action" value="update_design">
-                                <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
-                                <!-- Usamos redirect URL no POST para voltar onde estávamos -->
-                                <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
-                                
-                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <div class="sm:flex sm:items-start">
-                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Aparência do Site</h3>
-                                            <div class="mt-4 space-y-4">
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700">Cor Principal (Botões e Destaques)</label>
-                                                    <div class="mt-1 flex items-center">
-                                                        <input type="color" name="primary_color" x-model="primaryColor" class="h-8 w-8 rounded border border-gray-300 cursor-pointer p-0">
-                                                        <span class="ml-3 text-sm text-gray-500" x-text="primaryColor"></span>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700">Fonte dos Títulos</label>
-                                                    <select name="title_font" x-model="titleFont" class="mt-1 block w-full pl-3 pr-10 py-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border text-gray-900 bg-white">
-                                                        <option value="Inter">Inter</option>
-                                                        <option value="Roboto">Roboto</option>
-                                                        <option value="Playfair Display">Playfair Display</option>
-                                                        <option value="Montserrat">Montserrat</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700">Fonte do Texto Geral</label>
-                                                    <select name="text_font" x-model="textFont" class="mt-1 block w-full pl-3 pr-10 py-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border text-gray-900 bg-white">
-                                                        <option value="Inter">Inter</option>
-                                                        <option value="Roboto">Roboto</option>
-                                                        <option value="Open Sans">Open Sans</option>
-                                                        <option value="Lato">Lato</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700">Formato dos Botões</label>
-                                                    <select name="button_style" x-model="buttonStyle" class="mt-1 block w-full pl-3 pr-10 py-2 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border text-gray-900 bg-white">
-                                                        <option value="square">Quadrado</option>
-                                                        <option value="rounded">Levemente Arredondado</option>
-                                                        <option value="rounded-full">Totalmente Arredondado (Pílula)</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                <div x-show="isModalOpen" style="display: none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
+                    <div x-show="isModalOpen" class="fixed inset-0" @click="isModalOpen = false"></div>
+
+                    <div class="relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#F4F5F7]">
+                        <form method="POST" action="<?= BASE_URL ?>/dashboard">
+                            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+                            <input type="hidden" name="action" value="update_design">
+                            <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
+                            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+
+                            <!-- Modal Header -->
+                            <div class="px-8 py-6 bg-white flex justify-between items-center border-b border-gray-100">
+                                <div>
+                                    <h2 class="text-2xl font-extrabold text-[#0d0d1a] font-headline tracking-tight">Site Appearance</h2>
+                                    <p class="text-sm text-gray-500 mt-0.5">Customise your site's visual identity</p>
+                                </div>
+                                <button type="button" @click="isModalOpen = false" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors text-xl leading-none font-bold">✕</button>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="p-8 space-y-8">
+                                <!-- Row 1: Color + Button Style -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Primary Colour</label>
+                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200">
+                                            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0" :style="'background:' + primaryColor"></div>
+                                            <input type="color" name="primary_color" x-model="primaryColor" class="sr-only" id="colorPicker">
+                                            <label for="colorPicker" class="flex-1 font-mono text-sm text-gray-700 cursor-pointer" x-text="primaryColor"></label>
+                                            <span class="material-symbols-outlined text-gray-400 cursor-pointer" style="font-size:20px" onclick="document.getElementById('colorPicker').click()">colorize</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Button Style</label>
+                                        <div class="relative">
+                                            <select name="button_style" x-model="buttonStyle"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="square">Square</option>
+                                                <option value="rounded">Slightly Rounded</option>
+                                                <option value="rounded-full">Pill (Fully Rounded)</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-200">
-                                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition">Salvar Alterações</button>
-                                    <button type="button" @click="isModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition">Cancelar</button>
+
+                                <!-- Row 2: Fonts -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Heading Font</label>
+                                        <div class="relative">
+                                            <select name="title_font" x-model="titleFont"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                                                <option value="Montserrat">Montserrat</option>
+                                                <option value="Playfair Display">Playfair Display</option>
+                                                <option value="Inter">Inter</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Body Font</label>
+                                        <div class="relative">
+                                            <select name="text_font" x-model="textFont"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="Inter">Inter</option>
+                                                <option value="Roboto">Roboto</option>
+                                                <option value="Open Sans">Open Sans</option>
+                                                <option value="Manrope">Manrope</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
+
+                                <!-- Live Preview -->
+                                <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
+                                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
+                                    <h4 class="text-xl font-extrabold text-[#121220]" :style="'font-family:' + titleFont">Sample Headline</h4>
+                                    <p class="text-sm text-gray-500 leading-relaxed" :style="'font-family:' + textFont">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
+                                    <button type="button" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
+                                            :style="'background:' + primaryColor + '; border-radius:' + (buttonStyle === 'rounded-full' ? '9999px' : buttonStyle === 'rounded' ? '8px' : '2px') + '; font-family:' + titleFont">
+                                        Action Button
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="px-8 py-5 bg-white flex justify-end items-center gap-3 border-t border-gray-100">
+                                <button type="button" @click="isModalOpen = false"
+                                        class="px-6 py-2.5 rounded-full text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                        class="px-8 py-2.5 rounded-full bg-[#5B4FE9] text-white font-bold text-sm shadow-lg shadow-[#5B4FE9]/25 hover:bg-[#4a3ecc] transition-all active:scale-95">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Editar Estrutura Global -->
+            <!-- Structure Modal -->
             <?php $page = db_fetch_one("SELECT id FROM pages WHERE site_id = :sid AND status = 'published' LIMIT 1", [':sid' => $currentSite['id']]); ?>
-            <div x-data="{ isStructOpen: false }" 
+            <div x-data="{ isStructOpen: false }"
                  @open-structure-modal.window="isStructOpen = true">
                 <div x-show="isStructOpen" style="display: none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <!-- Overlay background -->
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div x-show="isStructOpen" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="isStructOpen = false"></div>
+                        <div x-show="isStructOpen" class="fixed inset-0 bg-black/60 transition-opacity" @click="isStructOpen = false"></div>
                         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        
-                        <!-- Panel Modal Ocupando boa parte da tela -->
+
                         <div x-show="isStructOpen" class="inline-block align-bottom bg-gray-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
-                            
+
                             <div class="bg-white px-4 py-3 border-b flex justify-between items-center z-10 relative">
-                                <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Estrutura do Site</h3>
+                                <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Site Structure</h3>
                                 <button type="button" @click="isStructOpen = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
                             </div>
-                            
-                            <!-- App Alpine de Gestão de Blocos (Portado) -->
+
                             <div x-data="editorApp(<?= $currentSite['id'] ?>, <?= $page['id'] ?? 0 ?>)" class="bg-gray-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[70vh] overflow-y-auto flex flex-col relative">
-                                
+
                                 <div class="flex justify-between items-center mb-4">
-                                    <p class="text-sm text-gray-500">Selecione as seções desejadas e arraste para alterar a ordem no site.</p>
-                                    <span x-show="isSaving" class="text-xs px-2 py-1 text-indigo-700 bg-indigo-50 font-bold rounded-full animate-pulse">Salvando...</span>
+                                    <p class="text-sm text-gray-500">Toggle sections on or off and drag to reorder them on your site.</p>
+                                    <span x-show="isSaving" class="text-xs px-2 py-1 text-indigo-700 bg-indigo-50 font-bold rounded-full animate-pulse">Saving...</span>
                                 </div>
-                                
+
                                 <div class="flex-1 w-full" id="blocks-list">
                                     <template x-for="(item, index) in availableTypes" :key="item.type">
                                         <div class="p-4 mb-2 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center justify-between group hover:border-indigo-400 cursor-move" :data-type="item.type">
-                                            
+
                                             <div class="flex items-center flex-1">
-                                                <span class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Arrastar">↕</span>
+                                                <span class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Drag to reorder">↕</span>
                                                 <div class="flex-1 cursor-pointer" @click="toggleBlock(item.type)">
                                                     <span class="font-bold text-gray-900 block text-sm" x-text="item.label"></span>
                                                     <span class="text-xs text-gray-500" x-text="item.desc"></span>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="ml-4 flex items-center gap-3">
-                                                <!-- Botão de Edição (Só exibe se estiver ativo) -->
-                                                <a x-show="isBlockActive(item.type)" :href="'<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?? 0 ?>&block_type=' + item.type" class="text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-1.5 rounded transition">Editar Conteúdo</a>
-                                                
-                                                <!-- Custom Toggler -->
+                                                <a x-show="isBlockActive(item.type)" :href="'<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?? 0 ?>&block_type=' + item.type" class="text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-1.5 rounded transition">Edit Content</a>
+
                                                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
                                                     <input type="checkbox" class="sr-only peer" :checked="isBlockActive(item.type)" @change="toggleBlock(item.type)">
                                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                                 </label>
                                             </div>
-                                            
+
                                         </div>
                                     </template>
                                 </div>
                             </div>
-                            <!-- Fim do Alpine App Estrutura -->
 
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Scripts Alpine.js do Modal de Blocos -->
+            <!-- Alpine.js editorApp -->
             <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.data('editorApp', (siteId, pageId) => ({
                     siteId: siteId,
                     pageId: pageId,
-                    blocks: [], // blocos vindos do banco
+                    blocks: [],
                     availableTypes: [
-                        { type: 'header', label: 'Cabeçalho (Menu)', desc: 'Menu de navegação no topo com logo.' },
-                        { type: 'hero', label: 'Capa / Banner Principal', desc: 'Slider com título principal de impacto.' },
-                        { type: 'about', label: 'Sobre Nós', desc: 'Descrição em texto com imagem lateral.' },
-                        { type: 'services', label: 'Serviços', desc: 'Grid de tópicos de serviços.' },
-                        { type: 'products', label: 'Produtos', desc: 'Vitrine de itens/produtos em cards.' },
-                        { type: 'gallery', label: 'Galeria de Fotos', desc: 'Grade de fotos arrastar e soltar.' },
-                        { type: 'videos', label: 'Vídeos', desc: 'Vídeos do YouTube.' },
-                        { type: 'testimonials', label: 'Depoimentos', desc: 'Citações e provas sociais.' },
-                        { type: 'contact', label: 'Contato', desc: 'Formulário de e-mail e dados.' },
-                        { type: 'footer', label: 'Rodapé', desc: 'Faixa inferior de encerramento.' }
+                        { type: 'header',       label: 'Header (Navigation)',    desc: 'Top navigation bar with logo.' },
+                        { type: 'hero',         label: 'Hero / Main Banner',     desc: 'Full-width banner with headline.' },
+                        { type: 'about',        label: 'About Us',               desc: 'Text description with side image.' },
+                        { type: 'services',     label: 'Services',               desc: 'Grid of service highlights.' },
+                        { type: 'products',     label: 'Products',               desc: 'Product showcase cards.' },
+                        { type: 'gallery',      label: 'Photo Gallery',          desc: 'Drag-and-drop photo grid.' },
+                        { type: 'videos',       label: 'Videos',                 desc: 'Embedded YouTube videos.' },
+                        { type: 'testimonials', label: 'Testimonials',           desc: 'Quotes and social proof.' },
+                        { type: 'contact',      label: 'Contact',                desc: 'Email form and contact details.' },
+                        { type: 'footer',       label: 'Footer',                 desc: 'Bottom closing section.' }
                     ],
                     isSaving: false,
                     sortableInstance: null,
@@ -313,19 +567,16 @@ function render_dashboard_footer() {
                     async fetchBlocks() {
                         try {
                             const res = await fetch(`<?= BASE_URL ?>/api/blocks?page_id=${this.pageId}`);
-                            if (!res.ok) throw new Error('Falha ao carregar blocos');
+                            if (!res.ok) throw new Error('Failed to load blocks');
                             const json = await res.json();
                             this.blocks = json.data || [];
-                            
-                            // Reordenar visually o `availableTypes` based no sort_order vindos do banco
+
                             if (this.blocks.length > 0) {
                                 const orderedTypes = [];
-                                // Primeiro os que já estão no banco, na ordem do banco
                                 this.blocks.forEach(b => {
                                     const match = this.availableTypes.find(t => t.type === b.type);
                                     if(match) orderedTypes.push(match);
                                 });
-                                // Depois os que sobram da lista disponível (desligados), ficam pro final
                                 this.availableTypes.forEach(t => {
                                     if(!orderedTypes.find(o => o.type === t.type)) {
                                         orderedTypes.push(t);
@@ -333,7 +584,7 @@ function render_dashboard_footer() {
                                 });
                                 this.availableTypes = orderedTypes;
                             }
-                            
+
                             this.$nextTick(() => {
                                 this.initSortable();
                             });
@@ -352,7 +603,6 @@ function render_dashboard_footer() {
 
                         try {
                             if (existingBlock && existingBlock.config?.is_active !== false) {
-                                // Desativar (Soft Delete)
                                 const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
                                     method: 'DELETE',
                                     headers: { 'Content-Type': 'application/json' },
@@ -364,7 +614,6 @@ function render_dashboard_footer() {
                                     this.evaluateFullReorder();
                                 }
                             } else if (existingBlock && existingBlock.config?.is_active === false) {
-                                // Reativar
                                 existingBlock.config.is_active = true;
                                 const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
                                     method: 'PUT',
@@ -374,11 +623,10 @@ function render_dashboard_footer() {
                                 if (res.ok) {
                                     this.evaluateFullReorder();
                                 } else {
-                                    existingBlock.config.is_active = false; // rollback
-                                    alert('Erro ao reativar bloco');
+                                    existingBlock.config.is_active = false;
+                                    alert('Error reactivating block');
                                 }
                             } else {
-                                // Adicionar novo cenário se não existir nada nem inativo
                                 const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
@@ -386,7 +634,7 @@ function render_dashboard_footer() {
                                 });
                                 const json = await res.json();
                                 if (json.success) {
-                                    await this.fetchBlocks(); 
+                                    await this.fetchBlocks();
                                 } else {
                                     alert(json.error);
                                 }
@@ -401,7 +649,7 @@ function render_dashboard_footer() {
                         if (this.sortableInstance) {
                             this.sortableInstance.destroy();
                         }
-                        
+
                         const el = document.getElementById('blocks-list');
                         if (el) {
                             this.sortableInstance = new Sortable(el, {
@@ -409,31 +657,29 @@ function render_dashboard_footer() {
                                 ghostClass: 'bg-indigo-50',
                                 handle: '.cursor-move',
                                 onEnd: (evt) => {
-                                    // Lê a nova ordem do DOM html e grava no banco somente os que estão ATIVOS (em blocks)
                                     this.evaluateFullReorder();
                                 }
                             });
                         }
                     },
-                    
+
                     async evaluateFullReorder() {
                         const el = document.getElementById('blocks-list');
                         if(!el) return;
-                        
+
                         const listItems = Array.from(el.children);
                         const newOrder = [];
                         let virtualIndex = 0;
-                        
+
                         listItems.forEach((item) => {
                             const domType = item.getAttribute('data-type');
-                            // Procura na memoria see type está ativo
                             const memBlock = this.blocks.find(b => b.type === domType);
                             if (memBlock) {
                                 newOrder.push({ id: memBlock.id, sort_order: virtualIndex });
                                 virtualIndex++;
                             }
                         });
-                        
+
                         if(newOrder.length > 0) {
                             await this.saveReorder(newOrder);
                         }
@@ -447,11 +693,8 @@ function render_dashboard_footer() {
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ action: 'reorder', page_id: this.pageId, blocks: newOrderArray })
                             });
-                            if (res.ok) {
-                                // success stealth
-                            }
                         } catch (e) {
-                            console.error("Erro ao reordenar", e);
+                            console.error('Reorder error', e);
                         }
                         this.isSaving = false;
                     }
@@ -459,7 +702,6 @@ function render_dashboard_footer() {
             });
             </script>
         <?php endif; ?>
-    </div>
 </body>
 </html>
 <?php

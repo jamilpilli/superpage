@@ -24,87 +24,83 @@ $recentLogs = db_fetch_all("
     ORDER BY h.created_at DESC LIMIT 10
 ");
 
-render_hub_header("Visão Geral do Sistema");
+render_hub_header("System Overview");
 ?>
 
-<!-- Cards KPI -->
-<div class="mt-4 pb-8">
-    <dl class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="relative bg-white pt-5 px-4 pb-6 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden border-t-4 border-indigo-500">
-            <dt>
-                <div class="absolute bg-indigo-500 rounded-md p-3">
-                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                </div>
-                <p class="ml-16 text-sm font-medium text-gray-500 truncate">Clientes Ativos</p>
-            </dt>
-            <dd class="ml-16 pb-2 flex items-baseline sm:pb-3">
-                <p class="text-2xl font-bold text-gray-900"><?= number_format($stats['users']) ?></p>
-            </dd>
+<div class="flex flex-col gap-8 max-w-6xl">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span class="material-symbols-outlined text-6xl">group</span>
+            </div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Active Clients</p>
+            <p class="text-3xl font-bold text-white"><?= number_format($stats['users']) ?></p>
         </div>
 
-        <div class="relative bg-white pt-5 px-4 pb-6 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden border-t-4 border-green-500">
-            <dt>
-                <div class="absolute bg-green-500 rounded-md p-3">
-                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                </div>
-                <p class="ml-16 text-sm font-medium text-gray-500 truncate">Sites Publicados</p>
-            </dt>
-            <dd class="ml-16 pb-2 flex items-baseline sm:pb-3">
-                <p class="text-2xl font-bold text-gray-900"><?= number_format($stats['sites_active']) ?></p>
-            </dd>
+        <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span class="material-symbols-outlined text-6xl">language</span>
+            </div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Published Sites</p>
+            <p class="text-3xl font-bold text-white"><?= number_format($stats['sites_active']) ?></p>
         </div>
 
-        <div class="relative bg-white pt-5 px-4 pb-6 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden border-t-4 border-yellow-500">
-            <dt>
-                <div class="absolute bg-yellow-500 rounded-md p-3">
-                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                </div>
-                <p class="ml-16 text-sm font-medium text-gray-500 truncate">Parceiros Vips</p>
-            </dt>
-            <dd class="ml-16 pb-2 flex items-baseline sm:pb-3">
-                <p class="text-2xl font-bold text-gray-900"><?= number_format($stats['partners']) ?></p>
-            </dd>
+        <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span class="material-symbols-outlined text-6xl">handshake</span>
+            </div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">VIP Partners</p>
+            <p class="text-3xl font-bold text-white"><?= number_format($stats['partners']) ?></p>
         </div>
 
-        <div class="relative bg-white pt-5 px-4 pb-6 sm:pt-6 sm:px-6 shadow rounded-lg overflow-hidden border-t-4 border-purple-500">
-            <dt>
-                <div class="absolute bg-purple-500 rounded-md p-3">
-                    <span class="text-white font-black text-xl leading-none inline-block pb-1 pl-1">$</span>
-                </div>
-                <p class="ml-16 text-sm font-medium text-gray-500 truncate">MRR Previsto (Mes)</p>
-            </dt>
-            <dd class="ml-16 pb-2 flex items-baseline sm:pb-3">
-                <p class="text-2xl font-bold text-gray-900">R$ <?= number_format((float)$stats['mrr'], 2, ',', '.') ?></p>
-            </dd>
+        <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span class="material-symbols-outlined text-6xl">payments</span>
+            </div>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Projected MRR</p>
+            <p class="text-3xl font-bold text-white">£<?= number_format((float)$stats['mrr'], 2) ?></p>
         </div>
-    </dl>
-</div>
 
-<!-- Logs Recentes -->
-<div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">Logs de Auditoria do HUB</h3>
-        <p class="mt-1 max-w-2xl text-sm text-gray-500">Últimas 10 ações tomadas por administradores.</p>
     </div>
-    <ul class="divide-y divide-gray-200">
-        <?php if (empty($recentLogs)): ?>
-            <li class="px-4 py-8 text-center text-sm text-gray-500">Nenhum evento registrado.</li>
-        <?php endif; ?>
-        
-        <?php foreach ($recentLogs as $log): ?>
-        <li class="px-4 py-4 sm:px-6 flex justify-between items-center hover:bg-gray-50">
+
+    <!-- Audit Logs -->
+    <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">history</span>
+            </div>
             <div>
-                <p class="text-sm font-medium text-indigo-600 truncate"><?= htmlspecialchars($log['action_type']) ?></p>
-                <p class="mt-1 flex items-center text-sm text-gray-500 border-l-[3px] border-gray-300 pl-2">
-                    <span class="truncate">Efetuado por <?= htmlspecialchars($log['admin_name']) ?> no objeto #<?= $log['entity_id'] ?> (<?= htmlspecialchars($log['entity_type']) ?>)</span>
-                </p>
+                <h3 class="text-base font-bold text-white font-headline">HUB Audit Log</h3>
+                <p class="text-xs text-slate-500">Last 10 actions taken by administrators.</p>
             </div>
-            <div class="ml-2 flex-shrink-0 flex text-xs text-gray-400">
-                <?= date('d/m/Y H:i', strtotime($log['created_at'])) ?>
+        </div>
+
+        <?php if (empty($recentLogs)): ?>
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <span class="material-symbols-outlined text-4xl text-slate-700 mb-3">history</span>
+                <p class="text-sm text-slate-500">No events recorded yet.</p>
             </div>
-        </li>
-        <?php endforeach; ?>
-    </ul>
+        <?php else: ?>
+            <ul class="divide-y divide-white/5">
+                <?php foreach ($recentLogs as $log): ?>
+                <li class="px-6 py-4 flex items-center justify-between gap-4 hover:bg-white/2 transition-colors">
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-[#a9a4ff] truncate"><?= htmlspecialchars($log['action_type']) ?></p>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            By <span class="text-slate-300"><?= htmlspecialchars($log['admin_name']) ?></span>
+                            — entity #<?= $log['entity_id'] ?> (<?= htmlspecialchars($log['entity_type']) ?>)
+                        </p>
+                    </div>
+                    <span class="text-xs text-slate-600 flex-shrink-0"><?= date('d M Y, H:i', strtotime($log['created_at'])) ?></span>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+
 </div>
 
 <?php render_hub_footer(); ?>

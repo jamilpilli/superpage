@@ -1,13 +1,29 @@
+# Ambiente
 .env
-superpage.sql
+*.sql.bak
+
+# Ficheiros de planeamento locais
 plan.md
 superpage_stack.md
+superpage.sql
 
-# Application folders
+# Pastas geradas / dados locais
 cache/
 logs/
 uploads/
+mysql-8.4/
+layouts/
 
-# System files
+# Sistema
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# IDE / editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code (configuração local — não é código do projecto)
+.claude/

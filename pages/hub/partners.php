@@ -48,78 +48,115 @@ $sql .= " ORDER BY u.created_at DESC";
 $users = db_fetch_all($sql);
 $csrf_token = generate_csrf_token();
 
-render_hub_header("Gestão de Parceiros Comerciais");
+render_hub_header("Partners Management");
 ?>
 
-<div class="mb-4 flex justify-between items-center">
-    <p class="text-sm text-gray-600">
-        Parceiros têm acesso a descontos na renovação de múltiplos sites.
-    </p>
-    <div>
+<div class="max-w-6xl flex flex-col gap-6">
+
+    <!-- Header actions -->
+    <div class="flex items-center justify-between gap-4">
+        <p class="text-sm text-slate-400">Partners receive discounts on multi-site renewals.</p>
         <?php if ($onlyPartners): ?>
-            <a href="?full=1" class="text-sm bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded shadow-sm hover:bg-gray-50">Mostrar Todos Clientes p/ Elevar</a>
+            <a href="?full=1"
+               class="flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full bg-[#181828] border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 transition-all">
+                <span class="material-symbols-outlined" style="font-size:16px">group</span>
+                Show All Clients
+            </a>
         <?php else: ?>
-            <a href="?" class="text-sm bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded shadow-sm hover:bg-gray-50">Mostrar Somente Parceiros</a>
+            <a href="?"
+               class="flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full bg-[#a9a4ff]/10 border border-[#a9a4ff]/20 text-[#a9a4ff] hover:bg-[#a9a4ff]/20 transition-all">
+                <span class="material-symbols-outlined" style="font-size:16px">handshake</span>
+                Show Partners Only
+            </a>
         <?php endif; ?>
     </div>
-</div>
 
-<?php if (isset($_SESSION['hub_msg'])): ?>
-    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
-        <p class="text-sm text-green-700"><?= $_SESSION['hub_msg'] ?></p>
-        <?php unset($_SESSION['hub_msg']); ?>
+    <?php if (isset($_SESSION['hub_msg'])): ?>
+        <div class="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+            <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px">check_circle</span>
+            <?= htmlspecialchars($_SESSION['hub_msg']) ?>
+            <?php unset($_SESSION['hub_msg']); ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- Partners table -->
+    <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">handshake</span>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-white font-headline"><?= $onlyPartners ? 'VIP Partners' : 'All Users' ?></h3>
+                <p class="text-xs text-slate-500"><?= count($users) ?> record<?= count($users) !== 1 ? 's' : '' ?> found.</p>
+            </div>
+        </div>
+
+        <?php if (empty($users)): ?>
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <span class="material-symbols-outlined text-4xl text-slate-700 mb-3">handshake</span>
+                <p class="text-sm text-slate-500">No partners found.</p>
+            </div>
+        <?php else: ?>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-white/5">
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sites</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <?php foreach ($users as $u): ?>
+                        <tr class="hover:bg-white/2 transition-colors">
+                            <td class="px-6 py-4">
+                                <p class="text-sm font-bold text-white"><?= htmlspecialchars($u['name']) ?></p>
+                                <p class="text-xs text-slate-500"><?= htmlspecialchars($u['email']) ?></p>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-400">
+                                <?= date('d M Y', strtotime($u['created_at'])) ?>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-bold text-white">
+                                <?= $u['sites_count'] ?>
+                            </td>
+                            <td class="px-6 py-4">
+                                <?php if ($u['role'] === 'partner'): ?>
+                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-[#a9a4ff]/10 text-[#a9a4ff]">VIP Partner</span>
+                                <?php else: ?>
+                                    <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-white/5 text-slate-400">Client</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <form method="POST" action="<?= BASE_URL ?>/hub/partners" class="inline">
+                                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                                    <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+
+                                    <?php if ($u['role'] === 'partner'): ?>
+                                        <input type="hidden" name="action" value="revoke_partner">
+                                        <button type="submit"
+                                                onclick="return confirm('Remove partner status?')"
+                                                class="px-4 py-1.5 text-xs font-bold rounded-full bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
+                                            Revoke Partner
+                                        </button>
+                                    <?php else: ?>
+                                        <input type="hidden" name="action" value="make_partner">
+                                        <button type="submit"
+                                                class="px-4 py-1.5 text-xs font-bold rounded-full bg-[#a9a4ff]/10 border border-[#a9a4ff]/20 text-[#a9a4ff] hover:bg-[#a9a4ff]/20 transition-all">
+                                            Make Partner
+                                        </button>
+                                    <?php endif; ?>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
     </div>
-<?php endif; ?>
 
-<div class="bg-white shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cadastro</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume (Sites)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hierarquia</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ação</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-            <?php foreach ($users as $u): ?>
-            <tr class="<?= $u['role'] === 'partner' ? 'bg-yellow-50 bg-opacity-30' : '' ?>">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-bold text-gray-900"><?= htmlspecialchars($u['name']) ?></div>
-                    <div class="text-sm text-gray-500"><?= htmlspecialchars($u['email']) ?></div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <?= date('d/m/Y', strtotime($u['created_at'])) ?>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">
-                    <?= $u['sites_count'] ?> site(s)
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <?php if ($u['role'] === 'partner'): ?>
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">💎 Partner VIP</span>
-                    <?php else: ?>
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Cliente Comum</span>
-                    <?php endif; ?>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <form method="POST" action="<?= BASE_URL ?>/hub/partners" class="inline">
-                        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                        <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                        
-                        <?php if ($u['role'] === 'partner'): ?>
-                            <input type="hidden" name="action" value="revoke_partner">
-                            <button type="submit" class="text-red-600 hover:text-red-900 text-xs" onClick="return confirm('Remover selo de parceria?');">Revogar Partner</button>
-                        <?php else: ?>
-                            <input type="hidden" name="action" value="make_partner">
-                            <button type="submit" class="text-indigo-600 hover:text-indigo-900 border border-indigo-200 px-2 py-1 rounded text-xs">Tornar Partner</button>
-                        <?php endif; ?>
-                    </form>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
 </div>
 
 <?php render_hub_footer(); ?>

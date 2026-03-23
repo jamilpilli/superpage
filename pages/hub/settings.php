@@ -49,58 +49,66 @@ foreach ($allSettings as $s) {
 }
 
 $csrf_token = generate_csrf_token();
-render_hub_header("Configurações Globais");
+render_hub_header("Global Settings");
 ?>
 
-<?php if (isset($_SESSION['hub_msg'])): ?>
-    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 shadow-sm">
-        <p class="text-sm text-green-700 font-bold"><?= $_SESSION['hub_msg'] ?></p>
-        <?php unset($_SESSION['hub_msg']); ?>
-    </div>
-<?php endif; ?>
+<div class="max-w-3xl flex flex-col gap-6">
 
-<form method="POST" action="<?= BASE_URL ?>/hub/settings">
-    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-    
-    <div class="space-y-6">
+    <?php if (isset($_SESSION['hub_msg'])): ?>
+        <div class="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+            <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px">check_circle</span>
+            <?= htmlspecialchars($_SESSION['hub_msg']) ?>
+            <?php unset($_SESSION['hub_msg']); ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="POST" action="<?= BASE_URL ?>/hub/settings" class="flex flex-col gap-6">
+        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+
         <?php foreach ($groupedSettings as $groupLabel => $items): ?>
-        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 mb-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 border-b pb-3 mb-4 text-indigo-700"><?= $groupLabel ?></h3>
-            
-            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
+            <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">tune</span>
+                </div>
+                <h3 class="text-base font-bold text-white font-headline"><?= htmlspecialchars($groupLabel) ?></h3>
+            </div>
+            <div class="p-6 space-y-5">
                 <?php foreach ($items as $item): ?>
-                    <div class="sm:col-span-6">
-                        <label for="set_<?= $item['id'] ?>" class="block text-sm font-medium text-gray-700">
-                            <?= ucwords(str_replace('_', ' ', $item['key_name'])) ?>
-                        </label>
-                        <div class="mt-1 flex rounded-md shadow-sm w-full md:w-1/2">
-                            <?php if ($item['type'] === 'boolean'): ?>
-                                <select name="settings[<?= $item['key_name'] ?>]" id="set_<?= $item['id'] ?>" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <option value="true" <?= $item['key_value'] === 'true' ? 'selected' : '' ?>>Sim / Ativo</option>
-                                    <option value="false" <?= $item['key_value'] === 'false' ? 'selected' : '' ?>>Não / Inativo</option>
-                                </select>
-                            <?php else: ?>
-                                <input type="<?= $item['type'] === 'string' ? 'text' : 'number' ?>" 
-                                       step="<?= $item['type'] === 'integer' ? '1' : '0.01' ?>"
-                                       name="settings[<?= $item['key_name'] ?>]" 
-                                       id="set_<?= $item['id'] ?>" 
-                                       value="<?= htmlspecialchars($item['key_value']) ?>"
-                                       class="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <?php endif; ?>
-                        </div>
-                        <p class="mt-2 text-xs text-gray-500">Chave base: <code class="bg-gray-100 px-1 rounded"><?= $item['key_name'] ?></code></p>
-                    </div>
+                <div class="space-y-1.5">
+                    <label for="set_<?= $item['id'] ?>" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">
+                        <?= ucwords(str_replace('_', ' ', $item['key_name'])) ?>
+                    </label>
+                    <?php if ($item['type'] === 'boolean'): ?>
+                        <select name="settings[<?= $item['key_name'] ?>]" id="set_<?= $item['id'] ?>"
+                                class="w-full bg-[#121220] border-none rounded-xl p-4 text-white text-sm focus:ring-2 focus:ring-[#685ef7]/50 transition-all appearance-none">
+                            <option value="true"  <?= $item['key_value'] === 'true'  ? 'selected' : '' ?>>Yes / Enabled</option>
+                            <option value="false" <?= $item['key_value'] === 'false' ? 'selected' : '' ?>>No / Disabled</option>
+                        </select>
+                    <?php else: ?>
+                        <input type="<?= $item['type'] === 'string' ? 'text' : 'number' ?>"
+                               step="<?= $item['type'] === 'integer' ? '1' : '0.01' ?>"
+                               name="settings[<?= $item['key_name'] ?>]"
+                               id="set_<?= $item['id'] ?>"
+                               value="<?= htmlspecialchars($item['key_value']) ?>"
+                               class="w-full bg-[#121220] border-none rounded-xl p-4 text-white text-sm placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/50 transition-all">
+                    <?php endif; ?>
+                    <p class="text-xs text-slate-600">Key: <code class="bg-white/5 px-1.5 py-0.5 rounded text-slate-400"><?= htmlspecialchars($item['key_name']) ?></code></p>
+                </div>
                 <?php endforeach; ?>
             </div>
         </div>
         <?php endforeach; ?>
-    </div>
 
-    <div class="flex justify-end mt-4 mb-20 md:mb-10">
-        <button type="submit" class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-6 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Salvar Configurações
-        </button>
-    </div>
-</form>
+        <div class="flex justify-end pb-8">
+            <button type="submit"
+                    class="px-8 py-2.5 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm shadow-lg shadow-[#685ef7]/20 hover:brightness-110 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined" style="font-size:18px">save</span>
+                Save Settings
+            </button>
+        </div>
+    </form>
+
+</div>
 
 <?php render_hub_footer(); ?>

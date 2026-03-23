@@ -90,89 +90,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $csrf_token = generate_csrf_token();
-render_dashboard_header("Configurações do Site");
+$siteName = htmlspecialchars($site['domain'] ?: $site['slug']);
+render_dashboard_header("Site Settings – $siteName");
 ?>
 
-<div class="max-w-4xl mx-auto pb-10">
-    <div class="md:flex md:items-center md:justify-between mb-8">
-        <div class="flex-1 min-w-0">
-            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Configurações Gerais</h2>
-            <p class="mt-1 text-sm text-gray-500">Gerenciamento de domínios, visibilidade e integrações base do site.</p>
+<div class="max-w-2xl mx-auto flex flex-col gap-6">
+
+    <!-- Page header -->
+    <div>
+        <div class="flex items-center gap-3 mb-2">
+            <span class="px-3 py-1 bg-[#a9a4ff]/10 text-[#a9a4ff] text-xs font-black rounded-full tracking-widest uppercase">Site Settings</span>
         </div>
+        <h1 class="text-3xl font-black font-headline text-white">Site Settings</h1>
+        <p class="text-slate-400 text-sm mt-1">Manage your domain, URL and site configuration.</p>
     </div>
 
     <?php if ($error): ?>
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6"><p class="text-sm text-red-700"><?= htmlspecialchars($error) ?></p></div>
+        <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+            <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px">error</span>
+            <?= htmlspecialchars($error) ?>
+        </div>
     <?php endif; ?>
     <?php if ($success): ?>
-        <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6"><p class="text-sm text-green-700"><?= htmlspecialchars($success) ?></p></div>
+        <div class="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+            <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px">check_circle</span>
+            <?= htmlspecialchars($success) ?>
+        </div>
     <?php endif; ?>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-        <div class="px-4 py-5 sm:px-6 bg-gray-50 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Endereços da Web (URLs)</h3>
-            <p class="mt-1 max-w-2xl text-sm text-gray-500">Altere o link gratuito Superpage ou vincule seu próprio domínio (.com.br).</p>
+    <!-- Web Addresses -->
+    <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">language</span>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-white font-headline">Web Addresses</h3>
+                <p class="text-xs text-slate-500">Change your free Superpage link or connect a custom domain.</p>
+            </div>
         </div>
-        <div class="px-4 py-5 sm:p-6">
-            <form method="POST" action="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $site['id'] ?>">
+        <div class="p-6">
+            <form method="POST" action="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $site['id'] ?>" class="space-y-5">
                 <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
                 <input type="hidden" name="action" value="update_general">
-                
-                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                    
-                    <div class="sm:col-span-4">
-                        <label for="slug" class="block text-sm font-medium text-gray-700">Subdomínio Gratuito (Slug)</label>
-                        <div class="mt-1 flex rounded-md shadow-sm">
-                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                                superpage.com.br/
-                            </span>
-                            <input type="text" name="slug" id="slug" value="<?= htmlspecialchars($site['slug']) ?>" required
-                                   class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                    </div>
 
-                    <div class="sm:col-span-4">
-                        <label for="domain" class="block text-sm font-medium text-gray-700">Domínio Customizado Automático</label>
-                        <div class="mt-1 flex rounded-md shadow-sm">
-                            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                                https://
-                            </span>
-                            <input type="text" name="domain" id="domain" value="<?= htmlspecialchars($site['domain'] ?? '') ?>" 
-                                   placeholder="www.minhaempresa.com.br"
-                                   class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        </div>
-                        <p class="mt-2 text-xs text-gray-500">Requer apontamento do Tipo CNAME ou A (via DNS) para nossos servidores.</p>
+                <div class="space-y-1.5">
+                    <label for="slug" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">Free Subdomain (Slug)</label>
+                    <div class="flex rounded-xl overflow-hidden">
+                        <span class="inline-flex items-center px-4 bg-[#0d0d1a] text-slate-500 text-sm font-medium border-r border-white/5 flex-shrink-0">
+                            superpage.com/
+                        </span>
+                        <input type="text" name="slug" id="slug" value="<?= htmlspecialchars($site['slug']) ?>" required
+                               class="flex-1 bg-[#121220] px-4 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#685ef7]/50">
                     </div>
-
                 </div>
-                
-                <div class="mt-6 pt-5 border-t border-gray-200 flex justify-start">
-                    <button type="submit" class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-8 inline-flex justify-center text-sm font-bold text-white hover:bg-indigo-700">
-                        Salvar
+
+                <div class="space-y-1.5">
+                    <label for="domain" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">Custom Domain</label>
+                    <div class="flex rounded-xl overflow-hidden">
+                        <span class="inline-flex items-center px-4 bg-[#0d0d1a] text-slate-500 text-sm font-medium border-r border-white/5 flex-shrink-0">
+                            https://
+                        </span>
+                        <input type="text" name="domain" id="domain" value="<?= htmlspecialchars($site['domain'] ?? '') ?>"
+                               placeholder="www.yourbusiness.co.uk"
+                               class="flex-1 bg-[#121220] px-4 py-4 text-white text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-[#685ef7]/50">
+                    </div>
+                    <p class="text-xs text-slate-500">Requires a CNAME or A record pointing to our servers via your DNS provider.</p>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit"
+                            class="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm shadow-lg shadow-[#685ef7]/20 hover:brightness-110 transition-all">
+                        Save Changes
                     </button>
                 </div>
             </form>
         </div>
     </div>
-    
-    <!-- Seção Danger Zone futura -->
-    <div class="bg-white shadow sm:rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Excluir Site</h3>
-            <div class="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Uma vez deletado o site, as assinaturas vinculadas serão canceladas e o tráfego do domínio interrompido permanentemente. Esta ação não tem volta.</p>
+
+    <!-- Danger Zone -->
+    <div class="bg-[#181828] rounded-xl border border-red-500/20 overflow-hidden">
+        <div class="px-6 py-4 border-b border-red-500/10 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-red-400" style="font-size:18px">warning</span>
             </div>
-            <div class="mt-5">
-                <form method="POST" action="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $site['id'] ?>" onsubmit="return confirm('Tem certeza? Isso vai inativar o site e tirá-lo do ar. Você poderá solicitar a restauração via suporte caso necessário.');">
-                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                    <input type="hidden" name="action" value="delete_site">
-                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        Deletar Site
-                    </button>
-                </form>
+            <div>
+                <h3 class="text-base font-bold text-red-400 font-headline">Danger Zone</h3>
+                <p class="text-xs text-slate-500">Irreversible and destructive actions.</p>
             </div>
         </div>
+        <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <p class="text-sm font-bold text-white mb-1">Delete this site</p>
+                <p class="text-sm text-slate-400 max-w-sm">Once deleted, linked subscriptions will be cancelled and domain traffic stopped permanently. This cannot be undone.</p>
+            </div>
+            <form method="POST" action="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $site['id'] ?>"
+                  onsubmit="return confirm('Are you sure? This will deactivate the site and take it offline. You can request restoration via support if needed.');"
+                  class="flex-shrink-0">
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                <input type="hidden" name="action" value="delete_site">
+                <button type="submit"
+                        class="px-5 py-2.5 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-bold text-sm transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                    Delete Site
+                </button>
+            </form>
+        </div>
     </div>
+
 </div>
 
 <?php render_dashboard_footer(); ?>

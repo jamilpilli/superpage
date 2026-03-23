@@ -99,53 +99,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $csrf_token = generate_csrf_token();
-render_dashboard_header("Criar Novo Site");
+render_dashboard_header("Create New Site");
 ?>
 
-<div class="max-w-3xl mx-auto">
-    <div class="md:flex md:items-center md:justify-between mb-6">
-        <div class="flex-1 min-w-0">
-            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Novo Site</h2>
-            <p class="mt-1 text-sm text-gray-500">Configure os dados iniciais do seu projeto.</p>
+<div class="max-w-lg mx-auto flex flex-col gap-6">
+
+    <!-- Page header -->
+    <div>
+        <div class="flex items-center gap-3 mb-2">
+            <span class="px-3 py-1 bg-[#a9a4ff]/10 text-[#a9a4ff] text-xs font-black rounded-full tracking-widest uppercase">New Site</span>
         </div>
-        <div class="mt-4 flex md:mt-0 md:ml-4">
-            <a href="<?= BASE_URL ?>/dashboard" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
-                Voltar
-            </a>
-        </div>
+        <h1 class="text-3xl font-black font-headline text-white">Create a New Site</h1>
+        <p class="text-slate-400 text-sm mt-1">Give your site a name and we'll set everything up for you.</p>
     </div>
 
-    <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-        <?php if ($error): ?>
-            <div class="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
-                <div class="flex">
-                    <div class="ml-3">
-                        <p class="text-sm text-red-700"><?= htmlspecialchars($error) ?></p>
-                    </div>
-                </div>
+    <?php if ($error): ?>
+        <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+            <span class="material-symbols-outlined flex-shrink-0" style="font-size:20px">error</span>
+            <?= htmlspecialchars($error) ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">web</span>
             </div>
-        <?php endif; ?>
-
-        <form action="<?= BASE_URL ?>/dashboard/create_site" method="POST" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-
             <div>
-                <label for="site_name" class="block text-sm font-medium text-gray-700">Nome do Site / Negócio</label>
-                <div class="mt-1 flex rounded-md shadow-sm">
-                    <input type="text" name="site_name" id="site_name" required
-                           class="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                           placeholder="Ex: Minha Empresa">
-                </div>
-                <p class="mt-2 text-sm text-gray-500">Este nome será usado para gerar sua URL gratuita (ex: <?= BASE_URL ?>/minha-empresa).</p>
+                <h3 class="text-base font-bold text-white font-headline">Site Details</h3>
+                <p class="text-xs text-slate-500">Set the initial details for your new site.</p>
             </div>
+        </div>
+        <div class="p-6">
+            <form action="<?= BASE_URL ?>/dashboard/create_site" method="POST" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
 
-            <div class="bg-gray-50 px-4 py-3 text-right sm:px-6 -mx-6 -mb-6 mt-6 rounded-b-lg border-t border-gray-200">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                    Gerar Site Agora
-                </button>
-            </div>
-        </form>
+                <div class="space-y-1.5">
+                    <label for="site_name" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">Site / Business Name</label>
+                    <input type="text" name="site_name" id="site_name" required autofocus
+                           class="w-full bg-[#121220] border-none rounded-xl p-4 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/50 transition-all text-sm"
+                           placeholder="e.g. My Business">
+                    <p class="text-xs text-slate-500">This name will be used to generate your free URL (e.g. <?= BASE_URL ?>/my-business).</p>
+                </div>
+
+                <div class="bg-[#121220] rounded-xl p-4 border border-[#a9a4ff]/10 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[#a9a4ff] flex-shrink-0 mt-0.5" style="font-size:18px">info</span>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Your site will be created with all blocks pre-configured. You can customise content, design, and structure immediately after creation.
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-between gap-4 pt-2">
+                    <a href="<?= BASE_URL ?>/dashboard"
+                       class="px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white font-bold text-sm transition-all">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="px-8 py-2.5 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm shadow-lg shadow-[#685ef7]/20 hover:brightness-110 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size:18px">add</span>
+                        Create Site
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
 </div>
 
 <?php render_dashboard_footer(); ?>
