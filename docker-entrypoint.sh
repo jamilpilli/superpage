@@ -8,6 +8,7 @@ DB_NAME=${DB_NAME:-superpage}
 DB_USER=${DB_USER:-root}
 DB_PASS=${DB_PASS:-}
 APP_DEBUG=${APP_DEBUG:-false}
+RESEND_API_KEY=${RESEND_API_KEY:-}
 EOF
 
 exec "$@"

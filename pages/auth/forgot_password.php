@@ -30,13 +30,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'expires_at' => $expires_at
                 ]);
 
-                $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/auth/reset_password?token=$token";
+                $protocol  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $resetLink = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/reset_password?token=' . $token;
 
-                if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] == 'true') {
-                    $success = "Email sent! Reset link (Dev Mode): <a href='$resetLink' class='underline text-[#a9a4ff]'>$resetLink</a>";
-                } else {
-                    $success = "If that email is registered, you'll receive a reset link shortly.";
+                // Envia email via Resend API
+                $apiKey  = getenv('RESEND_API_KEY');
+                $emailBody = "
+                    <div style='font-family:Inter,sans-serif;background:#0d0d1a;color:#e9e6f9;padding:40px;max-width:480px;margin:0 auto;border-radius:16px'>
+                        <h1 style='font-size:24px;font-weight:800;margin-bottom:8px'>Reset your password</h1>
+                        <p style='color:#aba9bb;margin-bottom:24px'>Hi {$user['name']}, click the button below to set a new password. This link expires in 30 minutes.</p>
+                        <a href='$resetLink' style='display:inline-block;background:linear-gradient(135deg,#685ef7,#914feb);color:#fff;font-weight:700;padding:14px 32px;border-radius:999px;text-decoration:none;margin-bottom:24px'>Reset Password</a>
+                        <p style='color:#aba9bb;font-size:13px'>If you didn't request this, you can safely ignore this email.</p>
+                        <hr style='border:none;border-top:1px solid rgba(255,255,255,0.08);margin:24px 0'>
+                        <p style='color:#474656;font-size:12px'>" . APP_NAME . " · superpage.co.uk</p>
+                    </div>";
+
+                if ($apiKey) {
+                    $payload = json_encode([
+                        'from'    => 'Superpage <noreply@superpage.co.uk>',
+                        'to'      => [$email],
+                        'subject' => 'Reset your Superpage password',
+                        'html'    => $emailBody,
+                    ]);
+                    $ch = curl_init('https://api.resend.com/emails');
+                    curl_setopt_array($ch, [
+                        CURLOPT_POST           => true,
+                        CURLOPT_POSTFIELDS     => $payload,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HTTPHEADER     => [
+                            'Authorization: Bearer ' . $apiKey,
+                            'Content-Type: application/json',
+                        ],
+                    ]);
+                    curl_exec($ch);
+                    curl_close($ch);
                 }
+
+                $success = "If that email is registered, you'll receive a reset link shortly.";
             } else {
                 $success = "If that email is registered, you'll receive a reset link shortly.";
             }
