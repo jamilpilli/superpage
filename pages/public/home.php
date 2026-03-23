@@ -38,6 +38,36 @@
         .signature-glow { background: linear-gradient(135deg, #685ef7 0%, #914feb 100%); }
         .glass-card { background: rgba(36,36,55,0.6); backdrop-filter: blur(20px); }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+        /* Page fade-in */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in         { animation: fadeInUp 0.6s ease both; }
+        .fade-in-delay-1 { animation: fadeInUp 0.6s ease 0.1s both; }
+        .fade-in-delay-2 { animation: fadeInUp 0.6s ease 0.2s both; }
+        .fade-in-delay-3 { animation: fadeInUp 0.6s ease 0.35s both; }
+        .fade-in-delay-4 { animation: fadeInUp 0.6s ease 0.5s both; }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal.visible  { opacity: 1; transform: translateY(0); }
+
+        /* Nav link animated underline */
+        .nav-link { position: relative; padding-bottom: 2px; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0;
+            width: 0; height: 2px;
+            background: linear-gradient(135deg, #685ef7, #914feb);
+            border-radius: 2px;
+            transition: width 0.25s ease;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after { width: 100%; }
+        .nav-link.active { color: #fff; }
     </style>
 </head>
 <body class="antialiased selection:bg-[#a9a4ff]/30">
@@ -48,9 +78,9 @@
             <div class="text-2xl font-black text-white tracking-tighter font-headline"><?= APP_NAME ?></div>
 
             <div class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight text-sm">
-                <a href="#features" class="text-slate-400 hover:text-white transition-colors">Features</a>
-                <a href="#how-it-works" class="text-slate-400 hover:text-white transition-colors">How It Works</a>
-                <a href="#pricing" class="text-slate-400 hover:text-white transition-colors">Pricing</a>
+                <a href="#features"     class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Features</a>
+                <a href="#how-it-works" class="nav-link text-slate-400 hover:text-white transition-colors duration-200">How It Works</a>
+                <a href="#pricing"      class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Pricing</a>
             </div>
 
             <div class="flex items-center gap-3">
@@ -66,25 +96,25 @@
     </nav>
 
     <!-- Hero -->
-    <section class="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
-        <!-- Background glow -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-[#685ef7]/20 blur-[120px] pointer-events-none"></div>
+    <section class="relative pt-32 pb-0 md:pt-36 overflow-hidden">
+        <div class="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[500px] rounded-full bg-[#685ef7]/20 blur-[120px] pointer-events-none"></div>
+        <div class="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-[#914feb]/15 blur-[100px] pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-center gap-16 relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-end gap-8 relative">
             <!-- Text -->
-            <div class="flex-1 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#181828] border border-[#a9a4ff]/20 mb-6">
+            <div class="flex-1 text-center lg:text-left pb-24">
+                <div class="fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#181828] border border-[#a9a4ff]/20 mb-6">
                     <span class="text-sm font-bold text-[#a9a4ff]">🚀 1st year free for your first site!</span>
                 </div>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold text-white tracking-tighter leading-[1.05] mb-5">
+                <h1 class="fade-in-delay-1 text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold text-white tracking-tighter leading-[1.05] mb-5">
                     Professional websites at<br>
                     <span class="text-transparent bg-clip-text signature-glow">record speed</span>
                 </h1>
-                <h2 class="text-2xl font-headline font-bold text-[#9a94ff] mb-5">No code. No hassle.</h2>
-                <p class="text-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                <h2 class="fade-in-delay-2 text-2xl font-headline font-bold text-[#9a94ff] mb-5">No code. No hassle.</h2>
+                <p class="fade-in-delay-3 text-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
                     The complete platform for small businesses and freelancers who need a fast, beautiful online presence — without the big agency price tag.
                 </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <div class="fade-in-delay-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                     <a href="<?= BASE_URL ?>/auth/register"
                        class="w-full sm:w-auto signature-glow px-8 py-4 rounded-full font-bold text-lg text-white hover:opacity-90 transition-all shadow-xl shadow-[#685ef7]/30">
                         Get Started — Free
@@ -96,38 +126,11 @@
                 </div>
             </div>
 
-            <!-- Visual -->
-            <div class="flex-1 relative flex justify-center lg:justify-end w-full max-w-md lg:max-w-none">
-                <div class="w-full glass-card rounded-2xl p-4 border border-white/5 shadow-2xl">
-                    <div class="bg-[#121220] rounded-xl aspect-video flex flex-col items-center justify-center gap-4 p-8">
-                        <div class="flex gap-3">
-                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                        </div>
-                        <div class="w-full space-y-2">
-                            <div class="h-4 bg-[#685ef7]/30 rounded-full w-3/4 mx-auto"></div>
-                            <div class="h-3 bg-white/5 rounded-full w-full"></div>
-                            <div class="h-3 bg-white/5 rounded-full w-5/6 mx-auto"></div>
-                        </div>
-                        <div class="flex gap-3 mt-2">
-                            <div class="h-8 w-28 signature-glow rounded-full opacity-80"></div>
-                            <div class="h-8 w-24 bg-white/10 rounded-full border border-white/10"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Floating badge -->
-                <div class="absolute -top-4 -right-4 glass-card border border-white/10 p-3 rounded-xl shadow-xl hidden lg:block">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-green-400" style="font-size:18px;font-variation-settings:'FILL' 1;">check_circle</span>
-                        </div>
-                        <div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance</div>
-                            <div class="text-base font-black text-white">99/100</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Hero character -->
+            <div class="flex-shrink-0 flex items-end justify-center lg:justify-end fade-in-delay-2">
+                <img src="<?= BASE_URL ?>/assets/img/hero.png"
+                     alt="Superpage Mascot"
+                     class="h-[420px] md:h-[520px] w-auto object-contain drop-shadow-[0_0_60px_rgba(104,94,247,0.4)] select-none">
             </div>
         </div>
     </section>
@@ -135,7 +138,7 @@
     <!-- Features -->
     <section id="features" class="py-24 bg-[#121220]">
         <div class="max-w-7xl mx-auto px-6 md:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-16 reveal">
                 <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Everything you need to grow</h2>
                 <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Built specifically for the UK small business market with local integrations and dedicated support.</p>
             </div>
@@ -143,17 +146,17 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php
                 $features = [
-                    ['grid_view',    'primary',       '#a9a4ff', 'Block Builder',      'Drag, drop, and customise. No technical skills required to build professional layouts.'],
-                    ['storefront',   'secondary-dim', '#914feb', 'Theme Marketplace',  'Choose from hundreds of industry-specific templates crafted by expert designers.'],
-                    ['bolt',         'tertiary',      '#ff98cd', 'Extreme Performance','Lightning-fast load times that keep your customers happy and improve SEO rankings.'],
-                    ['language',     'primary',       '#a9a4ff', 'Custom Domain',      'Connect your own .co.uk or .com domain instantly with automated SSL security.'],
-                    ['handshake',    'secondary-dim', '#914feb', 'Partner Programme',  'Earn rewards by referring other businesses or manage multiple client sites effortlessly.'],
-                    ['layers',       'tertiary',      '#ff98cd', 'Multiple Sites',     'Scale your empire. Launch new pages or separate brands from a single dashboard.'],
+                    ['grid_view',  '#a9a4ff', 'Block Builder',       'Drag, drop, and customise. No technical skills required to build professional layouts.'],
+                    ['storefront', '#914feb', 'Theme Marketplace',   'Choose from hundreds of industry-specific templates crafted by expert designers.'],
+                    ['bolt',       '#ff98cd', 'Extreme Performance', 'Lightning-fast load times that keep your customers happy and improve SEO rankings.'],
+                    ['language',   '#a9a4ff', 'Custom Domain',       'Connect your own .co.uk or .com domain instantly with automated SSL security.'],
+                    ['handshake',  '#914feb', 'Partner Programme',   'Earn rewards by referring other businesses or manage multiple client sites effortlessly.'],
+                    ['layers',     '#ff98cd', 'Multiple Sites',      'Scale your empire. Launch new pages or separate brands from a single dashboard.'],
                 ];
-                foreach ($features as [$icon, $colorKey, $hex, $title, $desc]):
+                foreach ($features as [$icon, $hex, $title, $desc]):
                 ?>
-                <div class="bg-[#181828] p-8 rounded-2xl border border-white/5 hover:-translate-y-1 transition-all duration-200 group">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center mb-6" style="background:<?= $hex ?>1a">
+                <div class="reveal bg-[#181828] p-8 rounded-2xl border border-white/5 hover:-translate-y-1 hover:border-[#a9a4ff]/20 hover:shadow-[0_8px_32px_rgba(104,94,247,0.15)] transition-all duration-300 group text-center">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 mx-auto transition-transform duration-300 group-hover:scale-110" style="background:<?= $hex ?>1a">
                         <span class="material-symbols-outlined text-3xl" style="color:<?= $hex ?>"><?= $icon ?></span>
                     </div>
                     <h3 class="text-xl font-headline font-bold text-white mb-3"><?= $title ?></h3>
@@ -169,7 +172,7 @@
         <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[#685ef7]/10 blur-[100px] pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-center gap-20 relative">
-            <div class="flex-1 space-y-10">
+            <div class="flex-1 space-y-10 reveal">
                 <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">How it works</h2>
 
                 <?php $steps = [
@@ -191,36 +194,13 @@
                 </a>
             </div>
 
-            <!-- Editor mockup -->
-            <div class="flex-1 w-full max-w-lg lg:max-w-none">
-                <div class="bg-[#181828] rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
-                    <!-- Fake topbar -->
-                    <div class="flex items-center gap-2 px-4 py-3 bg-[#121220] border-b border-white/5">
-                        <div class="w-3 h-3 rounded-full bg-red-400/60"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-400/60"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-400/60"></div>
-                        <div class="flex-1 mx-4 h-5 bg-white/5 rounded-full"></div>
-                    </div>
-                    <!-- Fake sidebar + content -->
-                    <div class="flex">
-                        <div class="w-16 bg-[#121220] py-4 px-2 space-y-3 flex flex-col items-center border-r border-white/5">
-                            <?php foreach(['home','edit_note','palette','contacts'] as $ic): ?>
-                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-[#685ef7]/20 transition-colors">
-                                <span class="material-symbols-outlined text-slate-500" style="font-size:18px"><?= $ic ?></span>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <div class="flex-1 p-6 space-y-4">
-                            <div class="h-5 bg-[#a9a4ff]/20 rounded-full w-2/3"></div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="h-20 bg-white/5 rounded-xl"></div>
-                                <div class="h-20 bg-white/5 rounded-xl"></div>
-                            </div>
-                            <div class="h-3 bg-white/5 rounded-full w-full"></div>
-                            <div class="h-3 bg-white/5 rounded-full w-4/5"></div>
-                            <div class="h-8 signature-glow rounded-full w-28 mt-2"></div>
-                        </div>
-                    </div>
+            <!-- Builder image -->
+            <div class="flex-1 w-full max-w-lg lg:max-w-none reveal">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-[#685ef7]/20 blur-[60px] rounded-3xl pointer-events-none"></div>
+                    <img src="<?= BASE_URL ?>/assets/img/builder.png"
+                         alt="Superpage Builder"
+                         class="relative w-full h-auto object-contain rounded-2xl shadow-2xl drop-shadow-[0_20px_60px_rgba(104,94,247,0.3)]">
                 </div>
             </div>
         </div>
@@ -229,10 +209,12 @@
     <!-- Pricing -->
     <section id="pricing" class="py-24 bg-gradient-to-b from-[#0d0d1a] via-[#121220] to-[#0d0d1a]">
         <div class="max-w-7xl mx-auto px-6 md:px-8 text-center">
-            <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Get ready to transform your business</h2>
-            <p class="text-on-surface-variant mb-12 text-lg">Launch offer: the first year is completely free for your first site!</p>
+            <div class="reveal">
+                <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Get ready to transform your business</h2>
+                <p class="text-on-surface-variant mb-12 text-lg">Launch offer: the first year is completely free for your first site!</p>
+            </div>
 
-            <div class="max-w-lg mx-auto bg-[#1e1e2f] p-12 rounded-2xl border border-[#474656]/40 shadow-2xl relative">
+            <div class="max-w-lg mx-auto bg-[#1e1e2f] p-12 rounded-2xl border border-[#474656]/40 shadow-2xl relative reveal">
                 <div class="absolute -top-4 left-1/2 -translate-x-1/2 signature-glow text-white px-6 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
                     Limited Launch Offer
                 </div>
@@ -272,8 +254,8 @@
                 <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-widest">Product</h4>
                 <ul class="space-y-3 text-slate-500 text-sm">
                     <li><a href="#features" class="hover:text-white transition">Features</a></li>
-                    <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
-                    <li><a href="#" class="hover:text-white transition">Themes</a></li>
+                    <li><a href="#pricing"  class="hover:text-white transition">Pricing</a></li>
+                    <li><a href="#"         class="hover:text-white transition">Themes</a></li>
                 </ul>
             </div>
             <div>
@@ -301,6 +283,29 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(el => {
+                if (el.isIntersecting) el.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Active nav link highlight on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(s => {
+                if (window.scrollY >= s.offsetTop - 100) current = s.id;
+            });
+            navLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+            });
+        }, { passive: true });
+    </script>
 
 </body>
 </html>
