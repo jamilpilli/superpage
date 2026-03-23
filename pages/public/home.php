@@ -1,307 +1,303 @@
 <?php
-// Página Home Pública
-
-$pageTitle = APP_NAME . " - O Construtor de Sites Institucionais Premium";
+// Public Landing Page
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?></title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    <title><?= APP_NAME ?> | No-Code Website Builder for UK Small Business</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a9a4ff",
+                        "primary-dim": "#685ef7",
+                        "secondary-dim": "#914feb",
+                        "surface-container": "#181828",
+                        "surface-container-high": "#1e1e2f",
+                        "surface-container-low": "#121220",
+                        "on-surface-variant": "#aba9bb",
+                        "outline-variant": "#474656",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .text-gradient {
-            background: linear-gradient(to right, #60a5fa, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero-bg {
-            background-image: url('<?= BASE_URL ?>/assets/img/hero.png');
-            background-size: cover;
-            background-position: center;
-        }
+        body { background-color: #0d0d1a; color: #e9e6f9; font-family: 'Inter', sans-serif; }
+        .signature-glow { background: linear-gradient(135deg, #685ef7 0%, #914feb 100%); }
+        .glass-card { background: rgba(36,36,55,0.6); backdrop-filter: blur(20px); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
 </head>
-<body class="bg-[#0f172a] text-white selection:bg-purple-500/30">
-    
-    <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#0f172a]/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <span class="text-white font-bold text-xl">S</span>
-                    </div>
-                    <span class="text-2xl font-extrabold tracking-tight text-white"><?= APP_NAME ?></span>
-                </div>
-                
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-sm font-medium text-slate-400 hover:text-white transition">Funcionalidades</a>
-                    <a href="#how-it-works" class="text-sm font-medium text-slate-400 hover:text-white transition">Como Funciona</a>
-                    <a href="#pricing" class="text-sm font-medium text-slate-400 hover:text-white transition">Planos</a>
-                </div>
+<body class="antialiased selection:bg-[#a9a4ff]/30">
 
-                <div class="flex items-center gap-4">
-                    <?php if (is_logged_in()): ?>
-                        <a href="<?= BASE_URL ?>/dashboard" class="text-sm font-medium text-slate-400 hover:text-white">Dashboard</a>
-                        <a href="<?= BASE_URL ?>/auth/logout" class="px-5 py-2.5 rounded-full bg-red-500/10 text-red-400 text-sm font-bold border border-red-500/20 hover:bg-red-500/20 transition">Sair</a>
-                    <?php else: ?>
-                        <a href="<?= BASE_URL ?>/auth/login" class="text-sm font-medium text-slate-400 hover:text-white transition">Entrar</a>
-                        <a href="<?= BASE_URL ?>/auth/register" class="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-600/20 transition-all hover:scale-105 active:scale-95">Experimentar Grátis</a>
-                    <?php endif; ?>
-                </div>
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0d0d1a]/80 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 md:px-8 flex justify-between items-center h-16">
+            <div class="text-2xl font-black text-white tracking-tighter font-headline"><?= APP_NAME ?></div>
+
+            <div class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight text-sm">
+                <a href="#features" class="text-slate-400 hover:text-white transition-colors">Features</a>
+                <a href="#how-it-works" class="text-slate-400 hover:text-white transition-colors">How It Works</a>
+                <a href="#pricing" class="text-slate-400 hover:text-white transition-colors">Pricing</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <?php if (is_logged_in()): ?>
+                    <a href="<?= BASE_URL ?>/dashboard" class="text-sm font-bold text-slate-400 hover:text-white transition">Dashboard</a>
+                    <a href="<?= BASE_URL ?>/auth/logout" class="px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white border border-white/10 hover:bg-white/5 transition">Sign Out</a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/auth/login" class="text-sm font-bold text-slate-400 hover:text-white transition">Log In</a>
+                    <a href="<?= BASE_URL ?>/auth/register" class="signature-glow px-6 py-2.5 rounded-full text-sm font-bold text-white hover:opacity-90 transition-all shadow-lg shadow-[#685ef7]/25">Try for Free</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(37,99,235,0.1),transparent_50%)]"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div class="text-center max-w-4xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold mb-6 animate-pulse">
-                    <span>✨</span> O 1º ano é totalmente grátis para o seu primeiro site!
+    <!-- Hero -->
+    <section class="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
+        <!-- Background glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-[#685ef7]/20 blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-center gap-16 relative">
+            <!-- Text -->
+            <div class="flex-1 text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#181828] border border-[#a9a4ff]/20 mb-6">
+                    <span class="text-sm font-bold text-[#a9a4ff]">🚀 1st year free for your first site!</span>
                 </div>
-                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8">
-                    Sites profissionais em <span class="text-gradient">velocidade recorde</span>
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold text-white tracking-tighter leading-[1.05] mb-5">
+                    Professional websites at<br>
+                    <span class="text-transparent bg-clip-text signature-glow">record speed</span>
                 </h1>
-                <p class="text-lg md:text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto">
-                    A plataforma definitiva para criar landing pages e sites institucionais OnePage que convertem visitantes em clientes. Sem código, sem complicações.
+                <h2 class="text-2xl font-headline font-bold text-[#9a94ff] mb-5">No code. No hassle.</h2>
+                <p class="text-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                    The complete platform for small businesses and freelancers who need a fast, beautiful online presence — without the big agency price tag.
                 </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="<?= BASE_URL ?>/auth/register" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg shadow-2xl shadow-blue-600/30 hover:shadow-blue-600/50 transition-all hover:-translate-y-1">
-                        Começar Agora — Grátis
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="<?= BASE_URL ?>/auth/register"
+                       class="w-full sm:w-auto signature-glow px-8 py-4 rounded-full font-bold text-lg text-white hover:opacity-90 transition-all shadow-xl shadow-[#685ef7]/30">
+                        Get Started — Free
                     </a>
-                    <a href="#features" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition">
-                        Ver Recursos
+                    <a href="#how-it-works"
+                       class="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-lg text-white border border-white/15 hover:bg-white/5 transition-all">
+                        See How It Works
                     </a>
                 </div>
             </div>
 
-            <!-- Preview/Visual -->
-            <div class="mt-20 relative px-4">
-                <div class="glass rounded-3xl p-4 shadow-2xl relative overflow-hidden group">
-                    <img src="<?= BASE_URL ?>/assets/img/hero.png" alt="Preview" class="rounded-2xl shadow-inner border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+            <!-- Visual -->
+            <div class="flex-1 relative flex justify-center lg:justify-end w-full max-w-md lg:max-w-none">
+                <div class="w-full glass-card rounded-2xl p-4 border border-white/5 shadow-2xl">
+                    <div class="bg-[#121220] rounded-xl aspect-video flex flex-col items-center justify-center gap-4 p-8">
+                        <div class="flex gap-3">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                        <div class="w-full space-y-2">
+                            <div class="h-4 bg-[#685ef7]/30 rounded-full w-3/4 mx-auto"></div>
+                            <div class="h-3 bg-white/5 rounded-full w-full"></div>
+                            <div class="h-3 bg-white/5 rounded-full w-5/6 mx-auto"></div>
+                        </div>
+                        <div class="flex gap-3 mt-2">
+                            <div class="h-8 w-28 signature-glow rounded-full opacity-80"></div>
+                            <div class="h-8 w-24 bg-white/10 rounded-full border border-white/10"></div>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Floating Elements -->
-                <div class="absolute -top-10 -right-10 hidden lg:block animate-bounce" style="animation-duration: 4s;">
-                    <div class="glass p-4 rounded-2xl border-blue-500/30 shadow-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-300">Performance</div>
-                                <div class="text-lg font-black text-white">99/100</div>
-                            </div>
+                <!-- Floating badge -->
+                <div class="absolute -top-4 -right-4 glass-card border border-white/10 p-3 rounded-xl shadow-xl hidden lg:block">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-green-400" style="font-size:18px;font-variation-settings:'FILL' 1;">check_circle</span>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Performance</div>
+                            <div class="text-base font-black text-white">99/100</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </section>
 
-    <!-- Features Grid -->
-    <section id="features" class="py-24 bg-[#0a101f]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-20">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">Tudo o que você precisa</h2>
-                <div class="w-20 h-1.5 bg-blue-600 mx-auto rounded-full"></div>
+    <!-- Features -->
+    <section id="features" class="py-24 bg-[#121220]">
+        <div class="max-w-7xl mx-auto px-6 md:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Everything you need to grow</h2>
+                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Built specifically for the UK small business market with local integrations and dedicated support.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Blocks Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-blue-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
-                        <svg class="w-8 h-8 text-blue-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <?php
+                $features = [
+                    ['grid_view',    'primary',       '#a9a4ff', 'Block Builder',      'Drag, drop, and customise. No technical skills required to build professional layouts.'],
+                    ['storefront',   'secondary-dim', '#914feb', 'Theme Marketplace',  'Choose from hundreds of industry-specific templates crafted by expert designers.'],
+                    ['bolt',         'tertiary',      '#ff98cd', 'Extreme Performance','Lightning-fast load times that keep your customers happy and improve SEO rankings.'],
+                    ['language',     'primary',       '#a9a4ff', 'Custom Domain',      'Connect your own .co.uk or .com domain instantly with automated SSL security.'],
+                    ['handshake',    'secondary-dim', '#914feb', 'Partner Programme',  'Earn rewards by referring other businesses or manage multiple client sites effortlessly.'],
+                    ['layers',       'tertiary',      '#ff98cd', 'Multiple Sites',     'Scale your empire. Launch new pages or separate brands from a single dashboard.'],
+                ];
+                foreach ($features as [$icon, $colorKey, $hex, $title, $desc]):
+                ?>
+                <div class="bg-[#181828] p-8 rounded-2xl border border-white/5 hover:-translate-y-1 transition-all duration-200 group">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center mb-6" style="background:<?= $hex ?>1a">
+                        <span class="material-symbols-outlined text-3xl" style="color:<?= $hex ?>"><?= $icon ?></span>
                     </div>
-                    <h3 class="text-xl font-bold mb-4">Construção por Blocos</h3>
-                    <p class="text-slate-400">Monte seu site arrastando e soltando blocos predefinidos: Hero, Sobre, Produtos, Serviços, Galeria e muito mais.</p>
+                    <h3 class="text-xl font-headline font-bold text-white mb-3"><?= $title ?></h3>
+                    <p class="text-on-surface-variant leading-relaxed text-sm"><?= $desc ?></p>
                 </div>
-
-                <!-- Marketplace Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-purple-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-purple-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors">
-                        <svg class="w-8 h-8 text-purple-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Marketplace de Temas</h3>
-                    <p class="text-slate-400">Adicione funcionalidades extras com plugins ou escolha temas exclusivos para dar um up no visual do seu site.</p>
-                </div>
-
-                <!-- Speed Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-green-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-green-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors">
-                        <svg class="w-8 h-8 text-green-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Performance Extrema</h3>
-                    <p class="text-slate-400">Otimização automática de imagens (WebP) e carregamento ultrarrápido para ranquear melhor no Google.</p>
-                </div>
-
-                <!-- Domain Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-orange-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-orange-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors">
-                        <svg class="w-8 h-8 text-orange-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Domínio Customizado</h3>
-                    <p class="text-slate-400">Use seu próprio domínio (ex: www.suaempresa.com) com SSL gratuito e configuração simplificada.</p>
-                </div>
-
-                <!-- Partner Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-cyan-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-cyan-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-600 transition-colors">
-                        <svg class="w-8 h-8 text-cyan-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Programa de Parceiros</h3>
-                    <p class="text-slate-400">Agências e freelancers podem gerenciar múltiplos sites de clientes em uma única conta de forma profissional.</p>
-                </div>
-
-                <!-- Multi-Site Feature -->
-                <div class="glass p-8 rounded-3xl border-transparent hover:border-pink-500/30 transition-all hover:-translate-y-2 group">
-                    <div class="w-14 h-14 bg-pink-600/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-pink-600 transition-colors">
-                        <svg class="w-8 h-8 text-pink-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4">Múltiplos Sites</h3>
-                    <p class="text-slate-400">Crie quantos sites precisar. Gerenciamento centralizado com um painel intuitivo e poderoso.</p>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
 
     <!-- How it works -->
     <section id="how-it-works" class="py-24 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row items-center gap-16">
-                <div class="flex-1">
-                    <h2 class="text-4xl md:text-5xl font-extrabold mb-8 leading-tight">
-                        Seu site no ar em <span class="text-gradient">3 passos simples</span>
-                    </h2>
-                    
-                    <div class="space-y-8">
-                        <div class="flex gap-6">
-                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xl">1</div>
-                            <div>
-                                <h4 class="text-xl font-bold mb-2">Configure sua conta</h4>
-                                <p class="text-slate-400">Crie sua conta em segundos e dê o primeiro passo para sua presença digital.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-6">
-                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center font-bold text-xl">2</div>
-                            <div>
-                                <h4 class="text-xl font-bold mb-2">Escolha seus blocos</h4>
-                                <p class="text-slate-400">Adicione as seções que seu negócio precisa e personalize o conteúdo conforme sua marca.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-6">
-                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-green-600 flex items-center justify-center font-bold text-xl">3</div>
-                            <div>
-                                <h4 class="text-xl font-bold mb-2">Publique e cresça</h4>
-                                <p class="text-slate-400">Publique instantaneamente com um clique e comece a receber seus primeiros visitantes.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-12">
-                        <a href="<?= BASE_URL ?>/auth/register" class="inline-block px-10 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 font-bold text-white transition shadow-lg shadow-blue-600/20">
-                            Quero criar meu site grátis
-                        </a>
-                    </div>
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[#685ef7]/10 blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-center gap-20 relative">
+            <div class="flex-1 space-y-10">
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white">How it works</h2>
+
+                <?php $steps = [
+                    ['01', 'Create your account',  'Sign up in seconds. No credit card required to start building your dream site today.'],
+                    ['02', 'Choose your blocks',   'Pick from pre-designed components and stack them to create your perfect layout.'],
+                    ['03', 'Publish and grow',      'Hit publish and watch your site go live on our global edge network. Scale with ease.'],
+                ]; foreach ($steps as [$num, $title, $desc]): ?>
+                <div class="relative pl-14">
+                    <div class="absolute left-0 top-0 text-5xl font-headline font-black text-[#9a94ff]/20 select-none leading-none"><?= $num ?></div>
+                    <h3 class="text-xl font-headline font-bold text-white mb-2"><?= $title ?></h3>
+                    <p class="text-on-surface-variant leading-relaxed"><?= $desc ?></p>
                 </div>
-                
-                <div class="flex-1 relative">
-                    <div class="absolute inset-0 bg-blue-600/20 blur-[100px] -z-10 animate-pulse"></div>
-                    <div class="glass p-4 rounded-[2rem] shadow-2xl rotate-2">
-                        <img src="<?= BASE_URL ?>/assets/img/builder.png" alt="Builder Illustration" class="rounded-[1.5rem]">
+                <?php endforeach; ?>
+
+                <a href="<?= BASE_URL ?>/auth/register"
+                   class="inline-flex items-center gap-2 signature-glow px-8 py-4 rounded-full font-bold text-white hover:opacity-90 transition-all shadow-lg shadow-[#685ef7]/25">
+                    Get Started — Free
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Editor mockup -->
+            <div class="flex-1 w-full max-w-lg lg:max-w-none">
+                <div class="bg-[#181828] rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+                    <!-- Fake topbar -->
+                    <div class="flex items-center gap-2 px-4 py-3 bg-[#121220] border-b border-white/5">
+                        <div class="w-3 h-3 rounded-full bg-red-400/60"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400/60"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400/60"></div>
+                        <div class="flex-1 mx-4 h-5 bg-white/5 rounded-full"></div>
+                    </div>
+                    <!-- Fake sidebar + content -->
+                    <div class="flex">
+                        <div class="w-16 bg-[#121220] py-4 px-2 space-y-3 flex flex-col items-center border-r border-white/5">
+                            <?php foreach(['home','edit_note','palette','contacts'] as $ic): ?>
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 hover:bg-[#685ef7]/20 transition-colors">
+                                <span class="material-symbols-outlined text-slate-500" style="font-size:18px"><?= $ic ?></span>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="flex-1 p-6 space-y-4">
+                            <div class="h-5 bg-[#a9a4ff]/20 rounded-full w-2/3"></div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="h-20 bg-white/5 rounded-xl"></div>
+                                <div class="h-20 bg-white/5 rounded-xl"></div>
+                            </div>
+                            <div class="h-3 bg-white/5 rounded-full w-full"></div>
+                            <div class="h-3 bg-white/5 rounded-full w-4/5"></div>
+                            <div class="h-8 signature-glow rounded-full w-28 mt-2"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section id="pricing" class="py-24 bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-y border-white/5">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-extrabold mb-8 leading-tight">
-                Prepare-se para transformar seu <span class="text-gradient">negócio hoje mesmo</span>
-            </h2>
-            <p class="text-xl text-slate-300 mb-12">
-                Aproveite nossa oferta de lançamento: O primeiro ano é totalmente por nossa conta para o seu primeiro site!
-            </p>
-            
-            <div class="glass p-1 rounded-2xl max-w-sm mx-auto mb-12 flex">
-                <div class="flex-1 py-3 bg-blue-600 rounded-xl font-bold text-white">Pagamento Anual</div>
-                <div class="flex-1 py-3 text-slate-400 font-bold">Grátis (1º Ano)</div>
-            </div>
+    <!-- Pricing -->
+    <section id="pricing" class="py-24 bg-gradient-to-b from-[#0d0d1a] via-[#121220] to-[#0d0d1a]">
+        <div class="max-w-7xl mx-auto px-6 md:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Get ready to transform your business</h2>
+            <p class="text-on-surface-variant mb-12 text-lg">Launch offer: the first year is completely free for your first site!</p>
 
-            <div class="inline-flex flex-col items-center">
-                <a href="<?= BASE_URL ?>/auth/register" class="px-12 py-5 rounded-2xl bg-white text-[#0f172a] font-black text-xl hover:bg-slate-200 transition-all hover:scale-105 shadow-2xl shadow-white/10">
-                    Começar Agora sem pagar nada
+            <div class="max-w-lg mx-auto bg-[#1e1e2f] p-12 rounded-2xl border border-[#474656]/40 shadow-2xl relative">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 signature-glow text-white px-6 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-lg">
+                    Limited Launch Offer
+                </div>
+                <div class="text-6xl font-headline font-extrabold text-white mb-2">£0<span class="text-xl font-medium text-on-surface-variant">/year</span></div>
+                <p class="text-[#9a94ff] font-bold mb-8">For your first 12 months</p>
+
+                <ul class="text-left space-y-4 mb-10">
+                    <?php $perks = ['Unlimited Blocks & Pages', 'Custom .co.uk Domain Included', 'Priority UK-Based Support', 'No Transaction Fees']; ?>
+                    <?php foreach ($perks as $perk): ?>
+                    <li class="flex items-center gap-3 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-[#a9a4ff]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                        <?= $perk ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+
+                <a href="<?= BASE_URL ?>/auth/register"
+                   class="block w-full signature-glow text-white py-4 rounded-full font-bold text-xl hover:opacity-90 transition-all mb-4">
+                    Start Now — Pay Nothing
                 </a>
-                <span class="mt-4 text-sm text-slate-400 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1.414 1.414L9 10.586 7.707 9.293a1.414 1.414l2 2a1.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                    Sem cartão de crédito necessário
-                </span>
+                <p class="text-sm text-on-surface-variant/60 flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-sm">verified_user</span>
+                    No credit card required.
+                </p>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-20 border-t border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-                <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center gap-2 mb-6">
-                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">S</span>
-                        </div>
-                        <span class="text-2xl font-bold text-white"><?= APP_NAME ?></span>
-                    </div>
-                    <p class="text-slate-400 max-w-sm">
-                        A plataforma completa para profissionais e empresas que buscam alta performance e conversão em seus sites institucionais.
-                    </p>
-                </div>
-                <div>
-                    <h5 class="font-bold text-white mb-6">Produto</h5>
-                    <ul class="space-y-4 text-slate-400">
-                        <li><a href="#features" class="hover:text-white transition">Funcionalidades</a></li>
-                        <li><a href="#pricing" class="hover:text-white transition">Planos</a></li>
-                        <li><a href="#" class="hover:text-white transition">Marketplace</a></li>
-                        <li><a href="#" class="hover:text-white transition">Temas</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 class="font-bold text-white mb-6">Suporte</h5>
-                    <ul class="space-y-4 text-slate-400">
-                        <li><a href="#" class="hover:text-white transition">Central de Ajuda</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contato</a></li>
-                        <li><a href="#" class="hover:text-white transition">Termos de Uso</a></li>
-                        <li><a href="#" class="hover:text-white transition">Privacidade</a></li>
-                    </ul>
-                </div>
+    <footer class="bg-[#080812] border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 md:px-8 py-16 grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div class="col-span-2 md:col-span-1">
+                <div class="text-xl font-black text-white font-headline mb-5"><?= APP_NAME ?></div>
+                <p class="text-slate-500 text-sm leading-relaxed mb-6">Empowering UK small businesses with high-performance web solutions.</p>
             </div>
-            
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-white/5 text-slate-500 text-sm">
-                <p>&copy; <?= date('Y') ?> <?= APP_NAME ?>. Todos os direitos reservados.</p>
-                <div class="flex gap-8">
-                    <a href="#" class="hover:text-white transition">Twitter</a>
-                    <a href="#" class="hover:text-white transition">Instagram</a>
-                    <a href="#" class="hover:text-white transition">LinkedIn</a>
-                </div>
+            <div>
+                <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-widest">Product</h4>
+                <ul class="space-y-3 text-slate-500 text-sm">
+                    <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                    <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+                    <li><a href="#" class="hover:text-white transition">Themes</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-widest">Support</h4>
+                <ul class="space-y-3 text-slate-500 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Help Centre</a></li>
+                    <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    <li><a href="#" class="hover:text-white transition">Partner Programme</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-widest">Legal</h4>
+                <ul class="space-y-3 text-slate-500 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 md:px-8 py-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
+            <p>&copy; <?= date('Y') ?> <?= APP_NAME ?> UK. Built for small business.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-white transition">Twitter</a>
+                <a href="#" class="hover:text-white transition">Instagram</a>
+                <a href="#" class="hover:text-white transition">LinkedIn</a>
             </div>
         </div>
     </footer>

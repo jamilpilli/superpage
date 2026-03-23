@@ -11,96 +11,348 @@ if (!$site_id) {
     redirect(BASE_URL . '/dashboard');
 }
 
-// Verifica permissão do site
 $site = db_fetch_one("SELECT * FROM sites WHERE id = :sid AND user_id = :uid", [':sid' => $site_id, ':uid' => $user['id']]);
 if (!$site) {
     redirect(BASE_URL . '/dashboard');
 }
 
-// Marcar como lido
+// Marcar como lido (resolve)
 $mark_read = filter_input(INPUT_GET, 'mark_read', FILTER_VALIDATE_INT);
 if ($mark_read) {
     db_update('site_contacts', ['status' => 'read'], 'id = :id AND site_id = :sid', [':id' => $mark_read, ':sid' => $site_id]);
     redirect(BASE_URL . '/dashboard/contacts?site_id=' . $site_id);
 }
 
-// Busca contatos
-$contacts = db_fetch_all("SELECT * FROM site_contacts WHERE site_id = :sid ORDER BY created_at DESC", [':sid' => $site_id]);
+// Deletar contato
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    global $pdo;
+    $delete_id = (int)$_POST['delete_id'];
+    $stmt = $pdo->prepare("DELETE FROM site_contacts WHERE id = :id AND site_id = :sid");
+    $stmt->execute([':id' => $delete_id, ':sid' => $site_id]);
+    redirect(BASE_URL . '/dashboard/contacts?site_id=' . $site_id);
+}
 
-// Carrega template global por último para já ter modificado os headers de redirect se precisar
+// Filtros
+$search        = trim(filter_input(INPUT_GET, 'search', FILTER_SANITIZE_SPECIAL_CHARS) ?? '');
+$status_filter = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_SPECIAL_CHARS) ?? 'all';
+
+// Build WHERE
+$where  = 'site_id = :sid';
+$params = [':sid' => $site_id];
+
+if ($search !== '') {
+    $where .= ' AND (name LIKE :s OR email LIKE :s2 OR message LIKE :s3)';
+    $params[':s']  = '%' . $search . '%';
+    $params[':s2'] = '%' . $search . '%';
+    $params[':s3'] = '%' . $search . '%';
+}
+
+if ($status_filter === 'new') {
+    $where .= " AND status = 'new'";
+} elseif ($status_filter === 'read') {
+    $where .= " AND status = 'read'";
+}
+
+// Total
+$total_result = db_fetch_one("SELECT COUNT(*) as total FROM site_contacts WHERE $where", $params);
+$total        = (int)($total_result['total'] ?? 0);
+
+// Export CSV
+if (filter_input(INPUT_GET, 'export') === 'csv') {
+    $all_contacts = db_fetch_all("SELECT * FROM site_contacts WHERE $where ORDER BY created_at DESC", $params);
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="contacts_' . $site['slug'] . '_' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['Name', 'Email', 'Phone', 'Message', 'Status', 'Received At']);
+    foreach ($all_contacts as $c) {
+        fputcsv($out, [$c['name'], $c['email'], $c['phone'] ?? '', $c['message'], $c['status'], $c['created_at']]);
+    }
+    fclose($out);
+    exit;
+}
+
+// Paginação
+$per_page    = 10;
+$page        = max(1, (int)(filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?? 1));
+$offset      = ($page - 1) * $per_page;
+$total_pages = max(1, (int)ceil($total / $per_page));
+
+$contacts = db_fetch_all(
+    "SELECT * FROM site_contacts WHERE $where ORDER BY created_at DESC LIMIT $per_page OFFSET $offset",
+    $params
+);
+
+// Gera URL preservando filtros
+function contacts_url($site_id, $extra = []) {
+    $q = array_merge(['site_id' => $site_id], $extra);
+    return BASE_URL . '/dashboard/contacts?' . http_build_query($q);
+}
+
+// Iniciais do nome
+function get_initials($name) {
+    $parts = preg_split('/\s+/', trim($name));
+    if (count($parts) >= 2) return strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
+    return strtoupper(substr($name, 0, 2));
+}
+
+// Cores de avatar (alterna por índice)
+$avatar_gradients = [
+    'bg-gradient-to-br from-[#685ef7] to-[#914feb]',
+    'bg-gradient-to-br from-[#e878b5] to-[#914feb]',
+    'bg-gradient-to-br from-[#685ef7] to-[#e878b5]',
+];
+
+// Carrega template por último
 require_once __DIR__ . '/../../includes/dashboard_template.php';
-render_dashboard_header("Contatos Recebidos - " . htmlspecialchars($site['domain'] ?: $site['slug']));
+render_dashboard_header('Contacts – ' . htmlspecialchars($site['domain'] ?: $site['slug']));
 ?>
 
-<div class="max-w-5xl mx-auto py-8">
-    <div class="flex justify-between items-center mb-6 px-4 sm:px-0">
-        <h2 class="text-2xl font-bold text-gray-900">Mensagens e Contatos</h2>
-        <span class="text-sm text-gray-500 font-medium"><?= count($contacts) ?> registros encontrados</span>
-    </div>
+<div class="max-w-6xl mx-auto">
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
-        <?php if (empty($contacts)): ?>
-            <div class="p-10 text-center text-gray-500">
-                <svg class="h-12 w-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <p class="font-bold text-gray-600">A caixa de entrada está vazia.</p>
-                <p class="text-sm mt-1">Nenhum contato recebido através do formulário do seu site ainda.</p>
+    <!-- Header -->
+    <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+            <div class="flex items-center gap-3 mb-3">
+                <span class="px-3 py-1 bg-[#a9a4ff]/10 text-[#a9a4ff] text-xs font-black rounded-full tracking-widest uppercase">Messages</span>
             </div>
+            <h1 class="text-4xl md:text-5xl font-black font-headline tracking-tight text-white mb-2">
+                Messages &amp; <span class="text-[#a9a4ff]">Contacts</span>
+            </h1>
+            <p class="text-slate-400 text-lg font-body">
+                You have <span class="text-white font-bold"><?= $total ?></span>
+                <?= $status_filter !== 'all' ? htmlspecialchars($status_filter) . ' ' : '' ?>record<?= $total !== 1 ? 's' : '' ?> in your inbox.
+            </p>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <a href="<?= contacts_url($site_id, array_filter(['search' => $search, 'status' => $status_filter !== 'all' ? $status_filter : null, 'export' => 'csv'])) ?>"
+               class="flex items-center gap-2 px-5 py-3 bg-[#181828] hover:bg-[#1e1e2f] rounded-full transition-all text-sm font-bold border border-white/10 text-slate-300 hover:text-white">
+                <span class="material-symbols-outlined text-xl">download</span>
+                <span>Export CSV</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" action="<?= BASE_URL ?>/dashboard/contacts" class="contents">
+            <input type="hidden" name="site_id" value="<?= $site_id ?>">
+
+            <!-- Search -->
+            <div class="md:col-span-2 relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" style="font-size:20px">search</span>
+                <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                       placeholder="Search by name, email or message..."
+                       class="w-full pl-12 pr-4 py-4 bg-[#121220] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#a9a4ff]/40 text-white placeholder-slate-500 text-sm"/>
+            </div>
+
+            <!-- Status filter -->
+            <div class="relative">
+                <select name="status" onchange="this.form.submit()"
+                        class="w-full px-4 py-4 bg-[#121220] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#a9a4ff]/40 text-white appearance-none cursor-pointer text-sm">
+                    <option value="all"  <?= $status_filter === 'all'  ? 'selected' : '' ?>>All Status</option>
+                    <option value="new"  <?= $status_filter === 'new'  ? 'selected' : '' ?>>New Messages</option>
+                    <option value="read" <?= $status_filter === 'read' ? 'selected' : '' ?>>Resolved</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500" style="font-size:20px">expand_more</span>
+            </div>
+
+            <!-- Submit search -->
+            <div class="flex items-center gap-2">
+                <button type="submit"
+                        class="flex-1 flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-br from-[#685ef7] to-[#914feb] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#685ef7]/20 hover:shadow-[#685ef7]/40 transition-all">
+                    <span class="material-symbols-outlined text-xl">search</span>
+                    Search
+                </button>
+                <?php if ($search !== '' || $status_filter !== 'all'): ?>
+                    <a href="<?= contacts_url($site_id) ?>"
+                       class="flex items-center justify-center w-14 h-14 bg-[#121220] border border-white/5 rounded-2xl hover:bg-white/5 transition-all text-slate-400 hover:text-white" title="Clear filters">
+                        <span class="material-symbols-outlined">close</span>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </form>
+    </section>
+
+    <!-- Contacts List -->
+    <section class="space-y-4">
+
+        <?php if (empty($contacts)): ?>
+            <div class="flex flex-col items-center justify-center py-24 text-center">
+                <div class="w-20 h-20 rounded-full bg-[#181828] border border-white/5 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-4xl text-slate-600">mail</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Inbox is empty</h3>
+                <p class="text-slate-400 text-sm max-w-sm">
+                    <?php if ($search !== '' || $status_filter !== 'all'): ?>
+                        No contacts match your current filters.
+                        <a href="<?= contacts_url($site_id) ?>" class="text-[#a9a4ff] font-bold hover:underline">Clear filters</a>
+                    <?php else: ?>
+                        No contact submissions received through your site's form yet.
+                    <?php endif; ?>
+                </p>
+            </div>
+
         <?php else: ?>
-            <ul class="divide-y divide-gray-200">
-                <?php foreach ($contacts as $contact): ?>
-                    <li class="<?= $contact['status'] === 'new' ? 'bg-indigo-50 border-l-4 border-indigo-600' : 'bg-white hover:bg-gray-50' ?> transition">
-                        <div class="px-4 py-6 sm:px-6">
-                            
-                            <!-- Header do Box de Email -->
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm uppercase shadow-sm">
-                                        <?= substr(htmlspecialchars($contact['name']), 0, 1) ?>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <p class="text-base font-bold text-gray-900 truncate">
-                                            <?= htmlspecialchars($contact['name']) ?>
-                                        </p>
-                                        <p class="text-xs text-gray-500"><?= date('d/m/Y \à\s H:i', strtotime($contact['created_at'])) ?></p>
-                                    </div>
-                                </div>
-                                <div class="ml-2 flex-shrink-0 flex items-center gap-2">
-                                    <p class="px-2 py-1 inline-flex text-[10px] uppercase font-bold rounded-full <?= $contact['status'] === 'new' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500 border border-gray-200' ?>">
-                                        <?= $contact['status'] === 'new' ? 'Nova' : 'Lida' ?>
-                                    </p>
-                                    <?php if ($contact['status'] === 'new'): ?>
-                                        <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $site_id ?>&mark_read=<?= $contact['id'] ?>" class="text-gray-400 hover:text-indigo-600 transition" title="Marcar como Lido">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            
-                            <!-- Informações de Contato Rápidas -->
-                            <div class="mt-2 mb-4 sm:flex gap-6 border-b border-gray-100 pb-4">
-                                <p class="flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
-                                    <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                    <a href="mailto:<?= htmlspecialchars($contact['email']) ?>"><?= htmlspecialchars($contact['email']) ?></a>
-                                </p>
-                                <?php if (!empty($contact['phone'])): ?>
-                                <p class="mt-2 flex items-center text-sm font-medium text-gray-700 hover:text-green-600 sm:mt-0">
-                                    <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                    <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $contact['phone']) ?>" target="_blank" title="Abrir no WhatsApp"><?= htmlspecialchars($contact['phone']) ?></a>
-                                </p>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <!-- Mensagem Principal -->
-                            <div class="mt-2 text-sm text-gray-700 bg-white p-4 rounded-md border border-gray-100 sm:p-5 shadow-inner">
-                                <?= nl2br(htmlspecialchars($contact['message'])) ?>
-                            </div>
-                            
+            <?php foreach ($contacts as $i => $contact):
+                $isNew     = $contact['status'] === 'new';
+                $initials  = get_initials($contact['name']);
+                $avatarBg  = $isNew ? $avatar_gradients[$i % count($avatar_gradients)] : 'bg-[#242437]';
+                $avatarTxt = $isNew ? 'text-white' : 'text-[#a9a4ff]';
+                $dateStr   = date('d M Y, H:i', strtotime($contact['created_at']));
+            ?>
+            <div class="group relative overflow-hidden rounded-2xl transition-all duration-200 hover:-translate-y-0.5">
+                <!-- Hover glow -->
+                <div class="absolute inset-0 bg-gradient-to-r from-[#a9a4ff]/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none"></div>
+
+                <div class="relative p-6 bg-[#181828]/60 backdrop-blur-xl border <?= $isNew ? 'border-[#5B4FE9]/30' : 'border-white/5' ?> rounded-2xl flex flex-col lg:flex-row lg:items-center gap-6">
+
+                    <!-- Avatar + Info -->
+                    <div class="flex items-center gap-5 lg:w-1/4">
+                        <div class="w-14 h-14 rounded-full <?= $avatarBg ?> <?= $avatarTxt ?> flex items-center justify-center text-xl font-black font-headline shadow-lg flex-shrink-0">
+                            <?= htmlspecialchars($initials) ?>
                         </div>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+                        <div class="min-w-0">
+                            <h3 class="text-white font-bold font-headline text-base flex items-center gap-2 flex-wrap">
+                                <?= htmlspecialchars($contact['name']) ?>
+                                <?php if ($isNew): ?>
+                                    <span class="bg-red-900/40 text-red-400 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest flex-shrink-0">NEW</span>
+                                <?php endif; ?>
+                            </h3>
+                            <p class="text-slate-400 text-xs mt-0.5"><?= $dateStr ?></p>
+                        </div>
+                    </div>
+
+                    <!-- Contact details + Message preview -->
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1.5">
+                            <a href="mailto:<?= htmlspecialchars($contact['email']) ?>"
+                               class="flex items-center gap-2 text-[#a9a4ff] hover:text-white font-medium text-sm transition-colors">
+                                <span class="material-symbols-outlined text-base flex-shrink-0" style="font-size:18px">mail</span>
+                                <span class="truncate"><?= htmlspecialchars($contact['email']) ?></span>
+                            </a>
+                            <?php if (!empty($contact['phone'])): ?>
+                                <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $contact['phone']) ?>" target="_blank"
+                                   class="flex items-center gap-2 text-slate-400 hover:text-green-400 text-sm transition-colors">
+                                    <span class="material-symbols-outlined text-base flex-shrink-0" style="font-size:18px">call</span>
+                                    <span><?= htmlspecialchars($contact['phone']) ?></span>
+                                </a>
+                            <?php else: ?>
+                                <span class="flex items-center gap-2 text-slate-600 text-sm">
+                                    <span class="material-symbols-outlined text-base flex-shrink-0" style="font-size:18px">call</span>
+                                    <span>No phone provided</span>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5">Message Preview</span>
+                            <p class="text-slate-300 text-sm line-clamp-2 italic leading-relaxed">
+                                "<?= htmlspecialchars(mb_substr($contact['message'], 0, 120)) ?><?= mb_strlen($contact['message']) > 120 ? '…' : '' ?>"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2 justify-end flex-shrink-0">
+                        <!-- Reply -->
+                        <a href="mailto:<?= htmlspecialchars($contact['email']) ?>?subject=Re: Your message&body=Hi <?= urlencode($contact['name']) ?>,"
+                           class="w-11 h-11 flex items-center justify-center rounded-full bg-[#242437] hover:bg-[#a9a4ff]/20 text-slate-400 hover:text-[#a9a4ff] transition-all" title="Reply via email">
+                            <span class="material-symbols-outlined" style="font-size:20px">reply</span>
+                        </a>
+
+                        <!-- Delete -->
+                        <form method="POST" action="<?= contacts_url($site_id, array_filter(['search' => $search ?: null, 'status' => $status_filter !== 'all' ? $status_filter : null, 'page' => $page > 1 ? $page : null])) ?>"
+                              onsubmit="return confirm('Delete this contact permanently?')">
+                            <input type="hidden" name="delete_id" value="<?= $contact['id'] ?>">
+                            <button type="submit"
+                                    class="w-11 h-11 flex items-center justify-center rounded-full bg-[#242437] hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all" title="Delete">
+                                <span class="material-symbols-outlined" style="font-size:20px">delete</span>
+                            </button>
+                        </form>
+
+                        <!-- Resolve / Resolved -->
+                        <?php if ($isNew): ?>
+                            <a href="<?= contacts_url($site_id, array_filter(['search' => $search ?: null, 'status' => $status_filter !== 'all' ? $status_filter : null, 'page' => $page > 1 ? $page : null, 'mark_read' => $contact['id']])) ?>"
+                               class="px-5 h-11 flex items-center gap-2 rounded-full bg-[#a9a4ff]/10 hover:bg-[#a9a4ff]/20 text-[#a9a4ff] font-bold text-sm transition-all" title="Mark as resolved">
+                                <span class="material-symbols-outlined text-lg" style="font-size:18px">check_circle</span>
+                                <span class="hidden sm:inline">Resolve</span>
+                            </a>
+                        <?php else: ?>
+                            <div class="px-5 h-11 flex items-center gap-2 rounded-full bg-[#474656]/20 text-slate-600 font-bold text-sm cursor-default select-none">
+                                <span class="material-symbols-outlined text-lg" style="font-size:18px; font-variation-settings: 'FILL' 1;">check_circle</span>
+                                <span class="hidden sm:inline">Resolved</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                </div>
+            </div>
+            <?php endforeach; ?>
         <?php endif; ?>
-    </div>
+
+    </section>
+
+    <!-- Pagination -->
+    <?php if ($total_pages > 1): ?>
+        <footer class="mt-12 flex items-center justify-center gap-2 flex-wrap">
+            <?php
+            $base_query = array_filter(['site_id' => $site_id, 'search' => $search ?: null, 'status' => $status_filter !== 'all' ? $status_filter : null]);
+            ?>
+
+            <!-- Prev -->
+            <?php if ($page > 1): ?>
+                <a href="<?= BASE_URL ?>/dashboard/contacts?<?= http_build_query(array_merge($base_query, ['page' => $page - 1])) ?>"
+                   class="w-10 h-10 flex items-center justify-center rounded-full bg-[#181828] hover:bg-[#1e1e2f] border border-white/5 transition-all text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </a>
+            <?php else: ?>
+                <span class="w-10 h-10 flex items-center justify-center rounded-full bg-[#121220] border border-white/5 text-slate-600 cursor-not-allowed">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </span>
+            <?php endif; ?>
+
+            <!-- Pages -->
+            <?php
+            $start = max(1, $page - 2);
+            $end   = min($total_pages, $page + 2);
+            if ($start > 1): ?>
+                <a href="<?= BASE_URL ?>/dashboard/contacts?<?= http_build_query(array_merge($base_query, ['page' => 1])) ?>"
+                   class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#181828] transition-all text-slate-400 hover:text-white text-sm">1</a>
+                <?php if ($start > 2): ?><span class="px-1 text-slate-600">…</span><?php endif; ?>
+            <?php endif; ?>
+
+            <?php for ($p = $start; $p <= $end; $p++): ?>
+                <?php if ($p === $page): ?>
+                    <span class="w-10 h-10 flex items-center justify-center rounded-full bg-[#a9a4ff] text-[#20009e] font-black text-sm"><?= $p ?></span>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/dashboard/contacts?<?= http_build_query(array_merge($base_query, ['page' => $p])) ?>"
+                       class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#181828] transition-all text-slate-400 hover:text-white text-sm"><?= $p ?></a>
+                <?php endif; ?>
+            <?php endfor; ?>
+
+            <?php if ($end < $total_pages): ?>
+                <?php if ($end < $total_pages - 1): ?><span class="px-1 text-slate-600">…</span><?php endif; ?>
+                <a href="<?= BASE_URL ?>/dashboard/contacts?<?= http_build_query(array_merge($base_query, ['page' => $total_pages])) ?>"
+                   class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#181828] transition-all text-slate-400 hover:text-white text-sm"><?= $total_pages ?></a>
+            <?php endif; ?>
+
+            <!-- Next -->
+            <?php if ($page < $total_pages): ?>
+                <a href="<?= BASE_URL ?>/dashboard/contacts?<?= http_build_query(array_merge($base_query, ['page' => $page + 1])) ?>"
+                   class="w-10 h-10 flex items-center justify-center rounded-full bg-[#181828] hover:bg-[#1e1e2f] border border-white/5 transition-all text-slate-400 hover:text-white">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </a>
+            <?php else: ?>
+                <span class="w-10 h-10 flex items-center justify-center rounded-full bg-[#121220] border border-white/5 text-slate-600 cursor-not-allowed">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </span>
+            <?php endif; ?>
+
+        </footer>
+        <p class="text-center text-xs text-slate-600 mt-4">
+            Showing <?= $offset + 1 ?>–<?= min($offset + $per_page, $total) ?> of <?= $total ?> records
+        </p>
+    <?php endif; ?>
+
 </div>
 
 <?php render_dashboard_footer(); ?>
