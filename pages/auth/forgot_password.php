@@ -3,103 +3,117 @@
 
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/functions.php';
-// require_once __DIR__ . '/../../includes/SimpleSMTP.php'; // A ser implementado
 
 if (is_logged_in()) {
     redirect('/dashboard');
 }
 
-$error = '';
+$error   = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        $error = "Sessão inválida. Tente novamente.";
+        $error = "Invalid session. Please try again.";
     } else {
         $email = trim($_POST['email'] ?? '');
-        
+
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $user = db_fetch_one("SELECT id, name FROM users WHERE email = :email", [':email' => $email]);
-            
+
             if ($user) {
-                // Rate Limiter Check (A implementar na tabela `rate_limits` ou direto)
-                
-                // Gerar token de recuperação
-                $token = bin2hex(random_bytes(32));
+                $token      = bin2hex(random_bytes(32));
                 $expires_at = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-                
-                // TODO: Limpar tokens velhos
+
                 db_insert('password_resets', [
-                    'user_id' => $user['id'],
-                    'token' => $token,
+                    'user_id'    => $user['id'],
+                    'token'      => $token,
                     'expires_at' => $expires_at
                 ]);
-                
-                // Link de reset simulado
+
                 $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/auth/reset_password?token=$token";
-                
-                // TODO: Enviar via SMTP real
-                // Por hora, exibimos no painel de sucesso (apenas para ambiente dev/mock)
+
                 if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] == 'true') {
-                    $success = "Email enviado! Link (Modo Dev): <a href='$resetLink' class='underline'>$resetLink</a>";
+                    $success = "Email sent! Reset link (Dev Mode): <a href='$resetLink' class='underline text-[#a9a4ff]'>$resetLink</a>";
                 } else {
-                    $success = "Se o e-mail estiver cadastrado, você receberá um link de recuperação em breve.";
+                    $success = "If that email is registered, you'll receive a reset link shortly.";
                 }
             } else {
-                // Mensagem genérica por segurança (não revela se o e-mail existe)
-                $success = "Se o e-mail estiver cadastrado, você receberá um link de recuperação em breve.";
+                $success = "If that email is registered, you'll receive a reset link shortly.";
             }
         } else {
-            $error = "E-mail inválido.";
+            $error = "Invalid email address.";
         }
     }
 }
 $csrf_token = generate_csrf_token();
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar Senha - <?= APP_NAME ?></title>
+    <title>Reset Password — <?= APP_NAME ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        body { background-color: #0d0d1a; color: #e9e6f9; font-family: 'Inter', sans-serif; }
+        .signature-glow { background: linear-gradient(135deg, #685ef7 0%, #914feb 100%); }
+        input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #181828 inset !important; -webkit-text-fill-color: #e9e6f9 !important; }
+    </style>
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center font-sans">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Recuperar Senha</h2>
-        
-        <?php if ($error): ?>
-            <div class="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="bg-green-50 text-green-700 p-4 rounded mb-4 text-sm break-all">
-                <?= $success ?> <!-- HTML Permitido apenas p/ debug seguro -->
+<body class="min-h-screen flex items-center justify-center px-4">
+
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <a href="<?= BASE_URL ?>" class="text-3xl font-black text-white tracking-tighter" style="font-family:'Plus Jakarta Sans',sans-serif">
+                <?= APP_NAME ?>
+            </a>
+            <p class="text-sm text-[#aba9bb] mt-2">Reset your password</p>
+        </div>
+
+        <div class="bg-[#181828] border border-white/5 rounded-2xl p-8 shadow-2xl">
+
+            <?php if ($error): ?>
+            <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm">
+                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                <?= htmlspecialchars($error) ?>
             </div>
-            <a href="/auth/login" class="block text-center w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">Voltar ao Login</a>
-        <?php else: ?>
-            <p class="text-sm text-gray-600 mb-4 text-center">Digite seu e-mail e lhe enviaremos as instruções para criar uma nova senha.</p>
-            
-            <form method="POST" action="/auth/forgot_password" class="space-y-4">
+            <?php endif; ?>
+
+            <?php if ($success): ?>
+            <div class="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-4 rounded-xl mb-6 text-sm">
+                <?= $success ?>
+            </div>
+            <a href="<?= BASE_URL ?>/auth/login"
+               class="block w-full signature-glow text-white font-bold py-3.5 rounded-xl text-center hover:opacity-90 transition-all">
+                Back to Sign In
+            </a>
+            <?php else: ?>
+            <p class="text-sm text-[#aba9bb] mb-6 text-center">Enter your email and we'll send you a link to reset your password.</p>
+
+            <form method="POST" action="<?= BASE_URL ?>/auth/forgot_password" class="space-y-5">
                 <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                
+
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
-                    <input type="email" id="email" name="email" required 
-                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                           placeholder="seu@email.com">
+                    <label for="email" class="block text-sm font-medium text-[#aba9bb] mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" required autocomplete="email"
+                           class="w-full bg-[#121220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-[#aba9bb]/50 focus:outline-none focus:border-[#a9a4ff]/50 focus:ring-1 focus:ring-[#a9a4ff]/30 transition-all"
+                           placeholder="you@example.com">
                 </div>
 
-                <button type="submit" 
-                        class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    Enviar Link de Recuperação
+                <button type="submit"
+                        class="w-full signature-glow text-white font-bold py-3.5 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[#685ef7]/25">
+                    Send Reset Link
                 </button>
             </form>
-            
-            <p class="mt-4 text-center text-sm text-gray-600">
-                Lembrou? <a href="/auth/login" class="text-indigo-600 font-semibold hover:text-indigo-500">Voltar ao login</a>.
+
+            <p class="text-center text-sm text-[#aba9bb] mt-6">
+                Remembered it?
+                <a href="<?= BASE_URL ?>/auth/login" class="text-[#a9a4ff] font-semibold hover:text-white transition-colors">Sign in</a>
             </p>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
+
 </body>
 </html>
