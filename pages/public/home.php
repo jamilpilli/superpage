@@ -222,7 +222,7 @@
                 <p class="text-[#9a94ff] font-bold mb-8">For your first 12 months</p>
 
                 <ul class="text-left space-y-4 mb-10">
-                    <?php $perks = ['Unlimited Blocks & Pages', 'Custom .co.uk Domain Included', 'Priority UK-Based Support', 'No Transaction Fees']; ?>
+                    <?php $perks = ['Unlimited Blocks & Pages', 'Priority UK-Based Support', 'No Transaction Fees']; ?>
                     <?php foreach ($perks as $perk): ?>
                     <li class="flex items-center gap-3 text-on-surface-variant">
                         <span class="material-symbols-outlined text-[#a9a4ff]" style="font-variation-settings:'FILL' 1;">check_circle</span>
