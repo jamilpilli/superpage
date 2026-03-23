@@ -1,0 +1,7 @@
+.env
+.git
+.claude
+*.md
+mysql-8.4/
+layouts/
+uploads/
