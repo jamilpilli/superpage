@@ -1,4 +1,4 @@
-﻿-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
 -- Host: localhost    Database: superpagebd
 -- ------------------------------------------------------
@@ -16,34 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `sites`
---
-
-DROP TABLE IF EXISTS `sites`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sites` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `domain` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('active','inactive','suspended') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `theme_id` int DEFAULT NULL,
-  `design` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `idx_domain` (`domain`),
-  KEY `idx_slug` (`slug`),
-  KEY `theme_id` (`theme_id`),
-  CONSTRAINT `sites_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `sites_ibfk_2` FOREIGN KEY (`theme_id`) REFERENCES `themes` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `sites_chk_1` CHECK (json_valid(`design`))
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `sites`
 --
 
@@ -54,59 +26,14 @@ INSERT INTO `sites` VALUES (1,1,NULL,'lemonblue','active','2026-03-10 22:37:47',
 UNLOCK TABLES;
 
 --
--- Table structure for table `pages`
---
-
-DROP TABLE IF EXISTS `pages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pages` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `site_id` int NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'home',
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('published','draft') COLLATE utf8mb4_unicode_ci DEFAULT 'published',
-  `seo_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_site_slug` (`site_id`,`slug`),
-  CONSTRAINT `pages_ibfk_1` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `pages_chk_1` CHECK (json_valid(`seo_data`))
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `pages`
 --
 
 LOCK TABLES `pages` WRITE;
 /*!40000 ALTER TABLE `pages` DISABLE KEYS */;
-INSERT INTO `pages` VALUES (1,1,'home','Lemonblue','published',NULL,'2026-03-10 22:37:47','2026-03-10 22:37:47'),(2,2,'home','MiniShop','published',NULL,'2026-03-11 01:03:33','2026-03-11 01:03:33'),(3,3,'home','Superpage','published',NULL,'2026-03-11 01:12:17','2026-03-11 01:12:17'),(4,4,'home','Alpha Vet','published',NULL,'2026-03-11 02:10:34','2026-03-11 02:10:34'),(5,5,'home','Algod├úo Doce','published',NULL,'2026-03-11 10:59:38','2026-03-11 10:59:38'),(6,6,'home','The Cocoa Pod','published',NULL,'2026-03-17 16:53:27','2026-03-17 16:53:27');
+INSERT INTO `pages` VALUES (1,1,'home','Lemonblue','published',NULL,'2026-03-10 22:37:47','2026-03-10 22:37:47'),(2,2,'home','MiniShop','published',NULL,'2026-03-11 01:03:33','2026-03-11 01:03:33'),(3,3,'home','Superpage','published',NULL,'2026-03-11 01:12:17','2026-03-11 01:12:17'),(4,4,'home','Alpha Vet','published',NULL,'2026-03-11 02:10:34','2026-03-11 02:10:34'),(5,5,'home','Algodão Doce','published',NULL,'2026-03-11 10:59:38','2026-03-11 10:59:38'),(6,6,'home','The Cocoa Pod','published',NULL,'2026-03-17 16:53:27','2026-03-17 16:53:27');
 /*!40000 ALTER TABLE `pages` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `blocks`
---
-
-DROP TABLE IF EXISTS `blocks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `blocks` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `page_id` int NOT NULL,
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `config` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_page_order` (`page_id`,`sort_order`),
-  CONSTRAINT `blocks_ibfk_1` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `blocks_chk_1` CHECK (json_valid(`config`))
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `blocks`
@@ -127,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-23 21:30:13
+-- Dump completed on 2026-03-24  1:19:59
