@@ -1,24 +1,14 @@
 -- =============================================================
 -- Seed: Sample Sites (5 niches)
--- All user passwords: adm123
+-- All sites linked to: jamil.pilli@gmail.com
 -- =============================================================
-
--- -------------------------------------------------------
--- USERS
--- -------------------------------------------------------
-INSERT INTO users (name, email, password_hash, role) VALUES
-('Sarah Johnson',   'cleaning@superpage.co.uk',   '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
-('Amanda Torres',   'beauty@superpage.co.uk',     '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
-('Marcos Souza',    'restaurant@superpage.co.uk', '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
-('Patricia Lima',   'travel@superpage.co.uk',     '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
-('Diego Ferreira',  'delivery@superpage.co.uk',   '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client');
 
 
 -- =====================================================================
 -- SITE 1: Sparkle Clean — Residential Cleaning Services
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'cleaning@superpage.co.uk'),
+    (SELECT id FROM users WHERE email = 'jamil.pilli@gmail.com'),
     'sparkle-clean',
     'active',
     '{"primary_color":"#0ea5e9","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded-full"}'
@@ -41,7 +31,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- About
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'sparkle-clean')),
  'about', 3,
- '{"title":"About Sparkle Clean","text":"Founded in 2015, Sparkle Clean has been transforming homes across the city with our professional, reliable cleaning services. Our fully vetted team uses eco-friendly, non-toxic products that are safe for your family and pets.\n\nWith over 2,000 happy clients and a 4.9-star average rating, we are the most trusted residential cleaning service in town.","image":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80","button_text":"Get a Free Quote","button_link":"#contact"}'),
+ '{"title":"About Sparkle Clean","text":"Founded in 2015, Sparkle Clean has been transforming homes across the city with our professional, reliable cleaning services. Our fully vetted team uses eco-friendly, non-toxic products that are safe for your family and pets.  With over 2,000 happy clients and a 4.9-star average rating, we are the most trusted residential cleaning service in town.","image":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80","button_text":"Get a Free Quote","button_link":"#contact"}'),
 
 -- Services
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'sparkle-clean')),
@@ -68,7 +58,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 2: Glow Studio — Beauty Salon & Aesthetics
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'beauty@superpage.co.uk'),
+    (SELECT id FROM users WHERE email = 'jamil.pilli@gmail.com'),
     'glow-studio',
     'active',
     '{"primary_color":"#db2777","title_font":"Playfair Display","text_font":"Inter","button_style":"rounded-full"}'
@@ -91,7 +81,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- About
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'glow-studio')),
  'about', 3,
- '{"title":"About Glow Studio","text":"Glow Studio was founded in 2018 by Amanda Torres, a certified aesthetician and hair stylist with over 15 years of experience. Our studio is a sanctuary where beauty and wellness meet.\n\nWe offer a curated menu of services using only professional-grade, cruelty-free products. Whether you are looking for a fresh haircut, radiant skin, or a complete makeover — our expert team is here to make it happen.","image":"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80","button_text":"Meet Our Team","button_link":"#team"}'),
+ '{"title":"About Glow Studio","text":"Glow Studio was founded in 2018 by Amanda Torres, a certified aesthetician and hair stylist with over 15 years of experience. Our studio is a sanctuary where beauty and wellness meet.  We offer a curated menu of services using only professional-grade, cruelty-free products. Whether you are looking for a fresh haircut, radiant skin, or a complete makeover — our expert team is here to make it happen.","image":"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80","button_text":"Meet Our Team","button_link":"#team"}'),
 
 -- Services
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'glow-studio')),
@@ -123,7 +113,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 3: Casa do Brasil — Brazilian Food Restaurant
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'restaurant@superpage.co.uk'),
+    (SELECT id FROM users WHERE email = 'jamil.pilli@gmail.com'),
     'casa-do-brasil',
     'active',
     '{"primary_color":"#16a34a","title_font":"Playfair Display","text_font":"Inter","button_style":"rounded"}'
@@ -146,7 +136,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- About
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'casa-do-brasil')),
  'about', 3,
- '{"title":"Our Story","text":"Casa do Brasil was born from a simple idea: bring the warmth of a Brazilian family kitchen to the world. Chef Marcos Souza, originally from Minas Gerais, opened the restaurant in 2012 after years working in top kitchens across Europe and the US.\n\nEvery dish on our menu tells a story — from the slow-cooked feijoada to the creamy brigadeiro. We source our ingredients locally and import key Brazilian products directly to ensure authenticity in every bite.","image":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80","button_text":"Make a Reservation","button_link":"#contact"}'),
+ '{"title":"Our Story","text":"Casa do Brasil was born from a simple idea: bring the warmth of a Brazilian family kitchen to the world. Chef Marcos Souza, originally from Minas Gerais, opened the restaurant in 2012 after years working in top kitchens across Europe and the US.  Every dish on our menu tells a story — from the slow-cooked feijoada to the creamy brigadeiro. We source our ingredients locally and import key Brazilian products directly to ensure authenticity in every bite.","image":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80","button_text":"Make a Reservation","button_link":"#contact"}'),
 
 -- Products (Menu)
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'casa-do-brasil')),
@@ -178,7 +168,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 4: Horizons Travel — Tourism & Travel Agency
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'travel@superpage.co.uk'),
+    (SELECT id FROM users WHERE email = 'jamil.pilli@gmail.com'),
     'horizons-travel',
     'active',
     '{"primary_color":"#0369a1","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded-full"}'
@@ -201,7 +191,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- About
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'horizons-travel')),
  'about', 3,
- '{"title":"About Horizons Travel","text":"With over 20 years of experience in the travel industry, Horizons Travel has helped thousands of families, couples, and solo travelers create unforgettable memories around the world.\n\nWe believe that travel is more than just visiting places — it is about connecting with cultures, people, and yourself. Our team of passionate travel experts works tirelessly to craft personalized itineraries that match your budget, style, and dreams.","image":"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80","button_text":"Start Planning","button_link":"#contact"}'),
+ '{"title":"About Horizons Travel","text":"With over 20 years of experience in the travel industry, Horizons Travel has helped thousands of families, couples, and solo travelers create unforgettable memories around the world.  We believe that travel is more than just visiting places — it is about connecting with cultures, people, and yourself. Our team of passionate travel experts works tirelessly to craft personalized itineraries that match your budget, style, and dreams.","image":"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80","button_text":"Start Planning","button_link":"#contact"}'),
 
 -- Services
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'horizons-travel')),
@@ -233,7 +223,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 5: SwiftDrop — Delivery Services
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'delivery@superpage.co.uk'),
+    (SELECT id FROM users WHERE email = 'jamil.pilli@gmail.com'),
     'swiftdrop',
     'active',
     '{"primary_color":"#ea580c","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded"}'
@@ -256,7 +246,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- About
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'swiftdrop')),
  'about', 3,
- '{"title":"About SwiftDrop","text":"SwiftDrop was founded in 2019 with a mission to make local delivery fast, affordable, and reliable. Starting with just 5 drivers in one city, we have grown to a fleet of 200+ couriers across 12 cities.\n\nWe serve individuals, small businesses, restaurants, pharmacies, and e-commerce stores. Our real-time tracking technology and dedicated support team ensure your package always arrives on time and in perfect condition.","image":"https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80","button_text":"Get Started","button_link":"#contact"}'),
+ '{"title":"About SwiftDrop","text":"SwiftDrop was founded in 2019 with a mission to make local delivery fast, affordable, and reliable. Starting with just 5 drivers in one city, we have grown to a fleet of 200+ couriers across 12 cities.  We serve individuals, small businesses, restaurants, pharmacies, and e-commerce stores. Our real-time tracking technology and dedicated support team ensure your package always arrives on time and in perfect condition.","image":"https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80","button_text":"Get Started","button_link":"#contact"}'),
 
 -- Services
 ((SELECT id FROM pages WHERE site_id = (SELECT id FROM sites WHERE slug = 'swiftdrop')),
