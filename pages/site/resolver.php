@@ -41,17 +41,54 @@ if (!$page) {
 $contactSuccess = false;
 $contactError = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
-    try {
-        db_insert('site_contacts', [
-            'site_id' => $site['id'],
-            'name' => trim($_POST['name'] ?? ''),
-            'email' => trim($_POST['email'] ?? ''),
-            'phone' => trim($_POST['phone'] ?? ''),
-            'message' => trim($_POST['message'] ?? '')
-        ]);
-        $contactSuccess = "Sua mensagem foi enviada com sucesso!";
-    } catch (\PDOException $e) {
-        $contactError = "Ocorreu um erro ao enviar sua mensagem. Tente novamente.";
+    $visitorIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $rateLimitAction = 'contact_' . $site['id'];
+
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $contactError = "Sessão inválida. Por favor, recarregue a página e tente novamente.";
+    } else {
+        $limit = db_fetch_one(
+            "SELECT attempts, blocked_until FROM rate_limits WHERE ip_address = :ip AND action = :action",
+            [':ip' => $visitorIp, ':action' => $rateLimitAction]
+        );
+
+        if ($limit && $limit['blocked_until'] && strtotime($limit['blocked_until']) > time()) {
+            $contactError = "Você enviou muitas mensagens. Tente novamente mais tarde.";
+        } else {
+            $name    = trim($_POST['name'] ?? '');
+            $email   = trim($_POST['email'] ?? '');
+            $phone   = trim($_POST['phone'] ?? '');
+            $message = trim($_POST['message'] ?? '');
+
+            if (empty($name) || empty($message)) {
+                $contactError = "Nome e mensagem são obrigatórios.";
+            } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $contactError = "Endereço de email inválido.";
+            } else {
+                try {
+                    db_insert('site_contacts', [
+                        'site_id' => $site['id'],
+                        'name'    => $name,
+                        'email'   => $email,
+                        'phone'   => $phone,
+                        'message' => $message,
+                    ]);
+
+                    if ($limit) {
+                        $attempts = $limit['attempts'] + 1;
+                        $blocked  = $attempts >= 5 ? date('Y-m-d H:i:s', strtotime('+1 hour')) : null;
+                        db_update('rate_limits', ['attempts' => $attempts, 'blocked_until' => $blocked],
+                            'ip_address = :ip AND action = :action', [':ip' => $visitorIp, ':action' => $rateLimitAction]);
+                    } else {
+                        db_insert('rate_limits', ['ip_address' => $visitorIp, 'action' => $rateLimitAction, 'attempts' => 1]);
+                    }
+
+                    $contactSuccess = "Sua mensagem foi enviada com sucesso!";
+                } catch (\PDOException $e) {
+                    $contactError = "Ocorreu um erro ao enviar sua mensagem. Tente novamente.";
+                }
+            }
+        }
     }
 }
 
@@ -461,6 +498,7 @@ else: ?>
                 
                 echo "<form action='#{$blockSlug}' method='POST' class='space-y-6'>
                 <input type='hidden' name='contact_submit' value='1'>
+                <input type='hidden' name='csrf_token' value='" . generate_csrf_token() . "'>
                 <div><label class='block text-sm font-medium text-gray-700'>Nome Completo</label><input type='text' name='name' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div>
                 <div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div><label class='block text-sm font-medium text-gray-700'>E-mail</label><input type='email' name='email' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div><label class='block text-sm font-medium text-gray-700'>Telefone</label><input type='tel' name='phone' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div></div>
                 <div><label class='block text-sm font-medium text-gray-700'>Mensagem</label><textarea required name='message' rows='4' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></textarea></div>
