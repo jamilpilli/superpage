@@ -2,8 +2,25 @@
 // Autenticação e Autorização
 
 if (session_status() === PHP_SESSION_NONE) {
+    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => $isSecure,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ]);
     session_start();
 }
+
+// Session timeout: expirar após 30 minutos de inatividade
+define('SESSION_TIMEOUT', 1800);
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > SESSION_TIMEOUT) {
+    session_unset();
+    session_destroy();
+    session_start();
+}
+$_SESSION['last_activity'] = time();
 
 function is_logged_in() {
     return isset($_SESSION['user_id']);
