@@ -365,9 +365,62 @@ else: ?>
                     ? "<img src='" . htmlspecialchars($cfg['image']) . "' alt='{$blockTitle}' title='{$blockTitle}' class='h-10 object-contain max-w-[200px]'>"
                     : "<h1 class='font-bold text-xl' style='color: var(--color-primary);'>{$blockTitle}</h1>";
 
-                $topPhoneHtml = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "hidden md:flex items-center text-gray-700 font-bold nav-link ml-6 pl-6 border-l border-gray-200 transition");
+                $topPhoneHtml       = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "hidden md:flex items-center text-gray-700 font-bold nav-link ml-6 pl-6 border-l border-gray-200 transition");
+                $mobilePhoneHtml    = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "flex items-center text-gray-700 font-bold px-4 py-3 rounded-xl hover:bg-gray-50 transition");
 
-                echo "<header id='inicio' class='bg-white shadow sticky top-0 z-50 transition-all'><div class='max-w-7xl mx-auto px-4 py-4 flex justify-between items-center'>{$headerLogo}<div class='flex items-center'><nav class='hidden md:flex space-x-6 text-sm font-medium items-center'>{$navLinks}</nav>{$topPhoneHtml}</div></div></header>";
+                // Mobile nav links (same links, different style)
+                $mobileNavLinks = "<a href='#inicio' class='block px-4 py-3 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition'>Home</a>";
+                foreach ($blocks as $navBlock) {
+                    $ntype = $navBlock['type'];
+                    if (in_array($ntype, ['header', 'hero', 'footer'])) continue;
+                    $ncfg  = json_decode($navBlock['config'], true) ?? [];
+                    $ntitle = (!empty($ncfg['title']) && trim($ncfg['title']) !== '') ? $ncfg['title'] : ucfirst($ntype);
+                    $nslug  = generate_slug($ntitle);
+                    $mobileNavLinks .= "<a href='#{$nslug}' class='mobile-site-link block px-4 py-3 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition'>" . htmlspecialchars($ntitle) . "</a>";
+                }
+
+                echo "
+                <header id='inicio' class='bg-white shadow sticky top-0 z-50'>
+                    <div class='max-w-7xl mx-auto px-4 py-4 flex justify-between items-center'>
+                        {$headerLogo}
+                        <div class='flex items-center'>
+                            <nav class='hidden md:flex space-x-6 text-sm font-medium items-center'>{$navLinks}</nav>
+                            {$topPhoneHtml}
+                        </div>
+                        <!-- Hamburger -->
+                        <button id='site-nav-toggle' aria-label='Open menu' class='md:hidden flex flex-col items-center justify-center gap-1.5 w-9 h-9 rounded-lg hover:bg-gray-100 transition-colors'>
+                            <span class='site-ham-line block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300'></span>
+                            <span class='site-ham-line block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300'></span>
+                            <span class='site-ham-line block w-5 h-0.5 bg-gray-700 rounded-full transition-all duration-300'></span>
+                        </button>
+                    </div>
+                    <!-- Mobile drawer -->
+                    <div id='site-nav-mobile' class='md:hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out border-t border-gray-100'>
+                        <div class='px-4 py-4 space-y-1 bg-white'>
+                            {$mobileNavLinks}
+                            " . ($mobilePhoneHtml ? "<div class='pt-3 border-t border-gray-100 mt-3'>{$mobilePhoneHtml}</div>" : "") . "
+                        </div>
+                    </div>
+                </header>
+                <script>
+                (function(){
+                    var btn    = document.getElementById('site-nav-toggle');
+                    var drawer = document.getElementById('site-nav-mobile');
+                    var lines  = btn.querySelectorAll('.site-ham-line');
+                    var open   = false;
+                    function toggle(force){
+                        open = force !== undefined ? force : !open;
+                        drawer.style.maxHeight = open ? drawer.scrollHeight + 'px' : '0';
+                        lines[0].style.transform = open ? 'translateY(8px) rotate(45deg)' : '';
+                        lines[1].style.opacity   = open ? '0' : '';
+                        lines[2].style.transform = open ? 'translateY(-8px) rotate(-45deg)' : '';
+                    }
+                    btn.addEventListener('click', function(){ toggle(); });
+                    document.querySelectorAll('.mobile-site-link').forEach(function(l){
+                        l.addEventListener('click', function(){ toggle(false); });
+                    });
+                })();
+                </script>";
                 break;
             case 'hero':
                 $heroId = 'slider-' . $block['id'];
