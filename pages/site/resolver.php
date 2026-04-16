@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
     $rateLimitAction = 'contact_' . $site['id'];
 
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        $contactError = "Sessão inválida. Por favor, recarregue a página e tente novamente.";
+        $contactError = "Invalid session. Please reload the page and try again.";
     } else {
         $limit = db_fetch_one(
             "SELECT attempts, blocked_until FROM rate_limits WHERE ip_address = :ip AND action = :action",
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         );
 
         if ($limit && $limit['blocked_until'] && strtotime($limit['blocked_until']) > time()) {
-            $contactError = "Você enviou muitas mensagens. Tente novamente mais tarde.";
+            $contactError = "Too many messages sent. Please try again later.";
         } else {
             $name    = trim($_POST['name'] ?? '');
             $email   = trim($_POST['email'] ?? '');
@@ -159,19 +159,86 @@ if (!$isPreview) {
     }
 }
 
-// 5. Renderização HTML Final
+// 5. Extrair dados SEO dos blocos
+$seoDescription = '';
+$seoKeywords    = [];
+$seoImage       = '';
+
+foreach ($blocks as $b) {
+    $cfg  = json_decode($b['config'] ?? '{}', true) ?: [];
+    $type = $b['type'];
+
+    // Descrição: primeiro bloco hero ou about
+    if (empty($seoDescription) && in_array($type, ['hero', 'about'])) {
+        $candidate = strip_tags($cfg['description'] ?? '');
+        if (!empty($candidate)) $seoDescription = $candidate;
+    }
+
+    // Keywords: títulos dos itens de serviços e produtos
+    if (in_array($type, ['services', 'products'])) {
+        foreach (($cfg['items'] ?? []) as $item) {
+            if (!empty($item['title'])) $seoKeywords[] = $item['title'];
+        }
+    }
+
+    // OG Image: primeira imagem encontrada nos blocos
+    if (empty($seoImage)) {
+        if (!empty($cfg['image']))                 $seoImage = $cfg['image'];
+        elseif (!empty($cfg['items'][0]['image'])) $seoImage = $cfg['items'][0]['image'];
+    }
+}
+
+if (empty($seoDescription)) $seoDescription = $site['name'];
+$seoDescription = mb_strimwidth($seoDescription, 0, 160, '...');
+
+$protocol     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$siteBaseUrl  = $protocol . '://' . $_SERVER['HTTP_HOST'];
+$canonicalUrl = $siteBaseUrl . '/' . $site['slug'];
+
+if (!empty($seoImage) && !preg_match('/^https?:\/\//', $seoImage)) {
+    $seoImage = $siteBaseUrl . '/' . ltrim($seoImage, '/');
+}
+
+$seoTitle       = htmlspecialchars($site['name']) . ' | ' . htmlspecialchars($page['title']);
+$seoKeywordsStr = implode(', ', array_unique(array_slice($seoKeywords, 0, 10)));
+
+// 6. Renderização HTML Final
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO Básico -->
-    <title>
-        <?= htmlspecialchars($page['title'])?>
-    </title>
-    <!-- Opcionalmente inserir theme colors, GTM, etc -->
+
+    <!-- Primary SEO -->
+    <title><?= $seoTitle ?></title>
+    <meta name="description" content="<?= htmlspecialchars($seoDescription) ?>">
+    <?php if ($seoKeywordsStr): ?>
+    <meta name="keywords"    content="<?= htmlspecialchars($seoKeywordsStr) ?>">
+    <?php endif; ?>
+    <link rel="canonical"    href="<?= htmlspecialchars($canonicalUrl) ?>">
+    <meta name="robots"      content="index, follow">
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="<?= htmlspecialchars($canonicalUrl) ?>">
+    <meta property="og:title"       content="<?= htmlspecialchars($site['name']) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($seoDescription) ?>">
+    <meta property="og:site_name"   content="<?= htmlspecialchars($site['name']) ?>">
+    <meta property="og:locale"      content="en_GB">
+    <?php if ($seoImage): ?>
+    <meta property="og:image"        content="<?= htmlspecialchars($seoImage) ?>">
+    <meta property="og:image:width"  content="1200">
+    <meta property="og:image:height" content="630">
+    <?php endif; ?>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="<?= htmlspecialchars($site['name']) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($seoDescription) ?>">
+    <?php if ($seoImage): ?>
+    <meta name="twitter:image"       content="<?= htmlspecialchars($seoImage) ?>">
+    <?php endif; ?>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

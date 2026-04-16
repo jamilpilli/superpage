@@ -10,6 +10,12 @@ if ($requestUri === '/' || $requestUri === '') {
     exit;
 }
 
+// Sitemap dinâmico
+if ($requestUri === '/sitemap.xml') {
+    require $basePath . '/public/sitemap.php';
+    exit;
+}
+
 // Rotas de Autenticação
 if (str_starts_with($requestUri, '/auth/')) {
     $action = str_replace('/auth/', '', $requestUri);

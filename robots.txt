@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /hub/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /migrations/
+
+Sitemap: https://superpage.co.uk/sitemap.xml
