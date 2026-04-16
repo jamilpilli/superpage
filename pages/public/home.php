@@ -2,7 +2,7 @@
 // Public Landing Page
 ?>
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -137,7 +137,7 @@
     </section>
 
     <!-- Features -->
-    <section id="features" class="py-24 bg-[#121220]">
+    <section id="features" class="py-24 bg-[#121220] scroll-mt-16">
         <div class="max-w-7xl mx-auto px-6 md:px-8">
             <div class="text-center mb-16 reveal">
                 <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Everything you need to grow</h2>
@@ -169,7 +169,7 @@
     </section>
 
     <!-- How it works -->
-    <section id="how-it-works" class="py-24 relative overflow-hidden">
+    <section id="how-it-works" class="py-24 relative overflow-hidden scroll-mt-16">
         <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[#685ef7]/10 blur-[100px] pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col lg:flex-row items-center gap-20 relative">
@@ -208,7 +208,7 @@
     </section>
 
     <!-- Examples / Showcase -->
-    <section id="examples" class="py-24 bg-[#121220] relative overflow-hidden">
+    <section id="examples" class="py-24 bg-[#121220] relative overflow-hidden scroll-mt-16">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full bg-[#685ef7]/8 blur-[140px] pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-6 md:px-8 relative">
@@ -289,7 +289,7 @@
     </section>
 
     <!-- Pricing -->
-    <section id="pricing" class="py-24 bg-gradient-to-b from-[#0d0d1a] via-[#121220] to-[#0d0d1a]">
+    <section id="pricing" class="py-24 bg-gradient-to-b from-[#0d0d1a] via-[#121220] to-[#0d0d1a] scroll-mt-16">
         <div class="max-w-7xl mx-auto px-6 md:px-8 text-center">
             <div class="reveal">
                 <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Get ready to transform your business</h2>
@@ -382,42 +382,6 @@
             transition: 'opacity 0.3s ease',
         });
         document.body.appendChild(progressBar);
-
-        // ── Smooth scroll (easeInOutQuart) ───────────────────────────────────
-        const NAV_OFFSET = 64;
-
-        function easeInOutQuart(t) {
-            return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
-        }
-
-        function smoothScrollTo(targetSelector, duration = 820) {
-            const el = document.querySelector(targetSelector);
-            if (!el) return;
-            const start    = window.scrollY;
-            const end      = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
-            const distance = end - start;
-            let startTime  = null;
-
-            function step(ts) {
-                if (!startTime) startTime = ts;
-                const elapsed  = ts - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                window.scrollTo(0, start + distance * easeInOutQuart(progress));
-                if (progress < 1) requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
-        }
-
-        // Intercept all in-page anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(link => {
-            link.addEventListener('click', e => {
-                const href = link.getAttribute('href');
-                if (!href || href === '#') return;
-                e.preventDefault();
-                smoothScrollTo(href);
-                history.pushState(null, '', href);
-            });
-        });
 
         // ── Scroll reveal ────────────────────────────────────────────────────
         const revealObserver = new IntersectionObserver(entries => {
