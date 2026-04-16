@@ -68,9 +68,18 @@ foreach ($all_blocks as $b) {
 
 // 4. Buscar design global
 $design = json_decode($site['design'] ?? '{}', true) ?: [];
-$primaryColor = $design['primary_color'] ?? '#4f46e5';
-$titleFont = $design['title_font'] ?? 'Inter';
-$textFont = $design['text_font'] ?? 'Inter';
+
+// Validar cor: aceitar apenas formato #rrggbb ou #rgb
+$rawColor = $design['primary_color'] ?? '#4f46e5';
+$primaryColor = preg_match('/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/', $rawColor) ? $rawColor : '#4f46e5';
+
+// Validar fonte: aceitar apenas letras, números, espaços e hífens
+$allowedFontPattern = '/^[a-zA-Z0-9 \-]+$/';
+$rawTitleFont = $design['title_font'] ?? 'Inter';
+$titleFont = preg_match($allowedFontPattern, $rawTitleFont) ? $rawTitleFont : 'Inter';
+$rawTextFont = $design['text_font'] ?? 'Inter';
+$textFont = preg_match($allowedFontPattern, $rawTextFont) ? $rawTextFont : 'Inter';
+
 $buttonStyle = $design['button_style'] ?? 'rounded';
 
 // Mapeia o formato do botão pra classes nativas do Tailwind
@@ -135,9 +144,9 @@ if (!$isPreview) {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --color-primary: <?=htmlspecialchars($primaryColor)?>;
-            --font-title: '<?= htmlspecialchars($titleFont)?>', sans-serif;
-            --font-text: '<?= htmlspecialchars($textFont)?>', sans-serif;
+            --color-primary: <?= $primaryColor ?>;
+            --font-title: '<?= $titleFont ?>', sans-serif;
+            --font-text: '<?= $textFont ?>', sans-serif;
         }
 
         html {
