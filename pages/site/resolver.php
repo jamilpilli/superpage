@@ -433,8 +433,9 @@ else: ?>
                         $btnHtml = (!empty($iBT) && !empty($iBL) && $iBL !== '#')
                             ? "<div class='mt-auto flex pt-4'><a href='{$iBL}' class='inline-block px-6 py-2 {$btnRadiusClass} text-white text-sm font-medium hover:opacity-90 transition' style='background-color: var(--color-primary);'>{$iBT}</a></div>"
                             : '';
-                        $imgHtml = $iI ? "<img src='{$iI}' class='h-12 w-auto max-w-full mb-6 object-contain rounded'" . ($iT ? " alt='{$iT}'" : '') . ">" : '';
-                        echo "<div class='bg-white rounded-xl shadow-md p-8 border border-gray-100 hover:shadow-lg transition flex flex-col'>{$imgHtml}<h3 class='text-xl font-bold mb-3 font-title text-gray-900'>{$iT}</h3><p class='text-gray-500 flex-1'>{$iD}</p>{$btnHtml}</div>";
+                        $imgHtml = $iI ? "<img src='{$iI}' class='w-full h-48 object-cover rounded-t-xl'" . ($iT ? " alt='{$iT}'" : '') . ">" : '';
+                        $cardPadding = $iI ? '' : 'p-8';
+                        echo "<div class='bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition flex flex-col overflow-hidden'>{$imgHtml}<div class='p-6 flex flex-col flex-1'><h3 class='text-xl font-bold mb-3 font-title text-gray-900'>{$iT}</h3><p class='text-gray-500 flex-1'>{$iD}</p>{$btnHtml}</div></div>";
                     }
                     echo "</div>";
                 }
