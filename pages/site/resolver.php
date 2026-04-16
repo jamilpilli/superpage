@@ -61,9 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             $message = trim($_POST['message'] ?? '');
 
             if (empty($name) || empty($message)) {
-                $contactError = "Nome e mensagem são obrigatórios.";
+                $contactError = "Name and message are required.";
             } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $contactError = "Endereço de email inválido.";
+                $contactError = "Invalid email address.";
             } else {
                 try {
                     db_insert('site_contacts', [
@@ -83,9 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                         db_insert('rate_limits', ['ip_address' => $visitorIp, 'action' => $rateLimitAction, 'attempts' => 1]);
                     }
 
-                    $contactSuccess = "Sua mensagem foi enviada com sucesso!";
+                    $contactSuccess = "Your message has been sent successfully!";
                 } catch (\PDOException $e) {
-                    $contactError = "Ocorreu um erro ao enviar sua mensagem. Tente novamente.";
+                    $contactError = "An error occurred while sending your message. Please try again.";
                 }
             }
         }
@@ -500,9 +500,9 @@ else: ?>
                 echo "<form action='#{$blockSlug}' method='POST' class='space-y-6'>
                 <input type='hidden' name='contact_submit' value='1'>
                 <input type='hidden' name='csrf_token' value='" . generate_csrf_token() . "'>
-                <div><label class='block text-sm font-medium text-gray-700'>Nome Completo</label><input type='text' name='name' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div>
-                <div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div><label class='block text-sm font-medium text-gray-700'>E-mail</label><input type='email' name='email' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div><label class='block text-sm font-medium text-gray-700'>Telefone</label><input type='tel' name='phone' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div></div>
-                <div><label class='block text-sm font-medium text-gray-700'>Mensagem</label><textarea required name='message' rows='4' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></textarea></div>
+                <div><label class='block text-sm font-medium text-gray-700'>Full Name</label><input type='text' name='name' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div>
+                <div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div><label class='block text-sm font-medium text-gray-700'>Email</label><input type='email' name='email' required class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div><div><label class='block text-sm font-medium text-gray-700'>Phone</label><input type='tel' name='phone' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></div></div>
+                <div><label class='block text-sm font-medium text-gray-700'>Message</label><textarea required name='message' rows='4' class='mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:ring-indigo-500 focus:border-indigo-500'></textarea></div>
                 <div class='text-center md:text-left'><button type='submit' class='inline-block w-auto text-white font-bold py-3 px-10 {$btnRadiusClass} shadow focus:outline-none transition hover:opacity-90' style='background-color: var(--color-primary);'>" . $btnText . "</button></div></form></div></div></section>";
                 break;
             case 'footer':
