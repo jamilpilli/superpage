@@ -1,6 +1,6 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
     # Redirecionar para index.php se o arquivo ou diretório não existir
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -11,6 +11,10 @@
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.tailwindcss.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: blob:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self'; object-src 'none'; base-uri 'self'"
 </IfModule>
 
 # Impedir acesso a diretórios e arquivos sensíveis
@@ -18,6 +22,6 @@
     Require all denied
 </FilesMatch>
 
-#<DirectoryMatch "^.*/(config|migrations|includes)/">
-#    Require all denied
-#</DirectoryMatch>
+<DirectoryMatch "^.*/(config|migrations|includes)/">
+    Require all denied
+</DirectoryMatch>
