@@ -22,11 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user) {
                 $token      = bin2hex(random_bytes(32));
+                $tokenHash  = hash('sha256', $token);
                 $expires_at = date('Y-m-d H:i:s', strtotime('+30 minutes'));
 
                 db_insert('password_resets', [
                     'user_id'    => $user['id'],
-                    'token'      => $token,
+                    'token'      => $tokenHash,
                     'expires_at' => $expires_at
                 ]);
 

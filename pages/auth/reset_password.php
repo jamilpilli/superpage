@@ -17,7 +17,8 @@ if (empty($token)) {
     redirect('/auth/login');
 }
 
-$resetRecord = db_fetch_one("SELECT user_id, expires_at FROM password_resets WHERE token = :token", [':token' => $token]);
+$tokenHash   = hash('sha256', $token);
+$resetRecord = db_fetch_one("SELECT user_id, expires_at FROM password_resets WHERE token = :token", [':token' => $tokenHash]);
 
 if (!$resetRecord || strtotime($resetRecord['expires_at']) < time()) {
     $error = "This reset link is invalid or has expired. Please request a new one.";
