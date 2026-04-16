@@ -5,6 +5,7 @@
 <html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/fav.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= APP_NAME ?> | No-Code Website Builder for UK Small Business</title>
     <script src="https://cdn.tailwindcss.com"></script>
