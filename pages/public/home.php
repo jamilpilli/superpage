@@ -367,21 +367,81 @@
     </footer>
 
     <script>
-        // Scroll reveal
-        const observer = new IntersectionObserver((entries) => {
+        // ── Scroll progress bar ──────────────────────────────────────────────
+        const progressBar = document.createElement('div');
+        Object.assign(progressBar.style, {
+            position:   'fixed',
+            top:        '0',
+            left:       '0',
+            height:     '2px',
+            width:      '0%',
+            background: 'linear-gradient(90deg, #685ef7, #a9a4ff, #914feb)',
+            zIndex:     '9999',
+            pointerEvents: 'none',
+            transformOrigin: 'left',
+            transition: 'opacity 0.3s ease',
+        });
+        document.body.appendChild(progressBar);
+
+        // ── Smooth scroll (easeInOutQuart) ───────────────────────────────────
+        const NAV_OFFSET = 64;
+
+        function easeInOutQuart(t) {
+            return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+        }
+
+        function smoothScrollTo(targetSelector, duration = 820) {
+            const el = document.querySelector(targetSelector);
+            if (!el) return;
+            const start    = window.scrollY;
+            const end      = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
+            const distance = end - start;
+            let startTime  = null;
+
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                const elapsed  = ts - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                window.scrollTo(0, start + distance * easeInOutQuart(progress));
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Intercept all in-page anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', e => {
+                const href = link.getAttribute('href');
+                if (!href || href === '#') return;
+                e.preventDefault();
+                smoothScrollTo(href);
+                history.pushState(null, '', href);
+            });
+        });
+
+        // ── Scroll reveal ────────────────────────────────────────────────────
+        const revealObserver = new IntersectionObserver(entries => {
             entries.forEach(el => {
                 if (el.isIntersecting) el.target.classList.add('visible');
             });
         }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-        // Active nav link highlight on scroll
+        // ── Active nav + progress bar on scroll ──────────────────────────────
         const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.nav-link');
+
         window.addEventListener('scroll', () => {
+            // Progress bar
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+            progressBar.style.width = pct + '%';
+            progressBar.style.opacity = pct > 1 ? '1' : '0';
+
+            // Active nav link
             let current = '';
             sections.forEach(s => {
-                if (window.scrollY >= s.offsetTop - 100) current = s.id;
+                if (window.scrollY >= s.offsetTop - 120) current = s.id;
             });
             navLinks.forEach(a => {
                 a.classList.toggle('active', a.getAttribute('href') === '#' + current);
