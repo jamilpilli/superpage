@@ -188,7 +188,9 @@ foreach ($blocks as $b) {
     }
 }
 
-if (empty($seoDescription)) $seoDescription = $site['name'];
+$siteName = $page['title'] ?? $site['slug'];
+
+if (empty($seoDescription)) $seoDescription = $siteName;
 $seoDescription = mb_strimwidth($seoDescription, 0, 160, '...');
 
 $protocol     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -199,7 +201,7 @@ if (!empty($seoImage) && !preg_match('/^https?:\/\//', $seoImage)) {
     $seoImage = $siteBaseUrl . '/' . ltrim($seoImage, '/');
 }
 
-$seoTitle       = htmlspecialchars($site['name']) . ' | ' . htmlspecialchars($page['title']);
+$seoTitle       = htmlspecialchars($siteName);
 $seoKeywordsStr = implode(', ', array_unique(array_slice($seoKeywords, 0, 10)));
 
 // 6. Renderização HTML Final
@@ -222,9 +224,9 @@ $seoKeywordsStr = implode(', ', array_unique(array_slice($seoKeywords, 0, 10)));
     <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="<?= htmlspecialchars($canonicalUrl) ?>">
-    <meta property="og:title"       content="<?= htmlspecialchars($site['name']) ?>">
+    <meta property="og:title"       content="<?= htmlspecialchars($siteName) ?>">
     <meta property="og:description" content="<?= htmlspecialchars($seoDescription) ?>">
-    <meta property="og:site_name"   content="<?= htmlspecialchars($site['name']) ?>">
+    <meta property="og:site_name"   content="<?= htmlspecialchars($siteName) ?>">
     <meta property="og:locale"      content="en_GB">
     <?php if ($seoImage): ?>
     <meta property="og:image"        content="<?= htmlspecialchars($seoImage) ?>">
@@ -234,7 +236,7 @@ $seoKeywordsStr = implode(', ', array_unique(array_slice($seoKeywords, 0, 10)));
 
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image">
-    <meta name="twitter:title"       content="<?= htmlspecialchars($site['name']) ?>">
+    <meta name="twitter:title"       content="<?= htmlspecialchars($siteName) ?>">
     <meta name="twitter:description" content="<?= htmlspecialchars($seoDescription) ?>">
     <?php if ($seoImage): ?>
     <meta name="twitter:image"       content="<?= htmlspecialchars($seoImage) ?>">
