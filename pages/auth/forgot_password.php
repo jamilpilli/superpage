@@ -15,6 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = "Invalid session. Please try again.";
     } else {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+        // Rate limit: max 3 tentativas por hora por IP
+        $fpLimit = db_fetch_one(
+            "SELECT attempts, blocked_until FROM rate_limits WHERE ip_address = :ip AND action = 'forgot_password'",
+            [':ip' => $ip]
+        );
+
+        if ($fpLimit && $fpLimit['blocked_until'] && strtotime($fpLimit['blocked_until']) > time()) {
+            $success = "If that email is registered, you'll receive a reset link shortly.";
+        } else {
+        if ($fpLimit) {
+            $fpAttempts = $fpLimit['attempts'] + 1;
+            $fpBlocked  = $fpAttempts >= 3 ? date('Y-m-d H:i:s', strtotime('+1 hour')) : null;
+            db_update('rate_limits', ['attempts' => $fpAttempts, 'blocked_until' => $fpBlocked],
+                'ip_address = :ip AND action = \'forgot_password\'', [':ip' => $ip]);
+        } else {
+            db_insert('rate_limits', ['ip_address' => $ip, 'action' => 'forgot_password', 'attempts' => 1]);
+        }
+
         $email = trim($_POST['email'] ?? '');
 
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -74,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = "Invalid email address.";
         }
+        } // fecha o bloco else do rate limit
     }
 }
 $csrf_token = generate_csrf_token();
