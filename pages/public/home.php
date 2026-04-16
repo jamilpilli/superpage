@@ -80,6 +80,7 @@
             <div class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight text-sm">
                 <a href="#features"     class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Features</a>
                 <a href="#how-it-works" class="nav-link text-slate-400 hover:text-white transition-colors duration-200">How It Works</a>
+                <a href="#examples"     class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Examples</a>
                 <a href="#pricing"      class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Pricing</a>
             </div>
 
@@ -203,6 +204,87 @@
                          class="relative w-full h-auto object-contain rounded-2xl shadow-2xl drop-shadow-[0_20px_60px_rgba(104,94,247,0.3)]">
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Examples / Showcase -->
+    <section id="examples" class="py-24 bg-[#121220] relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] rounded-full bg-[#685ef7]/8 blur-[140px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 md:px-8 relative">
+            <div class="text-center mb-16 reveal">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#181828] border border-[#a9a4ff]/20 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-[#a9a4ff] animate-pulse inline-block"></span>
+                    <span class="text-sm font-bold text-[#a9a4ff]">Live Examples</span>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Built for your industry</h2>
+                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Browse real sites live on Superpage — every one built without a single line of code.</p>
+            </div>
+
+            <div class="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory -mx-6 px-6 md:-mx-8 md:px-8" style="scrollbar-width: thin; scrollbar-color: #474656 transparent;">
+                <?php
+                $examples = [
+                    ['sparkle-clean',   'Sparkle Clean',    'Home Cleaning',        '#0ea5e9', 'water_drop',      'Your home, spotless.'],
+                    ['glow-studio',     'Glow Studio',      'Beauty & Aesthetics',  '#db2777', 'spa',             'Radiance redefined.'],
+                    ['casa-do-brasil',  'Casa do Brasil',   'Restaurant',           '#16a34a', 'restaurant_menu', 'A taste of Brazil.'],
+                    ['horizons-travel', 'Horizons Travel',  'Travel Agency',        '#0369a1', 'flight',          'Your world awaits.'],
+                    ['swiftdrop',       'SwiftDrop',        'Same-Day Delivery',    '#ea580c', 'local_shipping',  'Delivered fast.'],
+                ];
+                foreach ($examples as [$slug, $name, $category, $color, $icon, $tagline]):
+                ?>
+                <div class="snap-start flex-shrink-0 w-[290px] md:w-[310px] reveal">
+                    <a href="<?= BASE_URL ?>/<?= $slug ?>" target="_blank" rel="noopener" class="block group">
+                        <div class="bg-[#1a1a2e] rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 group-hover:-translate-y-2 group-hover:border-white/20 group-hover:shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+
+                            <!-- Browser chrome -->
+                            <div class="bg-[#111120] px-4 py-3 flex items-center gap-3 border-b border-white/5">
+                                <div class="flex gap-1.5 flex-shrink-0">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></div>
+                                </div>
+                                <div class="flex-1 bg-[#0d0d1a] rounded-full px-3 py-1 text-[11px] text-slate-500 font-mono truncate">
+                                    superpage.co.uk/<?= $slug ?>
+                                </div>
+                            </div>
+
+                            <!-- Mock hero -->
+                            <div class="h-44 relative overflow-hidden flex flex-col items-center justify-center text-center px-6 py-8">
+                                <div class="absolute inset-0" style="background: linear-gradient(135deg, <?= $color ?>30 0%, <?= $color ?>10 100%)"></div>
+                                <div class="absolute inset-0" style="background: radial-gradient(ellipse at 30% 40%, <?= $color ?>45, transparent 65%)"></div>
+                                <span class="material-symbols-outlined text-4xl mb-3 relative z-10 drop-shadow-lg" style="color:<?= $color ?>;font-variation-settings:'FILL' 1"><?= $icon ?></span>
+                                <div class="text-white font-headline font-bold text-lg leading-tight relative z-10"><?= htmlspecialchars($name) ?></div>
+                                <div class="text-white/55 text-xs relative z-10 mt-1"><?= htmlspecialchars($tagline) ?></div>
+                            </div>
+
+                            <!-- Mock content blocks -->
+                            <div class="px-5 pt-4 pb-5 space-y-2.5">
+                                <div class="flex gap-2 items-center">
+                                    <div class="h-2 rounded-full w-12 flex-shrink-0" style="background:<?= $color ?>55"></div>
+                                    <div class="h-2 rounded-full bg-white/10 w-full"></div>
+                                </div>
+                                <div class="h-1.5 rounded-full bg-white/8 w-full"></div>
+                                <div class="h-1.5 rounded-full bg-white/6 w-5/6"></div>
+                                <div class="h-1.5 rounded-full bg-white/5 w-4/6"></div>
+
+                                <!-- Footer of card -->
+                                <div class="flex items-center justify-between pt-3 mt-1 border-t border-white/5">
+                                    <span class="text-[11px] font-bold px-3 py-1 rounded-full" style="background:<?= $color ?>20;color:<?= $color ?>"><?= htmlspecialchars($category) ?></span>
+                                    <span class="text-[11px] text-slate-500 group-hover:text-white transition-colors flex items-center gap-0.5">
+                                        View site <span class="material-symbols-outlined" style="font-size:13px">arrow_outward</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <p class="text-center text-sm text-on-surface-variant mt-8 reveal">
+                Want a site like these?
+                <a href="<?= BASE_URL ?>/auth/register" class="text-[#a9a4ff] font-semibold hover:text-white transition-colors">Start for free →</a>
+            </p>
         </div>
     </section>
 
