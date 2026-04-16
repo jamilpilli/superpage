@@ -1,24 +1,24 @@
 -- =============================================================
 -- Seed: Sample Sites (5 niches)
--- All user passwords: senha123
+-- All user passwords: adm123
 -- =============================================================
 
 -- -------------------------------------------------------
 -- USERS
 -- -------------------------------------------------------
 INSERT INTO users (name, email, password_hash, role) VALUES
-('Sarah Johnson',   'cleaning@demo.com',   '$2y$12$LNonN9gJJE6A3JWjCFDOieQfVaZSj5Pvc9tHrGOKiGTk/0xsyq/M.', 'client'),
-('Amanda Torres',   'beauty@demo.com',     '$2y$12$LNonN9gJJE6A3JWjCFDOieQfVaZSj5Pvc9tHrGOKiGTk/0xsyq/M.', 'client'),
-('Marcos Souza',    'restaurant@demo.com', '$2y$12$LNonN9gJJE6A3JWjCFDOieQfVaZSj5Pvc9tHrGOKiGTk/0xsyq/M.', 'client'),
-('Patricia Lima',   'travel@demo.com',     '$2y$12$LNonN9gJJE6A3JWjCFDOieQfVaZSj5Pvc9tHrGOKiGTk/0xsyq/M.', 'client'),
-('Diego Ferreira',  'delivery@demo.com',   '$2y$12$LNonN9gJJE6A3JWjCFDOieQfVaZSj5Pvc9tHrGOKiGTk/0xsyq/M.', 'client');
+('Sarah Johnson',   'cleaning@superpage.co.uk',   '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
+('Amanda Torres',   'beauty@superpage.co.uk',     '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
+('Marcos Souza',    'restaurant@superpage.co.uk', '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
+('Patricia Lima',   'travel@superpage.co.uk',     '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client'),
+('Diego Ferreira',  'delivery@superpage.co.uk',   '$2y$12$6QqJCR2vjpg6ZO8cdib8FeByLcJIlnj0Kxfp80xro4ZOt0ZrJU1Ie', 'client');
 
 
 -- =====================================================================
 -- SITE 1: Sparkle Clean — Residential Cleaning Services
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'cleaning@demo.com'),
+    (SELECT id FROM users WHERE email = 'cleaning@superpage.co.uk'),
     'sparkle-clean',
     'active',
     '{"primary_color":"#0ea5e9","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded-full"}'
@@ -68,7 +68,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 2: Glow Studio — Beauty Salon & Aesthetics
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'beauty@demo.com'),
+    (SELECT id FROM users WHERE email = 'beauty@superpage.co.uk'),
     'glow-studio',
     'active',
     '{"primary_color":"#db2777","title_font":"Playfair Display","text_font":"Inter","button_style":"rounded-full"}'
@@ -123,7 +123,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 3: Casa do Brasil — Brazilian Food Restaurant
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'restaurant@demo.com'),
+    (SELECT id FROM users WHERE email = 'restaurant@superpage.co.uk'),
     'casa-do-brasil',
     'active',
     '{"primary_color":"#16a34a","title_font":"Playfair Display","text_font":"Inter","button_style":"rounded"}'
@@ -178,7 +178,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 4: Horizons Travel — Tourism & Travel Agency
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'travel@demo.com'),
+    (SELECT id FROM users WHERE email = 'travel@superpage.co.uk'),
     'horizons-travel',
     'active',
     '{"primary_color":"#0369a1","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded-full"}'
@@ -233,7 +233,7 @@ INSERT INTO blocks (page_id, type, sort_order, config) VALUES
 -- SITE 5: SwiftDrop — Delivery Services
 -- =====================================================================
 INSERT INTO sites (user_id, slug, status, design) VALUES (
-    (SELECT id FROM users WHERE email = 'delivery@demo.com'),
+    (SELECT id FROM users WHERE email = 'delivery@superpage.co.uk'),
     'swiftdrop',
     'active',
     '{"primary_color":"#ea580c","title_font":"Plus Jakarta Sans","text_font":"Inter","button_style":"rounded"}'
