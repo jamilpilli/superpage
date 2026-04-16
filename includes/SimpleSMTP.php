@@ -16,7 +16,7 @@ class SimpleSMTP {
         $this->pass = $pass ?? $_ENV['SMTP_PASS'] ?? '';
     }
     
-    public function send($to, $subject, $message, $from = 'noreply@superpage.com.br', $fromName = 'Superpage') {
+    public function send($to, $subject, $message, $from = 'noreply@superpage.com.br', $fromName = 'SuperPage') {
         if (isset($_ENV['APP_DEBUG']) && $_ENV['APP_DEBUG'] == 'true' && empty($this->user)) {
             // Em dev sem SMTP configurado real, apenas retorna true e loga (silencioso)
             error_log("Simulated Email Sent: To: $to, Subject: $subject");

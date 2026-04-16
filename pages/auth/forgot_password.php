@@ -68,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($apiKey) {
                     $payload = json_encode([
-                        'from'    => 'Superpage <noreply@superpage.co.uk>',
+                        'from'    => 'SuperPage <noreply@superpage.co.uk>',
                         'to'      => [$email],
-                        'subject' => 'Reset your Superpage password',
+                        'subject' => 'Reset your SuperPage password',
                         'html'    => $emailBody,
                     ]);
                     $ch = curl_init('https://api.resend.com/emails');

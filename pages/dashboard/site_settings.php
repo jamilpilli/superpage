@@ -126,7 +126,7 @@ render_dashboard_header("Site Settings – $siteName");
             </div>
             <div>
                 <h3 class="text-base font-bold text-white font-headline">Web Addresses</h3>
-                <p class="text-xs text-slate-500">Change your free Superpage link or connect a custom domain.</p>
+                <p class="text-xs text-slate-500">Change your free SuperPage link or connect a custom domain.</p>
             </div>
         </div>
         <div class="p-6">

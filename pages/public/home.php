@@ -165,7 +165,7 @@
             <!-- Hero character -->
             <div class="flex-shrink-0 flex items-end justify-center lg:justify-end fade-in-delay-2">
                 <img src="<?= BASE_URL ?>/assets/img/hero.png"
-                     alt="Superpage Mascot"
+                     alt="SuperPage Mascot"
                      class="h-[420px] md:h-[520px] w-auto object-contain drop-shadow-[0_0_60px_rgba(104,94,247,0.4)] select-none hover:scale-[1.03] hover:drop-shadow-[0_0_80px_rgba(104,94,247,0.55)] transition-all duration-700">
             </div>
         </div>
@@ -235,7 +235,7 @@
                 <div class="relative group">
                     <div class="absolute inset-0 bg-[#685ef7]/20 blur-[60px] rounded-3xl pointer-events-none transition-all duration-500 group-hover:bg-[#685ef7]/30 group-hover:blur-[80px]"></div>
                     <img src="<?= BASE_URL ?>/assets/img/builder.png"
-                         alt="Superpage Builder"
+                         alt="SuperPage Builder"
                          class="relative w-full h-auto object-contain rounded-2xl shadow-2xl drop-shadow-[0_20px_60px_rgba(104,94,247,0.3)] hover:scale-[1.02] hover:drop-shadow-[0_24px_80px_rgba(104,94,247,0.4)] transition-all duration-500">
                 </div>
             </div>
@@ -253,7 +253,7 @@
                     <span class="text-sm font-bold text-[#a9a4ff]">Live Examples</span>
                 </div>
                 <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Built for your industry</h2>
-                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Browse real sites live on Superpage — every one built without a single line of code.</p>
+                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Browse real sites live on SuperPage — every one built without a single line of code.</p>
             </div>
 
             <div class="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory -mx-6 px-6 md:-mx-8 md:px-8" style="scrollbar-width: thin; scrollbar-color: #474656 transparent;">
