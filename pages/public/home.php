@@ -80,6 +80,7 @@
         <div class="max-w-7xl mx-auto px-6 md:px-8 flex justify-between items-center h-16">
             <div class="text-2xl font-black text-white tracking-tighter font-headline select-none"><?= APP_NAME ?></div>
 
+            <!-- Desktop links -->
             <div class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight text-sm">
                 <a href="#features"     class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Features</a>
                 <a href="#how-it-works" class="nav-link text-slate-400 hover:text-white transition-colors duration-200">How It Works</a>
@@ -87,7 +88,8 @@
                 <a href="#pricing"      class="nav-link text-slate-400 hover:text-white transition-colors duration-200">Pricing</a>
             </div>
 
-            <div class="flex items-center gap-3">
+            <!-- Desktop CTA -->
+            <div class="hidden md:flex items-center gap-3">
                 <?php if (is_logged_in()): ?>
                     <a href="<?= BASE_URL ?>/dashboard" class="text-sm font-bold text-slate-400 hover:text-white transition-colors duration-200">Dashboard</a>
                     <a href="<?= BASE_URL ?>/auth/logout" class="px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white border border-white/10 hover:bg-white/5 transition-all duration-200 active:scale-95">Sign Out</a>
@@ -95,6 +97,35 @@
                     <a href="<?= BASE_URL ?>/auth/login" class="text-sm font-bold text-slate-400 hover:text-white transition-colors duration-200">Log In</a>
                     <a href="<?= BASE_URL ?>/auth/register" class="signature-glow px-6 py-2.5 rounded-full text-sm font-bold text-white hover:opacity-90 hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg shadow-[#685ef7]/25">Try for Free</a>
                 <?php endif; ?>
+            </div>
+
+            <!-- Mobile: CTA + Hamburger -->
+            <div class="flex md:hidden items-center gap-3">
+                <a href="<?= BASE_URL ?>/auth/register" class="signature-glow px-4 py-2 rounded-full text-sm font-bold text-white active:scale-95 transition-all duration-200">Try for Free</a>
+                <button id="nav-toggle" aria-label="Open menu" class="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-white/5 transition-colors duration-200">
+                    <span class="hamburger-line block w-5 h-0.5 bg-white rounded-full transition-all duration-300"></span>
+                    <span class="hamburger-line block w-5 h-0.5 bg-white rounded-full transition-all duration-300"></span>
+                    <span class="hamburger-line block w-5 h-0.5 bg-white rounded-full transition-all duration-300"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu drawer -->
+        <div id="nav-mobile" class="md:hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out border-t border-white/0">
+            <div class="px-6 py-6 space-y-1 bg-[#0d0d1a]">
+                <a href="#features"     class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Features</a>
+                <a href="#how-it-works" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">How It Works</a>
+                <a href="#examples"     class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Examples</a>
+                <a href="#pricing"      class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Pricing</a>
+                <div class="pt-4 border-t border-white/8 flex flex-col gap-3">
+                    <?php if (is_logged_in()): ?>
+                        <a href="<?= BASE_URL ?>/dashboard" class="px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Dashboard</a>
+                        <a href="<?= BASE_URL ?>/auth/logout" class="px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Sign Out</a>
+                    <?php else: ?>
+                        <a href="<?= BASE_URL ?>/auth/login" class="px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-bold transition-all duration-200">Log In</a>
+                        <a href="<?= BASE_URL ?>/auth/register" class="block w-full signature-glow text-white font-bold py-3.5 rounded-xl text-center active:scale-95 transition-all duration-200 shadow-lg shadow-[#685ef7]/25">Get Started — Free</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </nav>
@@ -372,6 +403,38 @@
     </footer>
 
     <script>
+        // ── Mobile menu ─────────────────────────────────────────────────────
+        const navToggle  = document.getElementById('nav-toggle');
+        const navMobile  = document.getElementById('nav-mobile');
+        const lines      = navToggle.querySelectorAll('.hamburger-line');
+        let menuOpen     = false;
+
+        function toggleMenu(force) {
+            menuOpen = force !== undefined ? force : !menuOpen;
+            if (menuOpen) {
+                navMobile.style.maxHeight = navMobile.scrollHeight + 'px';
+                navMobile.classList.add('border-white/5');
+                navMobile.classList.remove('border-white/0');
+                lines[0].style.transform = 'translateY(8px) rotate(45deg)';
+                lines[1].style.opacity   = '0';
+                lines[2].style.transform = 'translateY(-8px) rotate(-45deg)';
+            } else {
+                navMobile.style.maxHeight = '0';
+                navMobile.classList.remove('border-white/5');
+                navMobile.classList.add('border-white/0');
+                lines[0].style.transform = '';
+                lines[1].style.opacity   = '';
+                lines[2].style.transform = '';
+            }
+        }
+
+        navToggle.addEventListener('click', () => toggleMenu());
+
+        // Fechar ao clicar num link do menu mobile
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => toggleMenu(false));
+        });
+
         // ── Scroll progress bar ──────────────────────────────────────────────
         const progressBar = document.createElement('div');
         Object.assign(progressBar.style, {
