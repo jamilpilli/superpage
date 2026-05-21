@@ -310,19 +310,13 @@ render_hub_header("Users");
                     </td>
                     <td class="px-6 py-4">
                         <?php if (!$isSelf): ?>
-                        <div x-data="{ open: false }" class="relative flex justify-end" @click.outside="open = false">
-                            <button @click="open = !open"
+                        <div class="relative flex justify-end">
+                            <button onclick="hubToggleMenu('um<?= $u['id'] ?>')"
                                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all">
                                 <span class="material-symbols-outlined" style="font-size:16px">more_horiz</span>
                             </button>
 
-                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 style="display:none"
+                            <div id="um<?= $u['id'] ?>" style="display:none"
                                  class="absolute right-0 top-9 z-20 w-52 bg-[#1e1e2f] border border-white/10 rounded-xl shadow-2xl overflow-hidden origin-top-right">
 
                                 <!-- Change role -->
@@ -469,5 +463,19 @@ render_hub_header("Users");
     </div>
 </div>
 
+
+<script>
+function hubToggleMenu(id) {
+    const el = document.getElementById(id);
+    const isOpen = el.style.display !== 'none';
+    document.querySelectorAll('[id^="um"]').forEach(m => m.style.display = 'none');
+    if (!isOpen) el.style.display = 'block';
+}
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('[id^="um"]') && !e.target.closest('[onclick*="hubToggleMenu"]')) {
+        document.querySelectorAll('[id^="um"]').forEach(m => m.style.display = 'none');
+    }
+});
+</script>
 
 <?php render_hub_footer(); ?>
