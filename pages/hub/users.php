@@ -137,7 +137,6 @@ $csrf = generate_csrf_token();
 render_hub_header("Users");
 ?>
 
-<div x-data="{ adminModal: false }">
 <div class="max-w-6xl flex flex-col gap-6">
 
     <!-- Flash messages -->
@@ -160,7 +159,7 @@ render_hub_header("Users");
             <h2 class="text-2xl font-black text-white font-headline">Users</h2>
             <p class="text-sm text-on-surface-variant mt-0.5"><?= $totalUsers ?> total accounts</p>
         </div>
-        <button @click="adminModal = true"
+        <button onclick="document.getElementById('newAdminModal').style.display='flex'"
                 class="flex items-center gap-2 px-5 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-[#685ef7]/20 flex-shrink-0">
             <span class="material-symbols-outlined" style="font-size:18px">add</span>
             New Admin
@@ -414,22 +413,11 @@ render_hub_header("Users");
 </div><!-- /.max-w-6xl -->
 
 <!-- Create Admin Modal -->
-<div x-show="adminModal" x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-     style="display:none"
+<div id="newAdminModal" style="display:none"
      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-     @click.self="adminModal = false">
+     onclick="if(event.target===this) this.style.display='none'">
 
-    <div x-show="adminModal"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95"
-         class="w-full max-w-md bg-[#121220] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="w-full max-w-md bg-[#121220] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
 
         <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
             <div class="flex items-center gap-3">
@@ -441,7 +429,7 @@ render_hub_header("Users");
                     <p class="text-xs text-on-surface-variant">Full SuperAdmin access</p>
                 </div>
             </div>
-            <button @click="adminModal = false" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+            <button onclick="document.getElementById('newAdminModal').style.display='none'" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
                 <span class="material-symbols-outlined" style="font-size:18px">close</span>
             </button>
         </div>
@@ -467,7 +455,7 @@ render_hub_header("Users");
             </div>
 
             <div class="flex gap-3 pt-1">
-                <button type="button" @click="adminModal = false"
+                <button type="button" onclick="document.getElementById('newAdminModal').style.display='none'"
                         class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-sm font-bold rounded-xl transition-colors">
                     Cancel
                 </button>
@@ -481,6 +469,5 @@ render_hub_header("Users");
     </div>
 </div>
 
-</div><!-- /x-data adminModal -->
 
 <?php render_hub_footer(); ?>
