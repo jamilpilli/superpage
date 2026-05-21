@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Deploy — Produção
+
+O Superpage está hospedado num VPS Hostinger via **EasyPanel**.
+
+- **VPS IP:** `2a02:4780:f:5dbb::1`
+- **EasyPanel:** `http://2a02:4780:f:5dbb::1:3000`
+- **Deploy:** Aceder ao EasyPanel → projecto Superpage → botão **Deploy/Redeploy**
+- A chave SSH não está configurada nesta máquina — deploy tem de ser feito manualmente via EasyPanel ou pelo utilizador via terminal
+
 ## Regras de Git para este projeto
 
 **NUNCA faça commit direto na branch `main`.**
