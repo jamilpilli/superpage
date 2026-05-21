@@ -1,0 +1,40 @@
+# SuperPage
+
+> SuperPage is a no-code website builder for UK small businesses. The idea is simple: you don't need to be super at anything — SuperPage (your nerdy superhero) has already built and structured everything. You just fill in your business details and you're online in minutes.
+
+## What is SuperPage?
+
+SuperPage helps UK small businesses get online without any technical knowledge. Think of it like a digital business card — you don't need to know how to print it, you just hand it over. SuperPage does the same for your website.
+
+- No coding required
+- No expensive web agency needed
+- Professional website live in minutes
+- Custom domain support (.co.uk, .com)
+- Free for the first year
+
+## Who is it for?
+
+Any UK small business that needs to be found online: cleaners, hairdressers, restaurants, personal trainers, tradespeople, freelancers, beauty salons, delivery services, and more.
+
+## Key pages
+
+- Homepage: https://superpage.co.uk/
+- Create a free account: https://superpage.co.uk/auth/register
+- Sign in: https://superpage.co.uk/auth/login
+- Sitemap: https://superpage.co.uk/sitemap.xml
+
+## Example sites built with SuperPage
+
+- https://superpage.co.uk/sparkle-clean — Residential cleaning service
+- https://superpage.co.uk/glow-studio — Beauty salon & aesthetics
+- https://superpage.co.uk/casa-do-brasil — Brazilian restaurant
+- https://superpage.co.uk/horizons-travel — Travel agency
+- https://superpage.co.uk/swiftdrop — Same-day delivery service
+
+## Pricing
+
+SuperPage is free for the first year for your first site. No credit card required.
+
+## Contact & Support
+
+Website: https://superpage.co.uk

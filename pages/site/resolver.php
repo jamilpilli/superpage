@@ -193,9 +193,15 @@ $siteName = $page['title'] ?? $site['slug'];
 if (empty($seoDescription)) $seoDescription = $siteName;
 $seoDescription = mb_strimwidth($seoDescription, 0, 160, '...');
 
-$protocol     = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$siteBaseUrl  = $protocol . '://' . $_SERVER['HTTP_HOST'];
-$canonicalUrl = $siteBaseUrl . '/' . $site['slug'];
+$protocol    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$siteBaseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'];
+
+// Canonical aponta para o domínio custom quando disponível
+if (!empty($site['domain'])) {
+    $canonicalUrl = 'https://' . $site['domain'];
+} else {
+    $canonicalUrl = $siteBaseUrl . '/' . $site['slug'];
+}
 
 if (!empty($seoImage) && !preg_match('/^https?:\/\//', $seoImage)) {
     $seoImage = $siteBaseUrl . '/' . ltrim($seoImage, '/');
@@ -242,6 +248,30 @@ $seoKeywordsStr = implode(', ', array_unique(array_slice($seoKeywords, 0, 10)));
     <?php if ($seoImage): ?>
     <meta name="twitter:image"       content="<?= htmlspecialchars($seoImage) ?>">
     <?php endif; ?>
+
+    <!-- JSON-LD: Organization -->
+    <?php
+    $jsonld = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'Organization',
+        'name'     => $siteName,
+        'url'      => $canonicalUrl,
+        'description' => $seoDescription,
+    ];
+    if (!empty($seoImage))  $jsonld['image'] = $seoImage;
+    // Telefone do bloco de contato
+    foreach ($blocks as $_b) {
+        if ($_b['type'] === 'contact') {
+            $_cfg = json_decode($_b['config'] ?? '{}', true) ?: [];
+            if (!empty($_cfg['phone'])) {
+                $rawPhone = preg_replace('/\D/', '', $_cfg['phone']);
+                $jsonld['telephone'] = (str_starts_with(trim($_cfg['phone']), '+') ? '+' : '') . $rawPhone;
+            }
+            break;
+        }
+    }
+    echo '<script type="application/ld+json">' . json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+    ?>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -7,7 +7,99 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="/fav.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= APP_NAME ?> | No-Code Website Builder for UK Small Business</title>
+    <title>SuperPage — Get Your Business Online Today | UK Small Business Websites</title>
+    <meta name="description" content="You don't need to be super at anything — SuperPage already is. Get your UK small business online in minutes. No coding, no agency fees. Free for your first year.">
+    <link rel="canonical" href="https://superpage.co.uk/">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://superpage.co.uk/">
+    <meta property="og:title"       content="SuperPage — Get Your Business Online Today">
+    <meta property="og:description" content="You don't need to be super at anything — SuperPage already is. Get your UK small business online in minutes. No coding, no agency fees. Free for your first year.">
+    <meta property="og:site_name"   content="SuperPage">
+    <meta property="og:locale"      content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="SuperPage — Get Your Business Online Today">
+    <meta name="twitter:description" content="You don't need to be super at anything — SuperPage already is. Get your UK small business online in minutes. No coding, no agency fees. Free for your first year.">
+
+    <!-- JSON-LD: WebApplication + FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "SuperPage",
+          "url": "https://superpage.co.uk",
+          "description": "Website builder for UK small businesses. Get your business online in minutes — no tech skills required.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "inLanguage": "en-GB",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "GBP",
+            "description": "Free for the first year"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "SuperPage",
+            "url": "https://superpage.co.uk"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Do I need a website for my small business?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes — having a website is the modern equivalent of a business card. It helps customers find you on Google, builds trust, and lets you showcase your services 24/7 without any extra effort from you."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How much does it cost to get a website for my business in the UK?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "With SuperPage, your first website is completely free for the first year. No hidden fees, no credit card required. After that, plans are affordable and designed for small business budgets — a fraction of what a web agency would charge."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need any technical or coding skills to create a website?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "None at all. SuperPage is built for people who have never made a website before. You simply pick your sections, fill in your text and photos, and hit publish. The whole process takes minutes."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use my own domain name like mybusiness.co.uk?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. You can connect your own .co.uk or .com domain to your SuperPage site instantly. SSL security is included automatically at no extra cost."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What types of businesses use SuperPage?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "SuperPage is used by all kinds of UK small businesses — cleaners, hairdressers, restaurants, personal trainers, tradespeople, freelancers, beauty salons, and more. If you need to be found online, SuperPage is for you."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -144,12 +236,12 @@
                     <span class="text-sm font-bold text-[#a9a4ff]">🚀 1st year free for your first site!</span>
                 </div>
                 <h1 class="fade-in-delay-1 text-5xl md:text-6xl lg:text-7xl font-headline font-extrabold text-white tracking-tighter leading-[1.05] mb-5">
-                    Professional websites at<br>
-                    <span class="text-transparent bg-clip-text signature-glow">record speed</span>
+                    Get your business<br>
+                    <span class="text-transparent bg-clip-text signature-glow">online today</span>
                 </h1>
-                <h2 class="fade-in-delay-2 text-2xl font-headline font-bold text-[#9a94ff] mb-5">No code. No hassle.</h2>
+                <h2 class="fade-in-delay-2 text-2xl font-headline font-bold text-[#9a94ff] mb-5">No tech skills needed. No agency fees.</h2>
                 <p class="fade-in-delay-3 text-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
-                    The complete platform for small businesses and freelancers who need a fast, beautiful online presence — without the big agency price tag.
+                    You don't need to be super at anything — <strong class="text-white">SuperPage already is</strong>. Our nerdy superhero has built and structured everything for you. Just add your business details and you're online in minutes.
                 </p>
                 <div class="fade-in-delay-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                     <a href="<?= BASE_URL ?>/auth/register"
@@ -176,8 +268,8 @@
     <section id="features" class="py-24 bg-[#121220] scroll-mt-16">
         <div class="max-w-7xl mx-auto px-6 md:px-8">
             <div class="text-center mb-16 reveal">
-                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Everything you need to grow</h2>
-                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">Built specifically for the UK small business market with local integrations and dedicated support.</p>
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Everything a UK small business needs to get online</h2>
+                <p class="text-on-surface-variant max-w-2xl mx-auto text-lg">SuperPage has already done the hard work — you just add your details and you're live.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -329,7 +421,7 @@
     <section id="pricing" class="py-24 bg-gradient-to-b from-[#0d0d1a] via-[#121220] to-[#0d0d1a] scroll-mt-16">
         <div class="max-w-7xl mx-auto px-6 md:px-8 text-center">
             <div class="reveal">
-                <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Get ready to transform your business</h2>
+                <h2 class="text-4xl md:text-5xl font-headline font-extrabold text-white mb-4">Launch your UK small business website today</h2>
                 <p class="text-on-surface-variant mb-12 text-lg">Launch offer: the first year is completely free for your first site!</p>
             </div>
 
@@ -358,6 +450,53 @@
                     <span class="material-symbols-outlined text-sm">verified_user</span>
                     No credit card required.
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-24 bg-[#121220] scroll-mt-16">
+        <div class="max-w-3xl mx-auto px-6 md:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl font-headline font-bold text-white mb-4">Common questions</h2>
+                <p class="text-on-surface-variant text-lg">Everything you need to know before getting started.</p>
+            </div>
+
+            <?php $faqs = [
+                [
+                    'q' => 'Do I need a website for my small business?',
+                    'a' => 'Yes — a website is the modern business card. It helps customers find you on Google, builds trust, and lets you showcase your services 24/7 without any extra effort from you.'
+                ],
+                [
+                    'q' => 'How much does it cost to get a website in the UK?',
+                    'a' => 'Your first SuperPage site is completely free for the first year. No hidden fees, no credit card required. After that, plans are affordable and built for small business budgets — a fraction of what a web agency charges.'
+                ],
+                [
+                    'q' => 'Do I need any technical or coding skills?',
+                    'a' => 'None at all. SuperPage is built for people who have never made a website before. Fill in your business name, services, and photos — and you\'re live. The whole thing takes minutes.'
+                ],
+                [
+                    'q' => 'Can I use my own domain like mybusiness.co.uk?',
+                    'a' => 'Yes. Connect your own .co.uk or .com domain instantly. SSL security (the padlock in the browser) is included automatically at no extra cost.'
+                ],
+                [
+                    'q' => 'What types of businesses use SuperPage?',
+                    'a' => 'Cleaners, hairdressers, restaurants, personal trainers, tradespeople, freelancers, beauty salons, delivery services — any UK small business that needs to be found online.'
+                ],
+            ]; ?>
+
+            <div class="space-y-4 reveal">
+                <?php foreach ($faqs as $i => $faq): ?>
+                <div x-data="{ open: false }" class="bg-[#181828] border border-white/5 rounded-2xl overflow-hidden hover:border-[#a9a4ff]/20 transition-colors duration-200">
+                    <button @click="open = !open" class="w-full flex items-center justify-between px-6 py-5 text-left gap-4">
+                        <span class="font-headline font-bold text-white text-base md:text-lg"><?= htmlspecialchars($faq['q']) ?></span>
+                        <span class="material-symbols-outlined text-[#a9a4ff] flex-shrink-0 transition-transform duration-300" :class="open ? 'rotate-180' : ''">expand_more</span>
+                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="px-6 pb-5 text-on-surface-variant leading-relaxed">
+                        <?= htmlspecialchars($faq['a']) ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
