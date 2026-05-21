@@ -13,17 +13,8 @@ O Superpage está hospedado num VPS Hostinger via **EasyPanel**.
 
 ## Regras de Git para este projeto
 
-**NUNCA faça commit direto na branch `main`.**
-
-Antes de qualquer modificação:
-
-```bash
-git checkout main && git pull origin main
-git checkout -b feature/nome-da-tarefa   # ou fix/ ou chore/
-```
-
-Ao terminar, abra um Pull Request e aguarde revisão antes do merge.
-
+- Commits directamente na branch `main` — sem feature branches, sem PRs.
+- Fazer sempre `git pull origin main` antes de começar.
 - Mensagens de commit em **português**, um commit por mudança lógica.
 
 ## Stack e Ambiente
