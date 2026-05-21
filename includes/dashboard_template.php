@@ -135,7 +135,7 @@ function render_dashboard_header($title = "Dashboard") {
         }
     </style>
 </head>
-<body class="dark overflow-x-hidden" x-data>
+<body class="dark overflow-x-hidden">
 
     <!-- Sidebar fixa — visível apenas em desktop -->
     <nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
@@ -240,19 +240,19 @@ function render_dashboard_header($title = "Dashboard") {
             <span class="text-slate-600 font-light select-none hidden sm:inline">|</span>
 
             <!-- Site selector dropdown -->
-            <div class="relative" x-data="{ siteMenuOpen: false }" @click.outside="siteMenuOpen = false">
-                <button @click="siteMenuOpen = !siteMenuOpen"
+            <div class="relative">
+                <button onclick="document.getElementById('siteDropdown').style.display = document.getElementById('siteDropdown').style.display === 'none' ? 'block' : 'none'"
                         class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
                     <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
                         <?= $currentSite ? htmlspecialchars($currentSite['domain'] ?: $currentSite['slug']) : 'Select your page' ?>
                     </span>
-                    <svg class="w-4 h-4 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': siteMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
 
-                <div x-show="siteMenuOpen" style="display: none;"
+                <div id="siteDropdown" style="display: none;"
                      class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
                     <a href="<?= BASE_URL ?>/dashboard/create_site"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
@@ -351,6 +351,16 @@ function render_dashboard_footer() {
             </a>
         <?php endif; ?>
     </nav>
+
+        <script>
+        document.addEventListener('click', function(e) {
+            const dd = document.getElementById('siteDropdown');
+            if (!dd) return;
+            if (!e.target.closest('#siteDropdown') && !e.target.closest('[onclick*="siteDropdown"]')) {
+                dd.style.display = 'none';
+            }
+        });
+        </script>
 
         <?php if ($currentSite): ?>
             <?php
