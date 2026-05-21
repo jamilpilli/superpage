@@ -18,6 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name     = trim($_POST['name'] ?? '');
         $email    = trim($_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
+        $country  = trim($_POST['country'] ?? '');
+        $phone    = trim($_POST['phone'] ?? '');
+
+        $allowed_countries = ['GB','US','BR','PT','DE','FR','ES','IT','AU','CA','OTHER'];
+        $country = in_array($country, $allowed_countries) ? $country : null;
+
+        if ($phone !== '' && !preg_match('/^\+?[\d\s\-\(\)]{6,20}$/', $phone)) {
+            $phone = null;
+        }
 
         if (empty($name) || empty($email) || empty($password)) {
             $error = "All fields are required.";
@@ -35,7 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'name'          => $name,
                     'email'         => $email,
                     'password_hash' => $hash,
-                    'role'          => 'client'
+                    'role'          => 'client',
+                    'country'       => $country ?: null,
+                    'phone'         => $phone ?: null,
                 ]);
 
                 if ($userId) {
@@ -111,6 +122,34 @@ $csrf_token = generate_csrf_token();
                     <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password"
                            class="w-full bg-[#121220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-[#aba9bb]/50 focus:outline-none focus:border-[#a9a4ff]/50 focus:ring-1 focus:ring-[#a9a4ff]/30 transition-all"
                            placeholder="At least 6 characters">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-[#aba9bb] mb-2">Country</label>
+                        <select id="country" name="country" autocomplete="country"
+                                class="w-full bg-[#121220] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#a9a4ff]/50 focus:ring-1 focus:ring-[#a9a4ff]/30 transition-all appearance-none">
+                            <option value="" class="bg-[#121220]">Select…</option>
+                            <option value="GB" <?= (($_POST['country'] ?? '') === 'GB') ? 'selected' : '' ?> class="bg-[#121220]">🇬🇧 United Kingdom</option>
+                            <option value="US" <?= (($_POST['country'] ?? '') === 'US') ? 'selected' : '' ?> class="bg-[#121220]">🇺🇸 United States</option>
+                            <option value="BR" <?= (($_POST['country'] ?? '') === 'BR') ? 'selected' : '' ?> class="bg-[#121220]">🇧🇷 Brazil</option>
+                            <option value="PT" <?= (($_POST['country'] ?? '') === 'PT') ? 'selected' : '' ?> class="bg-[#121220]">🇵🇹 Portugal</option>
+                            <option value="DE" <?= (($_POST['country'] ?? '') === 'DE') ? 'selected' : '' ?> class="bg-[#121220]">🇩🇪 Germany</option>
+                            <option value="FR" <?= (($_POST['country'] ?? '') === 'FR') ? 'selected' : '' ?> class="bg-[#121220]">🇫🇷 France</option>
+                            <option value="ES" <?= (($_POST['country'] ?? '') === 'ES') ? 'selected' : '' ?> class="bg-[#121220]">🇪🇸 Spain</option>
+                            <option value="IT" <?= (($_POST['country'] ?? '') === 'IT') ? 'selected' : '' ?> class="bg-[#121220]">🇮🇹 Italy</option>
+                            <option value="AU" <?= (($_POST['country'] ?? '') === 'AU') ? 'selected' : '' ?> class="bg-[#121220]">🇦🇺 Australia</option>
+                            <option value="CA" <?= (($_POST['country'] ?? '') === 'CA') ? 'selected' : '' ?> class="bg-[#121220]">🇨🇦 Canada</option>
+                            <option value="OTHER" <?= (($_POST['country'] ?? '') === 'OTHER') ? 'selected' : '' ?> class="bg-[#121220]">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-[#aba9bb] mb-2">Phone <span class="text-[#aba9bb]/40 font-normal">(optional)</span></label>
+                        <input type="tel" id="phone" name="phone" autocomplete="tel"
+                               value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"
+                               class="w-full bg-[#121220] border border-white/10 rounded-xl px-4 py-3 text-white placeholder-[#aba9bb]/50 focus:outline-none focus:border-[#a9a4ff]/50 focus:ring-1 focus:ring-[#a9a4ff]/30 transition-all"
+                               placeholder="+44 7700 900000">
+                    </div>
                 </div>
 
                 <button type="submit"

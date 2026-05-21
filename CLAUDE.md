@@ -41,9 +41,14 @@ foreach ($f in Get-ChildItem migrations/*.sql | Sort-Object Name) { Get-Content 
 
 ## Migrations
 
-Adicione arquivos `.sql` na pasta `migrations/` com prefixo numérico sequencial (ex: `009_nome.sql`).
+Adicione arquivos `.sql` na pasta `migrations/` com prefixo numérico sequencial (ex: `010_nome.sql`).
 
-Execute via PowerShell (substituindo `nome_do_banco` pelo valor em `DB_NAME` do seu `.env`):
+**Opção preferida — `migrate.php`** (idempotente, rastreia execuções na tabela `schema_migrations`):
+```bash
+"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe" migrate.php
+```
+
+**Alternativa via PowerShell** (substituindo `nome_do_banco` pelo valor em `DB_NAME` do `.env`):
 ```powershell
 foreach ($f in Get-ChildItem migrations/*.sql | Sort-Object Name) { Get-Content $f.FullName | & "C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysql.exe" -u root nome_do_banco }
 ```
@@ -70,7 +75,8 @@ foreach ($f in Get-ChildItem migrations/*.sql | Sort-Object Name) { Get-Content 
 
 ```
 users → sites → pages → blocks
-                         └── config (JSON): configurações de cada bloco
+                │         └── config (JSON): configurações de cada bloco
+                └── subscriptions
 ```
 
 - **`blocks.type`**: `header`, `hero`, `about`, `services`, `products`, `testimonials`, `gallery`, `videos`, `contact`, `footer`
@@ -78,6 +84,10 @@ users → sites → pages → blocks
 - **`sites.design`**: JSON com `primary_color`, `title_font`, `text_font`, `button_style`
 - **`site_analytics`**: registra visitas (exceto quando `?preview=true`)
 - **`site_contacts`**: mensagens recebidas pelo formulário de contato
+- **`redirects`**: mapeamentos 301 (`old_url` → `new_url`, campo `is_active`)
+- **`rate_limits`**: throttle por IP e action (usado no formulário de contato do site)
+- **`hub_audit_logs`**: log de ações administrativas (admin_id, action, description)
+- **`subscriptions`** + **`themes`**: planos por site (MRR calculado no hub)
 
 ### Camadas
 
@@ -99,6 +109,17 @@ users → sites → pages → blocks
 - `partner` — parceiros (acesso parcial ao hub)
 - `admin` — acesso total, incluindo `/hub` e `hub.*` subdomínio
 
+### Páginas do Dashboard
+
+Todas em `pages/dashboard/`, requerem login. Passam `site_id` via query string quando referenciadas a um site específico.
+
+- `index.php` — visão geral (métricas, lista de sites)
+- `create_site.php` — criação de novo site
+- `content.php` — editor de blocos (Alpine.js + SortableJS + `/api/blocks`)
+- `contacts.php` — mensagens recebidas pelo formulário de contato
+- `settings.php` — configurações da conta do usuário
+- `site_settings.php` — configurações do site (slug, domínio customizado, status)
+
 ### API Endpoints
 
 Arquivos em `api/endpoints/` respondem JSON. Acesso via `/api/{nome-do-arquivo}`.
@@ -109,6 +130,18 @@ Arquivos em `api/endpoints/` respondem JSON. Acesso via `/api/{nome-do-arquivo}`
 ### Renderização do Site OnePage
 
 `pages/site/resolver.php` busca o site pelo slug, carrega os blocos ordenados por `sort_order`, e renderiza o HTML final com switch/case por tipo de bloco. O design global (cores, fontes) é aplicado via CSS custom properties.
+
+### BASE_URL e Paths
+
+`BASE_URL` é definido em `config/app.php` como string vazia em produção e Laragon (root). Em desenvolvimento com XAMPP com o projeto em subpasta `/superpage`, `BASE_URL` é automaticamente `/superpage`. Sempre use `BASE_URL` ao montar links internos em PHP (ex: `BASE_URL . '/dashboard'`).
+
+### CSRF
+
+Todo formulário mutante deve:
+1. Incluir `<?= generate_csrf_token() ?>` como campo hidden
+2. Verificar com `verify_csrf_token($_POST['csrf_token'] ?? '')` no handler
+
+Nunca pular CSRF em endpoints de API que recebem POST — `api/endpoints/blocks.php` usa sessão para autenticação e também exige CSRF.
 
 ## Design System — Kinetic
 
