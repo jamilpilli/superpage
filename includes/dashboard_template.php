@@ -241,7 +241,7 @@ function render_dashboard_header($title = "Dashboard") {
 
             <!-- Site selector dropdown -->
             <div class="relative">
-                <button onclick="document.getElementById('siteDropdown').style.display = document.getElementById('siteDropdown').style.display === 'none' ? 'block' : 'none'"
+                <button id="siteDropdownBtn"
                         class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
                     <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
@@ -253,7 +253,7 @@ function render_dashboard_header($title = "Dashboard") {
                 </button>
 
                 <div id="siteDropdown" style="display: none;"
-                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
+                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-[9999]">
                     <a href="<?= BASE_URL ?>/dashboard/create_site"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
                         <span class="material-symbols-outlined text-base" style="font-size:18px">add_circle</span>
@@ -353,13 +353,19 @@ function render_dashboard_footer() {
     </nav>
 
         <script>
-        document.addEventListener('click', function(e) {
-            const dd = document.getElementById('siteDropdown');
-            if (!dd) return;
-            if (!e.target.closest('#siteDropdown') && !e.target.closest('[onclick*="siteDropdown"]')) {
-                dd.style.display = 'none';
+        (function() {
+            var btn = document.getElementById('siteDropdownBtn');
+            var dd  = document.getElementById('siteDropdown');
+            if (btn && dd) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+                });
+                document.addEventListener('click', function(e) {
+                    if (!dd.contains(e.target)) dd.style.display = 'none';
+                });
             }
-        });
+        })();
         </script>
 
         <?php if ($currentSite): ?>
