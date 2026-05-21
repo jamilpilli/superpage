@@ -11,17 +11,12 @@ if (!$siteId) {
     redirect('/dashboard');
 }
 
-// Verifica ownership do site (Segurança) e se não foi deletado
-$site = db_fetch_one("SELECT * FROM sites WHERE id = :id AND user_id = :uid AND status != 'inactive'", [
-    ':id' => $siteId,
-    ':uid' => $user['id']
-]);
-
-if (!$site) {
+if (!can_access_site($siteId)) {
     http_response_code(404);
-    echo "Site não encontrado ou você não tem permissão para acessá-lo.";
+    echo "Site not found or access denied.";
     exit;
 }
+$site = db_fetch_one("SELECT * FROM sites WHERE id = :id AND status != 'inactive'", [':id' => $siteId]);
 
 $error = '';
 $success = '';

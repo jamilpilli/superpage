@@ -17,10 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $buttonStyle = $_POST['button_style'] ?? 'rounded';
         $redirectTo = $_POST['redirect_to'] ?? '/dashboard';
 
-        $checkSite = db_fetch_one("SELECT id FROM sites WHERE id = :id AND user_id = :uid", [
-            ':id' => $siteId,
-            ':uid' => $user['id']
-        ]);
+        $checkSite = can_access_site($siteId) ? ['id' => $siteId] : null;
 
         if ($checkSite) {
             $designJson = json_encode([
@@ -357,10 +354,7 @@ render_dashboard_header("Dashboard");
 <?php else: ?>
     <?php
     // ─── Dados para o painel geral ────────────────────────────────────────────
-    $allSites = db_fetch_all(
-        "SELECT id, slug, domain, status FROM sites WHERE user_id = :uid AND status != 'inactive' ORDER BY created_at DESC",
-        [':uid' => $user['id']]
-    );
+    $allSites = get_accessible_sites();
 
     $sitesWithStats = [];
     foreach ($allSites as $s) {

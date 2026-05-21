@@ -64,6 +64,27 @@ if (str_starts_with($requestUri, '/dashboard')) {
     exit;
 }
 
+// Rotas do Partner Panel
+if (str_starts_with($requestUri, '/partner')) {
+    require_login();
+
+    $path = str_replace('/partner', '', $requestUri);
+    if (empty($path) || $path === '/') {
+        require $basePath . '/partner/index.php';
+        exit;
+    }
+
+    $partnerFile = $basePath . "/partner{$path}.php";
+    if (file_exists($partnerFile)) {
+        require $partnerFile;
+        exit;
+    }
+
+    http_response_code(404);
+    echo "Page not found.";
+    exit;
+}
+
 // Rotas do HUB (SuperAdmin)
 if (str_starts_with($requestUri, '/hub')) {
     require_login(); // Protege o acesso

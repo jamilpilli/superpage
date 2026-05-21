@@ -11,10 +11,10 @@ if (!$site_id) {
     redirect(BASE_URL . '/dashboard');
 }
 
-$site = db_fetch_one("SELECT * FROM sites WHERE id = :sid AND user_id = :uid", [':sid' => $site_id, ':uid' => $user['id']]);
-if (!$site) {
+if (!can_access_site($site_id)) {
     redirect(BASE_URL . '/dashboard');
 }
+$site = db_fetch_one("SELECT * FROM sites WHERE id = :sid", [':sid' => $site_id]);
 
 // Marcar como lido (resolve)
 $mark_read = filter_input(INPUT_GET, 'mark_read', FILTER_VALIDATE_INT);

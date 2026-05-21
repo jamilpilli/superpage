@@ -55,6 +55,69 @@ function require_role($role) {
     }
 }
 
+// Verifica se o utilizador logado pode aceder a um site específico:
+// — dono do site, OU partner com esse cliente associado, OU admin
+function can_access_site($siteId) {
+    $user = get_logged_user();
+    if (!$user) return false;
+    if ($user['role'] === 'admin') return true;
+
+    global $pdo;
+
+    // Dono directo
+    $stmt = $pdo->prepare("SELECT id FROM sites WHERE id = :sid AND user_id = :uid");
+    $stmt->execute([':sid' => $siteId, ':uid' => $user['id']]);
+    if ($stmt->fetch()) return true;
+
+    // Partner: o dono do site é cliente deste partner
+    if ($user['role'] === 'partner') {
+        $stmt = $pdo->prepare("
+            SELECT s.id FROM sites s
+            JOIN partner_clients pc ON pc.client_id = s.user_id
+            WHERE s.id = :sid AND pc.partner_id = :pid
+        ");
+        $stmt->execute([':sid' => $siteId, ':pid' => $user['id']]);
+        if ($stmt->fetch()) return true;
+    }
+
+    return false;
+}
+
+// Devolve todos os sites acessíveis ao utilizador logado
+function get_accessible_sites() {
+    $user = get_logged_user();
+    if (!$user) return [];
+
+    global $pdo;
+
+    if ($user['role'] === 'admin') {
+        $stmt = $pdo->prepare("SELECT s.*, u.name as owner_name FROM sites s JOIN users u ON u.id = s.user_id WHERE s.status != 'inactive' ORDER BY s.created_at DESC");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    if ($user['role'] === 'partner') {
+        $stmt = $pdo->prepare("
+            SELECT s.*, u.name as owner_name FROM sites s
+            JOIN users u ON u.id = s.user_id
+            WHERE s.user_id = :uid AND s.status != 'inactive'
+            UNION
+            SELECT s.*, u.name as owner_name FROM sites s
+            JOIN users u ON u.id = s.user_id
+            JOIN partner_clients pc ON pc.client_id = s.user_id
+            WHERE pc.partner_id = :uid AND s.status != 'inactive'
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([':uid' => $user['id']]);
+        return $stmt->fetchAll();
+    }
+
+    // Cliente normal — só os seus
+    $stmt = $pdo->prepare("SELECT s.*, u.name as owner_name FROM sites s JOIN users u ON u.id = s.user_id WHERE s.user_id = :uid AND s.status != 'inactive' ORDER BY s.created_at DESC");
+    $stmt->execute([':uid' => $user['id']]);
+    return $stmt->fetchAll();
+}
+
 function generate_csrf_token() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

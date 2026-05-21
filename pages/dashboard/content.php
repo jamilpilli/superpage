@@ -11,10 +11,10 @@ if (!$siteId) {
     redirect('/dashboard');
 }
 
-$site = db_fetch_one("SELECT id, slug, domain FROM sites WHERE id = :id AND user_id = :uid AND status != 'inactive'", [':id' => $siteId, ':uid' => $user['id']]);
-if (!$site) {
+if (!can_access_site($siteId)) {
     redirect('/dashboard');
 }
+$site = db_fetch_one("SELECT id, slug, domain FROM sites WHERE id = :id AND status != 'inactive'", [':id' => $siteId]);
 
 render_dashboard_header("Edit Content – " . ($site['domain'] ?: $site['slug']));
 
