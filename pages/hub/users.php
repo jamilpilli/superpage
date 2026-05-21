@@ -137,7 +137,8 @@ $csrf = generate_csrf_token();
 render_hub_header("Users");
 ?>
 
-<div x-data="{ adminModal: false }" class="max-w-6xl flex flex-col gap-6">
+<div x-data="{ adminModal: false }">
+<div class="max-w-6xl flex flex-col gap-6">
 
     <!-- Flash messages -->
     <?php if ($msg): ?>
@@ -410,7 +411,7 @@ render_hub_header("Users");
         </div>
     </div>
 
-</div>
+</div><!-- /.max-w-6xl -->
 
 <!-- Create Admin Modal -->
 <div x-show="adminModal" x-transition:enter="transition ease-out duration-200"
@@ -479,5 +480,7 @@ render_hub_header("Users");
         </form>
     </div>
 </div>
+
+</div><!-- /x-data adminModal -->
 
 <?php render_hub_footer(); ?>
