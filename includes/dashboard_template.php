@@ -241,7 +241,7 @@ function render_dashboard_header($title = "Dashboard") {
 
             <!-- Site selector dropdown -->
             <div class="relative">
-                <button @click="siteMenuOpen = !siteMenuOpen" @click.away="siteMenuOpen = false"
+                <button @click="siteMenuOpen = !siteMenuOpen" @click.outside="siteMenuOpen = false"
                         class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
                     <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
