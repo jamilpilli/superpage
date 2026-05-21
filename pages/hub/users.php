@@ -127,97 +127,112 @@ $users = db_fetch_all(
     $params
 );
 
+// Contagens por role para os stats cards
+$allCounts = db_fetch_all("SELECT role, COUNT(*) as cnt FROM users GROUP BY role", []);
+$roleCounts = ['admin' => 0, 'partner' => 0, 'client' => 0];
+foreach ($allCounts as $rc) { $roleCounts[$rc['role']] = (int)$rc['cnt']; }
+$totalUsers = array_sum($roleCounts);
+
 $csrf = generate_csrf_token();
 render_hub_header("Users");
 ?>
 
-<div class="max-w-6xl flex flex-col gap-6">
+<div x-data="{ adminModal: false }" class="max-w-6xl flex flex-col gap-6">
 
+    <!-- Flash messages -->
     <?php if ($msg): ?>
     <div class="flex items-center gap-3 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl text-sm">
-        <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1">check_circle</span>
+        <span class="material-symbols-outlined flex-shrink-0" style="font-size:18px;font-variation-settings:'FILL' 1">check_circle</span>
         <?= htmlspecialchars($msg) ?>
     </div>
     <?php endif; ?>
-
     <?php if ($error): ?>
     <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm">
-        <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1">error</span>
+        <span class="material-symbols-outlined flex-shrink-0" style="font-size:18px;font-variation-settings:'FILL' 1">error</span>
         <?= htmlspecialchars($error) ?>
     </div>
     <?php endif; ?>
 
-    <!-- Create Admin Panel -->
-    <div x-data="{ open: false }" class="bg-[#121220] rounded-2xl border border-white/5 overflow-hidden">
-        <button @click="open = !open"
-                class="w-full flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors">
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:20px">admin_panel_settings</span>
-                <span class="font-bold text-white">Create Admin Account</span>
-            </div>
-            <span class="material-symbols-outlined text-slate-400 transition-transform duration-200"
-                  :class="open ? 'rotate-180' : ''" style="font-size:20px">expand_more</span>
-        </button>
-
-        <div x-show="open" x-transition style="display:none" class="border-t border-white/5 px-6 py-5">
-            <form method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
-                <input type="hidden" name="action" value="create_admin">
-                <div>
-                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Full Name</label>
-                    <input type="text" name="new_name" required placeholder="Admin Name"
-                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
-                </div>
-                <div>
-                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Email</label>
-                    <input type="email" name="new_email" required placeholder="admin@email.com"
-                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
-                </div>
-                <div>
-                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Password</label>
-                    <input type="password" name="new_password" required placeholder="Min. 6 characters"
-                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
-                </div>
-                <div class="sm:col-span-3 flex justify-end">
-                    <button type="submit"
-                            class="px-6 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors flex items-center gap-2">
-                        <span class="material-symbols-outlined" style="font-size:16px">add</span>
-                        Create Admin
-                    </button>
-                </div>
-            </form>
+    <!-- Page header -->
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-white font-headline">Users</h2>
+            <p class="text-sm text-on-surface-variant mt-0.5"><?= $totalUsers ?> total accounts</p>
         </div>
+        <button @click="adminModal = true"
+                class="flex items-center gap-2 px-5 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-[#685ef7]/20 flex-shrink-0">
+            <span class="material-symbols-outlined" style="font-size:18px">add</span>
+            New Admin
+        </button>
     </div>
 
-    <!-- Header + filters -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h2 class="text-xl font-bold text-white font-headline">All Users</h2>
-            <p class="text-sm text-on-surface-variant mt-0.5"><?= count($users) ?> users found</p>
-        </div>
+    <!-- Stats cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <?php
+        $statsCards = [
+            ['label' => 'Total Users',  'value' => $totalUsers,              'icon' => 'group',              'color' => '#a9a4ff', 'bg' => '#a9a4ff1a', 'href' => BASE_URL . '/hub/users'],
+            ['label' => 'Admins',       'value' => $roleCounts['admin'],     'icon' => 'admin_panel_settings','color' => '#685ef7', 'bg' => '#685ef71a', 'href' => BASE_URL . '/hub/users?role=admin'],
+            ['label' => 'Partners',     'value' => $roleCounts['partner'],   'icon' => 'handshake',          'color' => '#914feb', 'bg' => '#914feb1a', 'href' => BASE_URL . '/hub/users?role=partner'],
+            ['label' => 'Clients',      'value' => $roleCounts['client'],    'icon' => 'person',             'color' => '#aba9bb', 'bg' => '#aba9bb1a', 'href' => BASE_URL . '/hub/users?role=client'],
+        ];
+        foreach ($statsCards as $card): ?>
+        <a href="<?= $card['href'] ?>"
+           class="bg-[#121220] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:<?= $card['bg'] ?>">
+                    <span class="material-symbols-outlined" style="color:<?= $card['color'] ?>;font-size:18px"><?= $card['icon'] ?></span>
+                </div>
+                <span class="material-symbols-outlined text-slate-700 group-hover:text-slate-500 transition-colors" style="font-size:16px">arrow_forward</span>
+            </div>
+            <p class="text-3xl font-black text-white font-headline"><?= $card['value'] ?></p>
+            <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mt-1"><?= $card['label'] ?></p>
+        </a>
+        <?php endforeach; ?>
+    </div>
 
-        <form method="GET" action="" class="flex items-center gap-2 flex-wrap">
-            <input type="text" name="q" value="<?= htmlspecialchars($search) ?>"
-                   placeholder="Search name or email…"
-                   class="bg-[#121220] border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50 w-56">
-            <select name="role"
-                    class="bg-[#121220] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#a9a4ff]/50 appearance-none">
-                <option value="">All roles</option>
-                <option value="admin"   <?= $roleFilter === 'admin'   ? 'selected' : '' ?>>Admin</option>
-                <option value="partner" <?= $roleFilter === 'partner' ? 'selected' : '' ?>>Partner</option>
-                <option value="client"  <?= $roleFilter === 'client'  ? 'selected' : '' ?>>Client</option>
-            </select>
+    <!-- Search + role filter -->
+    <div class="flex flex-col sm:flex-row gap-3">
+        <form method="GET" action="" class="flex items-center gap-2 flex-1">
+            <div class="relative flex-1 max-w-xs">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" style="font-size:18px">search</span>
+                <input type="text" name="q" value="<?= htmlspecialchars($search) ?>"
+                       placeholder="Search name or email…"
+                       class="w-full bg-[#121220] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
+                <?php if ($roleFilter): ?>
+                <input type="hidden" name="role" value="<?= htmlspecialchars($roleFilter) ?>">
+                <?php endif; ?>
+            </div>
             <button type="submit"
-                    class="px-4 py-2 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors">
-                Filter
+                    class="px-4 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0">
+                Search
             </button>
             <?php if ($search || $roleFilter): ?>
             <a href="<?= BASE_URL ?>/hub/users"
-               class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-sm font-bold rounded-xl transition-colors">
+               class="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0">
                 Clear
             </a>
             <?php endif; ?>
         </form>
+
+        <!-- Role pill tabs -->
+        <div class="flex items-center gap-1.5 bg-[#121220] border border-white/5 rounded-xl p-1 flex-shrink-0">
+            <?php
+            $roleTabs = [
+                '' => 'All',
+                'admin' => 'Admin',
+                'partner' => 'Partner',
+                'client' => 'Client',
+            ];
+            foreach ($roleTabs as $val => $label):
+                $isActive = $roleFilter === $val;
+                $qs = $val ? '?role=' . $val . ($search ? '&q=' . urlencode($search) : '') : ($search ? '?q=' . urlencode($search) : '');
+            ?>
+            <a href="<?= BASE_URL ?>/hub/users<?= $qs ?>"
+               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all <?= $isActive ? 'bg-[#685ef7] text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">
+                <?= $label ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
     </div>
 
     <!-- Table -->
@@ -237,85 +252,113 @@ render_hub_header("Users");
                 <?php foreach ($users as $u):
                     $isSelf      = (int)$u['id'] === (int)$currentAdmin['id'];
                     $isSuspended = ($u['status'] ?? 'active') === 'suspended';
-                    $roleColors  = [
-                        'admin'   => 'bg-[#a9a4ff]/15 text-[#a9a4ff]',
-                        'partner' => 'bg-[#914feb]/15 text-[#c084fc]',
-                        'client'  => 'bg-white/5 text-slate-400',
-                    ];
-                    $roleColor = $roleColors[$u['role']] ?? $roleColors['client'];
+
+                    $avatarGrad = match($u['role']) {
+                        'admin'   => 'from-[#685ef7] to-[#a9a4ff]',
+                        'partner' => 'from-[#914feb] to-[#c084fc]',
+                        default   => 'from-slate-600 to-slate-500',
+                    };
+                    $roleBadge = match($u['role']) {
+                        'admin'   => 'bg-[#a9a4ff]/15 text-[#a9a4ff] border border-[#a9a4ff]/20',
+                        'partner' => 'bg-[#914feb]/15 text-[#c084fc] border border-[#914feb]/20',
+                        default   => 'bg-white/5 text-slate-400 border border-white/10',
+                    };
+                    $roleIcon = match($u['role']) {
+                        'admin'   => 'admin_panel_settings',
+                        'partner' => 'handshake',
+                        default   => 'person',
+                    };
                 ?>
-                <tr class="hover:bg-white/[0.02] transition-colors <?= $isSuspended ? 'opacity-50' : '' ?>">
+                <tr class="hover:bg-white/[0.02] transition-colors <?= $isSuspended ? 'opacity-40' : '' ?>">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#685ef7] to-[#914feb] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br <?= $avatarGrad ?> flex items-center justify-center text-white text-sm font-black flex-shrink-0">
                                 <?= strtoupper(substr($u['name'], 0, 1)) ?>
                             </div>
                             <div class="min-w-0">
-                                <p class="font-bold text-white truncate">
-                                    <?= htmlspecialchars($u['name']) ?>
+                                <div class="flex items-center gap-1.5">
+                                    <p class="font-bold text-white truncate"><?= htmlspecialchars($u['name']) ?></p>
                                     <?php if ($isSelf): ?>
-                                    <span class="text-[10px] text-[#a9a4ff] font-bold ml-1">(you)</span>
+                                    <span class="text-[10px] bg-[#a9a4ff]/10 text-[#a9a4ff] font-black px-1.5 py-0.5 rounded-full">YOU</span>
                                     <?php endif; ?>
-                                </p>
+                                    <?php if ($isSuspended): ?>
+                                    <span class="text-[10px] bg-red-500/10 text-red-400 font-black px-1.5 py-0.5 rounded-full">SUSPENDED</span>
+                                    <?php endif; ?>
+                                </div>
                                 <p class="text-xs text-on-surface-variant truncate"><?= htmlspecialchars($u['email']) ?></p>
                             </div>
                         </div>
                     </td>
                     <td class="px-4 py-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold <?= $roleColor ?>">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold <?= $roleBadge ?>">
+                            <span class="material-symbols-outlined" style="font-size:12px;font-variation-settings:'FILL' 1"><?= $roleIcon ?></span>
                             <?= ucfirst($u['role']) ?>
                         </span>
-                        <?php if ($isSuspended): ?>
-                        <span class="ml-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400">Suspended</span>
+                    </td>
+                    <td class="px-4 py-4 hidden md:table-cell">
+                        <?php if ((int)$u['site_count'] > 0): ?>
+                        <span class="inline-flex items-center gap-1 text-sm font-bold text-white">
+                            <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:14px">language</span>
+                            <?= (int)$u['site_count'] ?>
+                        </span>
+                        <?php else: ?>
+                        <span class="text-on-surface-variant">—</span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-4 hidden md:table-cell text-on-surface-variant">
-                        <?= (int)$u['site_count'] ?>
-                    </td>
-                    <td class="px-4 py-4 hidden lg:table-cell text-on-surface-variant">
+                    <td class="px-4 py-4 hidden lg:table-cell text-on-surface-variant text-xs">
                         <?= date('d M Y', strtotime($u['created_at'])) ?>
                     </td>
                     <td class="px-6 py-4">
                         <?php if (!$isSelf): ?>
-                        <div x-data="{ open: false }" class="relative flex justify-end">
-                            <button @click="open = !open" @click.outside="open = false"
+                        <div x-data="{ open: false }" class="relative flex justify-end" @click.outside="open = false">
+                            <button @click="open = !open"
                                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all">
-                                Actions
-                                <span class="material-symbols-outlined" style="font-size:14px">expand_more</span>
+                                <span class="material-symbols-outlined" style="font-size:16px">more_horiz</span>
                             </button>
 
-                            <div x-show="open" x-transition
-                                 class="absolute right-0 top-8 z-10 w-48 bg-[#1e1e2f] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 style="display:none"
+                                 class="absolute right-0 top-9 z-20 w-52 bg-[#1e1e2f] border border-white/10 rounded-xl shadow-2xl overflow-hidden origin-top-right">
 
                                 <!-- Change role -->
-                                <p class="px-4 pt-3 pb-1 text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Change Role</p>
+                                <div class="px-4 pt-3 pb-1">
+                                    <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">Change Role</p>
+                                </div>
                                 <?php foreach (['client', 'partner', 'admin'] as $role):
-                                    if ($role === $u['role']) continue; ?>
+                                    if ($role === $u['role']) continue;
+                                    $rIcon = match($role) { 'admin' => 'admin_panel_settings', 'partner' => 'handshake', default => 'person' };
+                                    $rColor = match($role) { 'admin' => 'text-[#a9a4ff]', 'partner' => 'text-[#c084fc]', default => 'text-slate-400' };
+                                ?>
                                 <form method="POST">
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="user_id"   value="<?= $u['id'] ?>">
                                     <input type="hidden" name="action"    value="set_role">
                                     <input type="hidden" name="role"      value="<?= $role ?>">
                                     <button type="submit"
-                                            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:16px">
-                                            <?= $role === 'admin' ? 'admin_panel_settings' : ($role === 'partner' ? 'handshake' : 'person') ?>
-                                        </span>
+                                            class="w-full text-left px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2.5">
+                                        <span class="material-symbols-outlined <?= $rColor ?>" style="font-size:16px"><?= $rIcon ?></span>
                                         Set as <?= ucfirst($role) ?>
                                     </button>
                                 </form>
                                 <?php endforeach; ?>
 
-                                <div class="border-t border-white/5 mt-1">
+                                <div class="border-t border-white/5 my-1"></div>
+
+                                <!-- Suspend / Activate -->
                                 <?php if ($isSuspended): ?>
                                 <form method="POST">
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="user_id"   value="<?= $u['id'] ?>">
                                     <input type="hidden" name="action"    value="activate">
                                     <button type="submit"
-                                            class="w-full text-left px-4 py-2.5 text-sm text-green-400 hover:text-green-300 hover:bg-green-500/10 transition-colors flex items-center gap-2">
+                                            class="w-full text-left px-4 py-2.5 text-sm text-green-400 hover:text-green-300 hover:bg-green-500/10 transition-colors flex items-center gap-2.5">
                                         <span class="material-symbols-outlined" style="font-size:16px">check_circle</span>
-                                        Activate
+                                        Activate Account
                                     </button>
                                 </form>
                                 <?php else: ?>
@@ -324,27 +367,25 @@ render_hub_header("Users");
                                     <input type="hidden" name="user_id"   value="<?= $u['id'] ?>">
                                     <input type="hidden" name="action"    value="suspend">
                                     <button type="submit"
-                                            class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                                            class="w-full text-left px-4 py-2.5 text-sm text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 transition-colors flex items-center gap-2.5">
                                         <span class="material-symbols-outlined" style="font-size:16px">block</span>
-                                        Suspend
+                                        Suspend Account
                                     </button>
                                 </form>
                                 <?php endif; ?>
-                                </div>
 
                                 <?php if ((int)$u['site_count'] === 0): ?>
-                                <div class="border-t border-white/5 mt-1">
-                                <form method="POST" onsubmit="return confirm('Delete this user permanently? This cannot be undone.')">
+                                <div class="border-t border-white/5 my-1"></div>
+                                <form method="POST" onsubmit="return confirm('Delete <?= htmlspecialchars(addslashes($u['name'])) ?> permanently? This cannot be undone.')">
                                     <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                                     <input type="hidden" name="user_id"   value="<?= $u['id'] ?>">
                                     <input type="hidden" name="action"    value="delete">
                                     <button type="submit"
-                                            class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                                            class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2.5">
                                         <span class="material-symbols-outlined" style="font-size:16px">delete</span>
                                         Delete User
                                     </button>
                                 </form>
-                                </div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -357,9 +398,10 @@ render_hub_header("Users");
 
                 <?php if (empty($users)): ?>
                 <tr>
-                    <td colspan="5" class="px-6 py-16 text-center text-on-surface-variant">
-                        <span class="material-symbols-outlined text-4xl block mb-2 opacity-30">person_search</span>
-                        No users found.
+                    <td colspan="5" class="px-6 py-20 text-center">
+                        <span class="material-symbols-outlined text-5xl block mb-3 text-slate-700">person_search</span>
+                        <p class="text-white font-bold mb-1">No users found</p>
+                        <p class="text-sm text-on-surface-variant">Try adjusting your search or filter.</p>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -368,6 +410,74 @@ render_hub_header("Users");
         </div>
     </div>
 
+</div>
+
+<!-- Create Admin Modal -->
+<div x-show="adminModal" x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     style="display:none"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+     @click.self="adminModal = false">
+
+    <div x-show="adminModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="w-full max-w-md bg-[#121220] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+
+        <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-[#685ef7]/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">admin_panel_settings</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white font-headline">New Admin Account</h3>
+                    <p class="text-xs text-on-surface-variant">Full SuperAdmin access</p>
+                </div>
+            </div>
+            <button @click="adminModal = false" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined" style="font-size:18px">close</span>
+            </button>
+        </div>
+
+        <form method="POST" class="px-6 py-5 flex flex-col gap-4">
+            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+            <input type="hidden" name="action" value="create_admin">
+
+            <div>
+                <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-2">Full Name</label>
+                <input type="text" name="new_name" required placeholder="e.g. John Smith"
+                       class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#a9a4ff]/50 transition-colors">
+            </div>
+            <div>
+                <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-2">Email Address</label>
+                <input type="email" name="new_email" required placeholder="admin@email.com"
+                       class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#a9a4ff]/50 transition-colors">
+            </div>
+            <div>
+                <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-2">Password</label>
+                <input type="password" name="new_password" required placeholder="Min. 6 characters"
+                       class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#a9a4ff]/50 transition-colors">
+            </div>
+
+            <div class="flex gap-3 pt-1">
+                <button type="button" @click="adminModal = false"
+                        class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-sm font-bold rounded-xl transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#685ef7]/20">
+                    <span class="material-symbols-outlined" style="font-size:16px">add</span>
+                    Create Admin
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php render_hub_footer(); ?>
