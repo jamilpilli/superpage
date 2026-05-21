@@ -19,9 +19,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $targetId = (int)($_POST['user_id'] ?? 0);
         $action   = $_POST['action'] ?? '';
 
-        // Impede que o admin se altere a si próprio
-        if ($targetId === (int)$currentAdmin['id']) {
+        // Criar novo admin
+        if ($action === 'create_admin') {
+            $newName  = trim($_POST['new_name'] ?? '');
+            $newEmail = trim($_POST['new_email'] ?? '');
+            $newPass  = trim($_POST['new_password'] ?? '');
+            if (empty($newName) || empty($newEmail) || empty($newPass)) {
+                $error = "All fields are required.";
+            } elseif (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+                $error = "Invalid email address.";
+            } elseif (strlen($newPass) < 6) {
+                $error = "Password must be at least 6 characters.";
+            } elseif (db_fetch_one("SELECT id FROM users WHERE email = :e", [':e' => $newEmail])) {
+                $error = "Email already in use.";
+            } else {
+                $newId = db_insert('users', [
+                    'name'          => $newName,
+                    'email'         => $newEmail,
+                    'password_hash' => password_hash($newPass, PASSWORD_DEFAULT, ['cost' => HASH_COST]),
+                    'role'          => 'admin',
+                ]);
+                db_insert('hub_audit_logs', ['admin_id' => $currentAdmin['id'], 'action_type' => 'user_create_admin', 'entity_type' => 'users', 'entity_id' => $newId, 'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '']);
+                $msg = "Admin account created for {$newEmail}.";
+            }
+        }
+
+        // Acções que requerem um targetId específico
+        if ($action === 'create_admin') {
+            // já tratado acima — não cair no bloco seguinte
+        } elseif ($targetId === (int)$currentAdmin['id']) {
             $error = "You cannot modify your own account here.";
+        } elseif ($action === 'delete') {
+            $siteCount = (int)(db_fetch_one("SELECT COUNT(id) as t FROM sites WHERE user_id = :id", [':id' => $targetId])['t'] ?? 0);
+            if ($siteCount > 0) {
+                $error = "Cannot delete user with active sites. Remove their sites first.";
+            } else {
+                db_insert('hub_audit_logs', [
+                    'admin_id'    => $currentAdmin['id'],
+                    'action_type' => 'user_delete',
+                    'entity_type' => 'users',
+                    'entity_id'   => $targetId,
+                    'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? '',
+                ]);
+                global $pdo;
+                $pdo->prepare("DELETE FROM users WHERE id = :id")->execute([':id' => $targetId]);
+                $msg = "User deleted.";
+            }
         } elseif ($action === 'set_role' && in_array($_POST['role'] ?? '', ['client', 'partner', 'admin'])) {
             $newRole = $_POST['role'];
             db_update('users', ['role' => $newRole], 'id = :id', [':id' => $targetId]);
@@ -103,6 +146,48 @@ render_hub_header("Users");
         <?= htmlspecialchars($error) ?>
     </div>
     <?php endif; ?>
+
+    <!-- Create Admin Panel -->
+    <div x-data="{ open: false }" class="bg-[#121220] rounded-2xl border border-white/5 overflow-hidden">
+        <button @click="open = !open"
+                class="w-full flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:20px">admin_panel_settings</span>
+                <span class="font-bold text-white">Create Admin Account</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 transition-transform duration-200"
+                  :class="open ? 'rotate-180' : ''" style="font-size:20px">expand_more</span>
+        </button>
+
+        <div x-show="open" x-transition style="display:none" class="border-t border-white/5 px-6 py-5">
+            <form method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                <input type="hidden" name="action" value="create_admin">
+                <div>
+                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Full Name</label>
+                    <input type="text" name="new_name" required placeholder="Admin Name"
+                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
+                </div>
+                <div>
+                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Email</label>
+                    <input type="email" name="new_email" required placeholder="admin@email.com"
+                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
+                </div>
+                <div>
+                    <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-1.5">Password</label>
+                    <input type="password" name="new_password" required placeholder="Min. 6 characters"
+                           class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#a9a4ff]/50">
+                </div>
+                <div class="sm:col-span-3 flex justify-end">
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined" style="font-size:16px">add</span>
+                        Create Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Header + filters -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -246,6 +331,21 @@ render_hub_header("Users");
                                 </form>
                                 <?php endif; ?>
                                 </div>
+
+                                <?php if ((int)$u['site_count'] === 0): ?>
+                                <div class="border-t border-white/5 mt-1">
+                                <form method="POST" onsubmit="return confirm('Delete this user permanently? This cannot be undone.')">
+                                    <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                                    <input type="hidden" name="user_id"   value="<?= $u['id'] ?>">
+                                    <input type="hidden" name="action"    value="delete">
+                                    <button type="submit"
+                                            class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                                        <span class="material-symbols-outlined" style="font-size:16px">delete</span>
+                                        Delete User
+                                    </button>
+                                </form>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <?php else: ?>
