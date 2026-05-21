@@ -5,8 +5,8 @@ function render_dashboard_header($title = "Dashboard") {
     global $currentSite; // Armazenar o site atual
     $user = get_logged_user();
 
-    // Buscar sites ativos do usuário para popular o dropdown
-    $sites = db_fetch_all("SELECT id, slug, domain, design FROM sites WHERE user_id = :uid AND status != 'inactive' ORDER BY created_at DESC", [':uid' => $user['id']]);
+    // Buscar sites acessíveis ao utilizador (admin vê todos, client vê os seus, partner vê os seus + clientes)
+    $sites = get_accessible_sites();
 
     $currentSiteId = isset($_GET['site_id']) ? (int)$_GET['site_id'] : null;
     $currentSite = null;

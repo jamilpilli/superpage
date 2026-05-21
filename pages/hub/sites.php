@@ -112,25 +112,34 @@ render_hub_header("Sites Management");
                                 <?= $s['theme_name'] ? htmlspecialchars($s['theme_name']) : '—' ?>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <form method="POST" action="<?= BASE_URL ?>/hub/sites" class="inline"
-                                      onsubmit="return confirm('Are you sure you want to change this site\'s status?');">
-                                    <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
-                                    <input type="hidden" name="site_id" value="<?= $s['id'] ?>">
-
-                                    <?php if ($s['status'] === 'active'): ?>
-                                        <input type="hidden" name="action" value="block">
-                                        <button type="submit"
-                                                class="px-4 py-1.5 text-xs font-bold rounded-full bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all">
-                                            Suspend
-                                        </button>
-                                    <?php else: ?>
-                                        <input type="hidden" name="action" value="unblock">
-                                        <button type="submit"
-                                                class="px-4 py-1.5 text-xs font-bold rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all">
-                                            Reactivate
-                                        </button>
-                                    <?php endif; ?>
-                                </form>
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $s['id'] ?>"
+                                       class="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#685ef7]/20 text-[#a9a4ff] hover:bg-[#685ef7]/40 transition-all">
+                                        Edit Content
+                                    </a>
+                                    <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $s['id'] ?>"
+                                       class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all">
+                                        Settings
+                                    </a>
+                                    <form method="POST" action="<?= BASE_URL ?>/hub/sites" class="inline"
+                                          onsubmit="return confirm('Are you sure you want to change this site\'s status?');">
+                                        <input type="hidden" name="csrf_token" value="<?= $csrf_token ?>">
+                                        <input type="hidden" name="site_id" value="<?= $s['id'] ?>">
+                                        <?php if ($s['status'] === 'active'): ?>
+                                            <input type="hidden" name="action" value="block">
+                                            <button type="submit"
+                                                    class="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all">
+                                                Suspend
+                                            </button>
+                                        <?php else: ?>
+                                            <input type="hidden" name="action" value="unblock">
+                                            <button type="submit"
+                                                    class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all">
+                                                Reactivate
+                                            </button>
+                                        <?php endif; ?>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
