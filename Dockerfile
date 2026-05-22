@@ -1,7 +1,11 @@
 FROM php:8.3-apache
 
 # PHP extensions necessárias
-RUN docker-php-ext-install pdo pdo_mysql
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+        libpng-dev libjpeg62-turbo-dev libwebp-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-configure gd --with-webp --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql gd
 
 # Activar módulos Apache
 RUN a2enmod rewrite headers
