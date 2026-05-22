@@ -510,23 +510,28 @@ function render_dashboard_footer() {
 
                                 <div class="flex-1 w-full" id="blocks-list">
                                     <template x-for="(item, index) in availableTypes" :key="item.type">
-                                        <div class="p-4 mb-2 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center justify-between group hover:border-indigo-400 cursor-move" :data-type="item.type">
+                                        <div class="p-4 mb-2 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center justify-between group"
+                                             :class="item.fixed ? 'opacity-75 bg-gray-50' : 'hover:border-indigo-400 cursor-move'"
+                                             :data-type="item.type">
 
                                             <div class="flex items-center flex-1">
-                                                <span class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Drag to reorder">↕</span>
-                                                <div class="flex-1 cursor-pointer" @click="toggleBlock(item.type)">
+                                                <span x-show="!item.fixed" class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Drag to reorder">↕</span>
+                                                <span x-show="item.fixed" class="text-gray-300 mr-4 text-xl" title="Fixed position">🔒</span>
+                                                <div class="flex-1" :class="item.fixed ? '' : 'cursor-pointer'" @click="!item.fixed && toggleBlock(item.type)">
                                                     <span class="font-bold text-gray-900 block text-sm" x-text="item.label"></span>
-                                                    <span class="text-xs text-gray-500" x-text="item.desc"></span>
+                                                    <span class="text-xs text-gray-500" x-text="item.fixed ? item.desc + ' — always present' : item.desc"></span>
                                                 </div>
                                             </div>
 
                                             <div class="ml-4 flex items-center gap-3">
                                                 <a x-show="isBlockActive(item.type)" :href="'<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?? 0 ?>&block_type=' + item.type" class="text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-1.5 rounded transition">Edit Content</a>
 
-                                                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                                                    <input type="checkbox" class="sr-only peer" :checked="isBlockActive(item.type)" @change="toggleBlock(item.type)">
-                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                                                </label>
+                                                <template x-if="!item.fixed">
+                                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                                        <input type="checkbox" class="sr-only peer" :checked="isBlockActive(item.type)" @change="toggleBlock(item.type)">
+                                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                                    </label>
+                                                </template>
                                             </div>
 
                                         </div>
@@ -547,16 +552,16 @@ function render_dashboard_footer() {
                     pageId: pageId,
                     blocks: [],
                     availableTypes: [
-                        { type: 'header',       label: 'Header (Navigation)',    desc: 'Top navigation bar with logo.' },
-                        { type: 'hero',         label: 'Hero / Main Banner',     desc: 'Full-width banner with headline.' },
-                        { type: 'about',        label: 'About Us',               desc: 'Text description with side image.' },
-                        { type: 'services',     label: 'Services',               desc: 'Grid of service highlights.' },
-                        { type: 'products',     label: 'Products',               desc: 'Product showcase cards.' },
-                        { type: 'gallery',      label: 'Photo Gallery',          desc: 'Drag-and-drop photo grid.' },
-                        { type: 'videos',       label: 'Videos',                 desc: 'Embedded YouTube videos.' },
-                        { type: 'testimonials', label: 'Testimonials',           desc: 'Quotes and social proof.' },
-                        { type: 'contact',      label: 'Contact',                desc: 'Email form and contact details.' },
-                        { type: 'footer',       label: 'Footer',                 desc: 'Bottom closing section.' }
+                        { type: 'header',       label: 'Header (Navigation)',    desc: 'Top navigation bar with logo.',    fixed: true  },
+                        { type: 'hero',         label: 'Hero / Main Banner',     desc: 'Full-width banner with headline.', fixed: false },
+                        { type: 'about',        label: 'About Us',               desc: 'Text description with side image.',fixed: false },
+                        { type: 'services',     label: 'Services',               desc: 'Grid of service highlights.',      fixed: false },
+                        { type: 'products',     label: 'Products',               desc: 'Product showcase cards.',          fixed: false },
+                        { type: 'gallery',      label: 'Photo Gallery',          desc: 'Drag-and-drop photo grid.',        fixed: false },
+                        { type: 'videos',       label: 'Videos',                 desc: 'Embedded YouTube videos.',         fixed: false },
+                        { type: 'testimonials', label: 'Testimonials',           desc: 'Quotes and social proof.',         fixed: false },
+                        { type: 'contact',      label: 'Contact',                desc: 'Email form and contact details.',  fixed: false },
+                        { type: 'footer',       label: 'Footer',                 desc: 'Bottom closing section.',          fixed: true  }
                     ],
                     isSaving: false,
                     sortableInstance: null,
@@ -657,6 +662,8 @@ function render_dashboard_footer() {
                                 animation: 150,
                                 ghostClass: 'bg-indigo-50',
                                 handle: '.cursor-move',
+                                filter: '[data-type="header"], [data-type="footer"]',
+                                preventOnFilter: true,
                                 onEnd: (evt) => {
                                     this.evaluateFullReorder();
                                 }
