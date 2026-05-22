@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Regra de Debug — OBRIGATÓRIO
+
+**Antes de alterar qualquer código para corrigir um bug de frontend (UI não funciona, botão não responde, modal não abre, etc.):**
+
+1. Pedir ao utilizador: **F12 → Console → copiar todos os erros**
+2. Pedir ao utilizador: **F12 → Network → identificar requests com erro**
+3. Só depois de ter essa informação, propor e aplicar a correção
+
+Nunca deduzir a causa de um bug de frontend sem evidência do browser. Uma linha de erro no console vale mais do que 10 commits de tentativa e erro.
+
 ## Deploy — Produção
 
 O Superpage está hospedado num VPS Hostinger via **EasyPanel**.
