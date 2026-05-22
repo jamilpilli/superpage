@@ -560,7 +560,7 @@ function render_dashboard_footer() {
                         var editHref = BASE + '/dashboard/content?site_id=' + SITE_ID + '&block_type=' + item.type;
                         div.innerHTML =
                             '<div class="flex items-center flex-1">' +
-                                '<span class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Drag to reorder">\u2195</span>' +
+                                '<span class="cursor-move text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition select-none" title="Drag to reorder">\u2195</span>' +
                                 '<div class="flex-1 cursor-pointer" data-block-label>' +
                                     '<span class="font-bold text-gray-900 block text-sm">' + item.label + '</span>' +
                                     '<span class="text-xs text-gray-500">' + item.desc + '</span>' +
@@ -659,7 +659,8 @@ function render_dashboard_footer() {
                         sortableInstance = new Sortable(el, {
                             animation: 150,
                             ghostClass: 'bg-indigo-50',
-                            handle: '.cursor-move',
+                            filter: 'input, a, button, label',
+                            preventOnFilter: false,
                             onEnd: function() { evaluateFullReorder(); }
                         });
                     }
