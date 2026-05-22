@@ -159,12 +159,12 @@ function render_dashboard_header($title = "Dashboard") {
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Content</span>
                 </a>
                 <!-- Edit Design -->
-                <button type="button" @click="$dispatch('open-design-modal')" class="<?= $navInactive ?> w-full text-left">
+                <button type="button" onclick="openDesignModal()" class="<?= $navInactive ?> w-full text-left">
                     <span class="material-symbols-outlined text-xl">palette</span>
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Design</span>
                 </button>
                 <!-- Edit Structure -->
-                <button type="button" @click="$dispatch('open-structure-modal')" class="<?= $navInactive ?> w-full text-left">
+                <button type="button" onclick="openStructureModal()" class="<?= $navInactive ?> w-full text-left">
                     <span class="material-symbols-outlined text-xl">account_tree</span>
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Structure</span>
                 </button>
@@ -328,7 +328,7 @@ function render_dashboard_footer() {
                 <span class="material-symbols-outlined text-2xl">edit_note</span>
                 <span>Content</span>
             </a>
-            <button type="button" @click="$dispatch('open-design-modal')" class="<?= $bnInactive ?>">
+            <button type="button" onclick="openDesignModal()" class="<?= $bnInactive ?>">
                 <span class="material-symbols-outlined text-2xl">palette</span>
                 <span>Design</span>
             </button>
@@ -366,6 +366,11 @@ function render_dashboard_footer() {
                 });
             }
         })();
+
+        window.openDesignModal    = function() { var m=document.getElementById('designModal');    if(m) m.style.display='flex'; };
+        window.closeDesignModal   = function() { var m=document.getElementById('designModal');    if(m) m.style.display='none'; };
+        window.openStructureModal = function() { var m=document.getElementById('structureModal'); if(m) m.style.display='block'; };
+        window.closeStructureModal= function() { var m=document.getElementById('structureModal'); if(m) m.style.display='none'; };
         </script>
 
         <?php if ($currentSite): ?>
@@ -377,145 +382,123 @@ function render_dashboard_footer() {
                 $buttonStyle = $design['button_style'] ?? 'rounded';
             ?>
             <!-- Design Modal (Kinetic) -->
-            <div x-data="{
-                     isModalOpen: false,
-                     primaryColor: '<?= $primaryColor ?>',
-                     titleFont: '<?= $titleFont ?>',
-                     textFont: '<?= $textFont ?>',
-                     buttonStyle: '<?= $buttonStyle ?>',
-                     loadFont(font) {
-                         if (!font) return;
-                         const id = 'gf-' + font.replace(/\s+/g, '-');
-                         if (!document.getElementById(id)) {
-                             const link = document.createElement('link');
-                             link.id = id;
-                             link.rel = 'stylesheet';
-                             link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
-                             document.head.appendChild(link);
-                         }
-                     }
-                 }"
-                 x-init="loadFont(titleFont); loadFont(textFont); $watch('titleFont', v => loadFont(v)); $watch('textFont', v => loadFont(v))"
-                 @open-design-modal.window="isModalOpen = true">
-                <div x-show="isModalOpen" style="display: none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
-                    <div x-show="isModalOpen" class="fixed inset-0" @click="isModalOpen = false"></div>
+            <?php $initBr = $buttonStyle === 'rounded-full' ? '9999px' : ($buttonStyle === 'rounded' ? '8px' : '2px'); ?>
+            <div id="designModal" style="display:none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
+                <div class="fixed inset-0" onclick="closeDesignModal()"></div>
 
-                    <div class="relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#F4F5F7]">
-                        <form method="POST" action="<?= BASE_URL ?>/dashboard">
-                            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-                            <input type="hidden" name="action" value="update_design">
-                            <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
-                            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                <div class="relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#F4F5F7]">
+                    <form method="POST" action="<?= BASE_URL ?>/dashboard">
+                        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+                        <input type="hidden" name="action" value="update_design">
+                        <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
+                        <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
 
-                            <!-- Modal Header -->
-                            <div class="px-8 py-6 bg-white flex justify-between items-center border-b border-gray-100">
-                                <div>
-                                    <h2 class="text-2xl font-extrabold text-[#0d0d1a] font-headline tracking-tight">Site Appearance</h2>
-                                    <p class="text-sm text-gray-500 mt-0.5">Customise your site's visual identity</p>
-                                </div>
-                                <button type="button" @click="isModalOpen = false" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors text-xl leading-none font-bold">✕</button>
+                        <!-- Modal Header -->
+                        <div class="px-8 py-6 bg-white flex justify-between items-center border-b border-gray-100">
+                            <div>
+                                <h2 class="text-2xl font-extrabold text-[#0d0d1a] font-headline tracking-tight">Site Appearance</h2>
+                                <p class="text-sm text-gray-500 mt-0.5">Customise your site's visual identity</p>
                             </div>
+                            <button type="button" onclick="closeDesignModal()" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors text-xl leading-none font-bold">✕</button>
+                        </div>
 
-                            <!-- Modal Body -->
-                            <div class="p-8 space-y-8">
-                                <!-- Row 1: Color + Button Style -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-[#121220]">Primary Colour</label>
-                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200">
-                                            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0" :style="'background:' + primaryColor"></div>
-                                            <input type="color" name="primary_color" x-model="primaryColor" class="sr-only" id="colorPicker">
-                                            <label for="colorPicker" class="flex-1 font-mono text-sm text-gray-700 cursor-pointer" x-text="primaryColor"></label>
-                                            <span class="material-symbols-outlined text-gray-400 cursor-pointer" style="font-size:20px" onclick="document.getElementById('colorPicker').click()">colorize</span>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-[#121220]">Button Style</label>
-                                        <div class="relative">
-                                            <select name="button_style" x-model="buttonStyle"
-                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                                <option value="square">Square</option>
-                                                <option value="rounded">Slightly Rounded</option>
-                                                <option value="rounded-full">Pill (Fully Rounded)</option>
-                                            </select>
-                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
-                                        </div>
+                        <!-- Modal Body -->
+                        <div class="p-8 space-y-8">
+                            <!-- Row 1: Color + Button Style -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-[#121220]">Primary Colour</label>
+                                    <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200">
+                                        <div id="colorSwatch" class="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0" style="background:<?= htmlspecialchars($primaryColor) ?>"></div>
+                                        <input type="color" name="primary_color" id="colorPicker" value="<?= htmlspecialchars($primaryColor) ?>" class="sr-only">
+                                        <label for="colorPicker" class="flex-1 font-mono text-sm text-gray-700 cursor-pointer" id="colorHexLabel"><?= htmlspecialchars($primaryColor) ?></label>
+                                        <span class="material-symbols-outlined text-gray-400 cursor-pointer" style="font-size:20px" onclick="document.getElementById('colorPicker').click()">colorize</span>
                                     </div>
                                 </div>
-
-                                <!-- Row 2: Fonts -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-[#121220]">Heading Font</label>
-                                        <div class="relative">
-                                            <select name="title_font" x-model="titleFont"
-                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                                <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
-                                                <option value="Montserrat">Montserrat</option>
-                                                <option value="Playfair Display">Playfair Display</option>
-                                                <option value="Inter">Inter</option>
-                                            </select>
-                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
-                                        </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-[#121220]">Button Style</label>
+                                    <div class="relative">
+                                        <select name="button_style" id="btnStyleSelect"
+                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                            <option value="square" <?= $buttonStyle === 'square' ? 'selected' : '' ?>>Square</option>
+                                            <option value="rounded" <?= $buttonStyle === 'rounded' ? 'selected' : '' ?>>Slightly Rounded</option>
+                                            <option value="rounded-full" <?= $buttonStyle === 'rounded-full' ? 'selected' : '' ?>>Pill (Fully Rounded)</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
                                     </div>
-                                    <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-[#121220]">Body Font</label>
-                                        <div class="relative">
-                                            <select name="text_font" x-model="textFont"
-                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                                <option value="Inter">Inter</option>
-                                                <option value="Roboto">Roboto</option>
-                                                <option value="Open Sans">Open Sans</option>
-                                                <option value="Manrope">Manrope</option>
-                                            </select>
-                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Live Preview -->
-                                <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
-                                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
-                                    <h4 class="text-xl font-extrabold text-[#121220]" :style="'font-family:' + titleFont">Sample Headline</h4>
-                                    <p class="text-sm text-gray-500 leading-relaxed" :style="'font-family:' + textFont">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
-                                    <button type="button" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
-                                            :style="'background:' + primaryColor + '; border-radius:' + (buttonStyle === 'rounded-full' ? '9999px' : buttonStyle === 'rounded' ? '8px' : '2px') + '; font-family:' + titleFont">
-                                        Action Button
-                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Modal Footer -->
-                            <div class="px-8 py-5 bg-white flex justify-end items-center gap-3 border-t border-gray-100">
-                                <button type="button" @click="isModalOpen = false"
-                                        class="px-6 py-2.5 rounded-full text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-                                    Cancel
-                                </button>
-                                <button type="submit"
-                                        class="px-8 py-2.5 rounded-full bg-[#5B4FE9] text-white font-bold text-sm shadow-lg shadow-[#5B4FE9]/25 hover:bg-[#4a3ecc] transition-all active:scale-95">
-                                    Save Changes
+                            <!-- Row 2: Fonts -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-[#121220]">Heading Font</label>
+                                    <div class="relative">
+                                        <select name="title_font" id="titleFontSelect"
+                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                            <option value="Plus Jakarta Sans" <?= $titleFont === 'Plus Jakarta Sans' ? 'selected' : '' ?>>Plus Jakarta Sans</option>
+                                            <option value="Montserrat" <?= $titleFont === 'Montserrat' ? 'selected' : '' ?>>Montserrat</option>
+                                            <option value="Playfair Display" <?= $titleFont === 'Playfair Display' ? 'selected' : '' ?>>Playfair Display</option>
+                                            <option value="Inter" <?= $titleFont === 'Inter' ? 'selected' : '' ?>>Inter</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-[#121220]">Body Font</label>
+                                    <div class="relative">
+                                        <select name="text_font" id="textFontSelect"
+                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                            <option value="Inter" <?= $textFont === 'Inter' ? 'selected' : '' ?>>Inter</option>
+                                            <option value="Roboto" <?= $textFont === 'Roboto' ? 'selected' : '' ?>>Roboto</option>
+                                            <option value="Open Sans" <?= $textFont === 'Open Sans' ? 'selected' : '' ?>>Open Sans</option>
+                                            <option value="Manrope" <?= $textFont === 'Manrope' ? 'selected' : '' ?>>Manrope</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Preview -->
+                            <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
+                                <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
+                                <h4 id="previewHeading" class="text-xl font-extrabold text-[#121220]" style="font-family:<?= htmlspecialchars($titleFont) ?>">Sample Headline</h4>
+                                <p id="previewText" class="text-sm text-gray-500 leading-relaxed" style="font-family:<?= htmlspecialchars($textFont) ?>">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
+                                <button type="button" id="previewBtn" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
+                                        style="background:<?= htmlspecialchars($primaryColor) ?>; border-radius:<?= $initBr ?>; font-family:<?= htmlspecialchars($titleFont) ?>">
+                                    Action Button
                                 </button>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="px-8 py-5 bg-white flex justify-end items-center gap-3 border-t border-gray-100">
+                            <button type="button" onclick="closeDesignModal()"
+                                    class="px-6 py-2.5 rounded-full text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="px-8 py-2.5 rounded-full bg-[#5B4FE9] text-white font-bold text-sm shadow-lg shadow-[#5B4FE9]/25 hover:bg-[#4a3ecc] transition-all active:scale-95">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
             <!-- Structure Modal -->
             <?php $page = db_fetch_one("SELECT id FROM pages WHERE site_id = :sid AND status = 'published' LIMIT 1", [':sid' => $currentSite['id']]); ?>
-            <div x-data="{ isStructOpen: false }"
-                 @open-structure-modal.window="isStructOpen = true">
-                <div x-show="isStructOpen" style="display: none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div x-show="isStructOpen" class="fixed inset-0 bg-black/60 transition-opacity" @click="isStructOpen = false"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div id="structureModal" style="display:none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-black/60 transition-opacity" onclick="closeStructureModal()"></div>
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                        <div x-show="isStructOpen" class="inline-block align-bottom bg-gray-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
+                    <div class="inline-block align-bottom bg-gray-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
 
-                            <div class="bg-white px-4 py-3 border-b flex justify-between items-center z-10 relative">
-                                <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Site Structure</h3>
-                                <button type="button" @click="isStructOpen = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
-                            </div>
+                        <div class="bg-white px-4 py-3 border-b flex justify-between items-center z-10 relative">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Site Structure</h3>
+                            <button type="button" onclick="closeStructureModal()" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                        </div>
 
                             <div x-data="editorApp(<?= $currentSite['id'] ?>, <?= $page['id'] ?? 0 ?>)" class="bg-gray-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[70vh] overflow-y-auto flex flex-col relative">
 
@@ -550,7 +533,6 @@ function render_dashboard_footer() {
                                 </div>
                             </div>
 
-                        </div>
                     </div>
                 </div>
             </div>
@@ -717,6 +699,56 @@ function render_dashboard_footer() {
                     }
                 }));
             });
+            </script>
+
+            <!-- Design Modal Live Preview JS -->
+            <script>
+            (function() {
+                var colorPicker  = document.getElementById('colorPicker');
+                var colorSwatch  = document.getElementById('colorSwatch');
+                var colorHexLbl  = document.getElementById('colorHexLabel');
+                var btnStyleSel  = document.getElementById('btnStyleSelect');
+                var titleFontSel = document.getElementById('titleFontSelect');
+                var textFontSel  = document.getElementById('textFontSelect');
+                var prevHeading  = document.getElementById('previewHeading');
+                var prevText     = document.getElementById('previewText');
+                var prevBtn      = document.getElementById('previewBtn');
+
+                function getBorderRadius(s) {
+                    if (s === 'rounded-full') return '9999px';
+                    if (s === 'rounded') return '8px';
+                    return '2px';
+                }
+                function loadFont(font) {
+                    if (!font) return;
+                    var id = 'gf-' + font.replace(/\s+/g, '-');
+                    if (!document.getElementById(id)) {
+                        var link = document.createElement('link');
+                        link.id = id; link.rel = 'stylesheet';
+                        link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
+                        document.head.appendChild(link);
+                    }
+                }
+                function updatePreview() {
+                    var color     = colorPicker  ? colorPicker.value  : '';
+                    var btnStyle  = btnStyleSel  ? btnStyleSel.value  : 'rounded';
+                    var titleFont = titleFontSel ? titleFontSel.value : 'Inter';
+                    var textFont  = textFontSel  ? textFontSel.value  : 'Inter';
+                    if (colorSwatch) colorSwatch.style.background = color;
+                    if (colorHexLbl) colorHexLbl.textContent = color;
+                    if (prevHeading) prevHeading.style.fontFamily = titleFont;
+                    if (prevText)    prevText.style.fontFamily = textFont;
+                    if (prevBtn) {
+                        prevBtn.style.background    = color;
+                        prevBtn.style.borderRadius  = getBorderRadius(btnStyle);
+                        prevBtn.style.fontFamily    = titleFont;
+                    }
+                }
+                if (colorPicker)  colorPicker.addEventListener('input', updatePreview);
+                if (btnStyleSel)  btnStyleSel.addEventListener('change', updatePreview);
+                if (titleFontSel) titleFontSel.addEventListener('change', function() { loadFont(this.value); updatePreview(); });
+                if (textFontSel)  textFontSel.addEventListener('change',  function() { loadFont(this.value); updatePreview(); });
+            })();
             </script>
         <?php endif; ?>
 </body>
