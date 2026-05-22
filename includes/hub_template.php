@@ -12,8 +12,10 @@ function render_hub_header($title = "HUB Admin") {
     $uri = $_SERVER['REQUEST_URI'];
     $navItems = [
         ['href' => BASE_URL . '/hub',          'label' => 'Overview',        'icon' => 'dashboard',        'match' => fn($u) => rtrim($u, '/') === rtrim(BASE_URL . '/hub', '/')],
-        ['href' => BASE_URL . '/hub/sites',    'label' => 'Sites',           'icon' => 'language',         'match' => fn($u) => strpos($u, '/hub/sites') !== false],
-        ['href' => BASE_URL . '/hub/users',    'label' => 'Users',           'icon' => 'group',            'match' => fn($u) => strpos($u, '/hub/users') !== false],
+        ['href' => BASE_URL . '/hub/sites',          'label' => 'Sites',           'icon' => 'language',         'match' => fn($u) => strpos($u, '/hub/sites') !== false],
+        ['href' => BASE_URL . '/hub/create_client',  'label' => 'Create Client',   'icon' => 'add_business',     'match' => fn($u) => strpos($u, '/hub/create_client') !== false],
+        ['href' => BASE_URL . '/hub/import_clients', 'label' => 'Import Clients',  'icon' => 'upload_file',      'match' => fn($u) => strpos($u, '/hub/import_clients') !== false],
+        ['href' => BASE_URL . '/hub/users',          'label' => 'Users',           'icon' => 'group',            'match' => fn($u) => strpos($u, '/hub/users') !== false],
         ['href' => BASE_URL . '/hub/partners', 'label' => 'Partners',        'icon' => 'handshake',        'match' => fn($u) => strpos($u, '/hub/partners') !== false],
         ['href' => BASE_URL . '/hub/settings', 'label' => 'Global Settings', 'icon' => 'settings',         'match' => fn($u) => strpos($u, '/hub/settings') !== false],
     ];
