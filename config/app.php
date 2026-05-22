@@ -7,6 +7,8 @@ if (!defined('APP_NAME')) {
     define('APP_DEBUG', getenv('APP_DEBUG') === 'true');
     define('UPLOAD_DIR', __DIR__ . '/../uploads');
 
+    define('N8N_PROSPECT_WEBHOOK_URL', getenv('N8N_PROSPECT_WEBHOOK_URL') ?: '');
+
     // Helper de base path para ambiente Dev XAMPP vs Produção
     $basePathLocal = (strpos($_SERVER['REQUEST_URI'] ?? '', '/superpage') === 0) ? '/superpage' : '';
     define('BASE_URL', $basePathLocal);
