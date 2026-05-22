@@ -5,7 +5,7 @@ function render_dashboard_header($title = "Dashboard") {
     global $currentSite; // Armazenar o site atual
     $user = get_logged_user();
 
-    // Buscar sites acessíveis ao utilizador (admin vê todos, client vê os seus, partner vê os seus + clientes)
+    // Buscar sites acessíveis (admin vê todos, partner vê os seus + clientes, client vê os seus)
     $sites = get_accessible_sites();
 
     $currentSiteId = isset($_GET['site_id']) ? (int)$_GET['site_id'] : null;
@@ -135,7 +135,7 @@ function render_dashboard_header($title = "Dashboard") {
         }
     </style>
 </head>
-<body class="dark overflow-x-hidden">
+<body class="dark overflow-x-hidden" x-data="{ siteMenuOpen: false }">
 
     <!-- Sidebar fixa — visível apenas em desktop -->
     <nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
@@ -159,12 +159,12 @@ function render_dashboard_header($title = "Dashboard") {
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Content</span>
                 </a>
                 <!-- Edit Design -->
-                <button type="button" onclick="openDesignModal()" class="<?= $navInactive ?> w-full text-left">
+                <button type="button" @click="$dispatch('open-design-modal')" class="<?= $navInactive ?> w-full text-left">
                     <span class="material-symbols-outlined text-xl">palette</span>
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Design</span>
                 </button>
                 <!-- Edit Structure -->
-                <button type="button" onclick="openStructureModal()" class="<?= $navInactive ?> w-full text-left">
+                <button type="button" @click="$dispatch('open-structure-modal')" class="<?= $navInactive ?> w-full text-left">
                     <span class="material-symbols-outlined text-xl">account_tree</span>
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Edit Structure</span>
                 </button>
@@ -241,19 +241,19 @@ function render_dashboard_header($title = "Dashboard") {
 
             <!-- Site selector dropdown -->
             <div class="relative">
-                <button id="siteDropdownBtn"
+                <button @click="siteMenuOpen = !siteMenuOpen" @click.outside="siteMenuOpen = false"
                         class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
                     <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
                         <?= $currentSite ? htmlspecialchars($currentSite['domain'] ?: $currentSite['slug']) : 'Select your page' ?>
                     </span>
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': siteMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
 
-                <div id="siteDropdown" style="display: none;"
-                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-[9999]">
+                <div x-show="siteMenuOpen" style="display: none;"
+                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
                     <a href="<?= BASE_URL ?>/dashboard/create_site"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
                         <span class="material-symbols-outlined text-base" style="font-size:18px">add_circle</span>
@@ -328,7 +328,7 @@ function render_dashboard_footer() {
                 <span class="material-symbols-outlined text-2xl">edit_note</span>
                 <span>Content</span>
             </a>
-            <button type="button" onclick="openDesignModal()" class="<?= $bnInactive ?>">
+            <button type="button" @click="$dispatch('open-design-modal')" class="<?= $bnInactive ?>">
                 <span class="material-symbols-outlined text-2xl">palette</span>
                 <span>Design</span>
             </button>
@@ -352,27 +352,6 @@ function render_dashboard_footer() {
         <?php endif; ?>
     </nav>
 
-        <script>
-        (function() {
-            var btn = document.getElementById('siteDropdownBtn');
-            var dd  = document.getElementById('siteDropdown');
-            if (btn && dd) {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-                });
-                document.addEventListener('click', function(e) {
-                    if (!dd.contains(e.target)) dd.style.display = 'none';
-                });
-            }
-        })();
-
-        window.openDesignModal    = function() { var m=document.getElementById('designModal');    if(m) m.style.display='flex'; };
-        window.closeDesignModal   = function() { var m=document.getElementById('designModal');    if(m) m.style.display='none'; };
-        window.openStructureModal = function() { var m=document.getElementById('structureModal'); if(m) m.style.display='block'; };
-        window.closeStructureModal= function() { var m=document.getElementById('structureModal'); if(m) m.style.display='none'; };
-        </script>
-
         <?php if ($currentSite): ?>
             <?php
                 $design = json_decode($currentSite['design'] ?? '{}', true) ?: [];
@@ -382,392 +361,346 @@ function render_dashboard_footer() {
                 $buttonStyle = $design['button_style'] ?? 'rounded';
             ?>
             <!-- Design Modal (Kinetic) -->
-            <?php $initBr = $buttonStyle === 'rounded-full' ? '9999px' : ($buttonStyle === 'rounded' ? '8px' : '2px'); ?>
-            <div id="designModal" style="display:none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
-                <div class="fixed inset-0" onclick="closeDesignModal()"></div>
+            <div x-data="{
+                     isModalOpen: false,
+                     primaryColor: '<?= $primaryColor ?>',
+                     titleFont: '<?= $titleFont ?>',
+                     textFont: '<?= $textFont ?>',
+                     buttonStyle: '<?= $buttonStyle ?>',
+                     loadFont(font) {
+                         if (!font) return;
+                         const id = 'gf-' + font.replace(/\s+/g, '-');
+                         if (!document.getElementById(id)) {
+                             const link = document.createElement('link');
+                             link.id = id;
+                             link.rel = 'stylesheet';
+                             link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
+                             document.head.appendChild(link);
+                         }
+                     }
+                 }"
+                 x-init="loadFont(titleFont); loadFont(textFont); $watch('titleFont', v => loadFont(v)); $watch('textFont', v => loadFont(v))"
+                 @open-design-modal.window="isModalOpen = true">
+                <div x-show="isModalOpen" style="display: none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
+                    <div x-show="isModalOpen" class="fixed inset-0" @click="isModalOpen = false"></div>
 
-                <div class="relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#F4F5F7]">
-                    <form method="POST" action="<?= BASE_URL ?>/dashboard">
-                        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-                        <input type="hidden" name="action" value="update_design">
-                        <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
-                        <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
+                    <div class="relative w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#F4F5F7]">
+                        <form method="POST" action="<?= BASE_URL ?>/dashboard">
+                            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
+                            <input type="hidden" name="action" value="update_design">
+                            <input type="hidden" name="site_id" value="<?= $currentSite['id'] ?>">
+                            <input type="hidden" name="redirect_to" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
 
-                        <!-- Modal Header -->
-                        <div class="px-8 py-6 bg-white flex justify-between items-center border-b border-gray-100">
-                            <div>
-                                <h2 class="text-2xl font-extrabold text-[#0d0d1a] font-headline tracking-tight">Site Appearance</h2>
-                                <p class="text-sm text-gray-500 mt-0.5">Customise your site's visual identity</p>
-                            </div>
-                            <button type="button" onclick="closeDesignModal()" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors text-xl leading-none font-bold">✕</button>
-                        </div>
-
-                        <!-- Modal Body -->
-                        <div class="p-8 space-y-8">
-                            <!-- Row 1: Color + Button Style -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-bold text-[#121220]">Primary Colour</label>
-                                    <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200">
-                                        <div id="colorSwatch" class="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0" style="background:<?= htmlspecialchars($primaryColor) ?>"></div>
-                                        <input type="color" name="primary_color" id="colorPicker" value="<?= htmlspecialchars($primaryColor) ?>" class="sr-only">
-                                        <label for="colorPicker" class="flex-1 font-mono text-sm text-gray-700 cursor-pointer" id="colorHexLabel"><?= htmlspecialchars($primaryColor) ?></label>
-                                        <span class="material-symbols-outlined text-gray-400 cursor-pointer" style="font-size:20px" onclick="document.getElementById('colorPicker').click()">colorize</span>
-                                    </div>
+                            <!-- Modal Header -->
+                            <div class="px-8 py-6 bg-white flex justify-between items-center border-b border-gray-100">
+                                <div>
+                                    <h2 class="text-2xl font-extrabold text-[#0d0d1a] font-headline tracking-tight">Site Appearance</h2>
+                                    <p class="text-sm text-gray-500 mt-0.5">Customise your site's visual identity</p>
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-bold text-[#121220]">Button Style</label>
-                                    <div class="relative">
-                                        <select name="button_style" id="btnStyleSelect"
-                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                            <option value="square" <?= $buttonStyle === 'square' ? 'selected' : '' ?>>Square</option>
-                                            <option value="rounded" <?= $buttonStyle === 'rounded' ? 'selected' : '' ?>>Slightly Rounded</option>
-                                            <option value="rounded-full" <?= $buttonStyle === 'rounded-full' ? 'selected' : '' ?>>Pill (Fully Rounded)</option>
-                                        </select>
-                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
-                                    </div>
-                                </div>
+                                <button type="button" @click="isModalOpen = false" class="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 transition-colors text-xl leading-none font-bold">✕</button>
                             </div>
 
-                            <!-- Row 2: Fonts -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-bold text-[#121220]">Heading Font</label>
-                                    <div class="relative">
-                                        <select name="title_font" id="titleFontSelect"
-                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                            <option value="Plus Jakarta Sans" <?= $titleFont === 'Plus Jakarta Sans' ? 'selected' : '' ?>>Plus Jakarta Sans</option>
-                                            <option value="Montserrat" <?= $titleFont === 'Montserrat' ? 'selected' : '' ?>>Montserrat</option>
-                                            <option value="Playfair Display" <?= $titleFont === 'Playfair Display' ? 'selected' : '' ?>>Playfair Display</option>
-                                            <option value="Inter" <?= $titleFont === 'Inter' ? 'selected' : '' ?>>Inter</option>
-                                        </select>
-                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                            <!-- Modal Body -->
+                            <div class="p-8 space-y-8">
+                                <!-- Row 1: Color + Button Style -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Primary Colour</label>
+                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-200">
+                                            <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm flex-shrink-0" :style="'background:' + primaryColor"></div>
+                                            <input type="color" name="primary_color" x-model="primaryColor" class="sr-only" id="colorPicker">
+                                            <label for="colorPicker" class="flex-1 font-mono text-sm text-gray-700 cursor-pointer" x-text="primaryColor"></label>
+                                            <span class="material-symbols-outlined text-gray-400 cursor-pointer" style="font-size:20px" onclick="document.getElementById('colorPicker').click()">colorize</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Button Style</label>
+                                        <div class="relative">
+                                            <select name="button_style" x-model="buttonStyle"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="square">Square</option>
+                                                <option value="rounded">Slightly Rounded</option>
+                                                <option value="rounded-full">Pill (Fully Rounded)</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="block text-sm font-bold text-[#121220]">Body Font</label>
-                                    <div class="relative">
-                                        <select name="text_font" id="textFontSelect"
-                                                class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                            <option value="Inter" <?= $textFont === 'Inter' ? 'selected' : '' ?>>Inter</option>
-                                            <option value="Roboto" <?= $textFont === 'Roboto' ? 'selected' : '' ?>>Roboto</option>
-                                            <option value="Open Sans" <?= $textFont === 'Open Sans' ? 'selected' : '' ?>>Open Sans</option>
-                                            <option value="Manrope" <?= $textFont === 'Manrope' ? 'selected' : '' ?>>Manrope</option>
-                                        </select>
-                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+
+                                <!-- Row 2: Fonts -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Heading Font</label>
+                                        <div class="relative">
+                                            <select name="title_font" x-model="titleFont"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                                                <option value="Montserrat">Montserrat</option>
+                                                <option value="Playfair Display">Playfair Display</option>
+                                                <option value="Inter">Inter</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        </div>
                                     </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-[#121220]">Body Font</label>
+                                        <div class="relative">
+                                            <select name="text_font" x-model="textFont"
+                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
+                                                <option value="Inter">Inter</option>
+                                                <option value="Roboto">Roboto</option>
+                                                <option value="Open Sans">Open Sans</option>
+                                                <option value="Manrope">Manrope</option>
+                                            </select>
+                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Live Preview -->
+                                <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
+                                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
+                                    <h4 class="text-xl font-extrabold text-[#121220]" :style="'font-family:' + titleFont">Sample Headline</h4>
+                                    <p class="text-sm text-gray-500 leading-relaxed" :style="'font-family:' + textFont">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
+                                    <button type="button" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
+                                            :style="'background:' + primaryColor + '; border-radius:' + (buttonStyle === 'rounded-full' ? '9999px' : buttonStyle === 'rounded' ? '8px' : '2px') + '; font-family:' + titleFont">
+                                        Action Button
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Live Preview -->
-                            <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
-                                <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
-                                <h4 id="previewHeading" class="text-xl font-extrabold text-[#121220]" style="font-family:<?= htmlspecialchars($titleFont) ?>">Sample Headline</h4>
-                                <p id="previewText" class="text-sm text-gray-500 leading-relaxed" style="font-family:<?= htmlspecialchars($textFont) ?>">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
-                                <button type="button" id="previewBtn" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
-                                        style="background:<?= htmlspecialchars($primaryColor) ?>; border-radius:<?= $initBr ?>; font-family:<?= htmlspecialchars($titleFont) ?>">
-                                    Action Button
+                            <!-- Modal Footer -->
+                            <div class="px-8 py-5 bg-white flex justify-end items-center gap-3 border-t border-gray-100">
+                                <button type="button" @click="isModalOpen = false"
+                                        class="px-6 py-2.5 rounded-full text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                        class="px-8 py-2.5 rounded-full bg-[#5B4FE9] text-white font-bold text-sm shadow-lg shadow-[#5B4FE9]/25 hover:bg-[#4a3ecc] transition-all active:scale-95">
+                                    Save Changes
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Modal Footer -->
-                        <div class="px-8 py-5 bg-white flex justify-end items-center gap-3 border-t border-gray-100">
-                            <button type="button" onclick="closeDesignModal()"
-                                    class="px-6 py-2.5 rounded-full text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="px-8 py-2.5 rounded-full bg-[#5B4FE9] text-white font-bold text-sm shadow-lg shadow-[#5B4FE9]/25 hover:bg-[#4a3ecc] transition-all active:scale-95">
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
 
             <!-- Structure Modal -->
             <?php $page = db_fetch_one("SELECT id FROM pages WHERE site_id = :sid AND status = 'published' LIMIT 1", [':sid' => $currentSite['id']]); ?>
-            <div id="structureModal" style="display:none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div class="fixed inset-0 bg-black/60 transition-opacity" onclick="closeStructureModal()"></div>
-                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-data="{ isStructOpen: false }"
+                 @open-structure-modal.window="isStructOpen = true">
+                <div x-show="isStructOpen" style="display: none;" class="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div x-show="isStructOpen" class="fixed inset-0 bg-black/60 transition-opacity" @click="isStructOpen = false"></div>
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                    <div class="inline-block align-bottom bg-gray-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
+                        <div x-show="isStructOpen" class="inline-block align-bottom bg-gray-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
 
-                        <div class="bg-white px-4 py-3 border-b flex justify-between items-center z-10 relative">
-                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Site Structure</h3>
-                            <button type="button" onclick="closeStructureModal()" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
-                        </div>
+                            <div class="bg-white px-4 py-3 border-b flex justify-between items-center z-10 relative">
+                                <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-title">Site Structure</h3>
+                                <button type="button" @click="isStructOpen = false" class="text-gray-400 hover:text-gray-500 p-1">✕</button>
+                            </div>
 
-                            <div class="bg-gray-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[70vh] overflow-y-auto flex flex-col relative">
+                            <div x-data="editorApp(<?= $currentSite['id'] ?>, <?= $page['id'] ?? 0 ?>)" class="bg-gray-50 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[70vh] overflow-y-auto flex flex-col relative">
+
                                 <div class="flex justify-between items-center mb-4">
                                     <p class="text-sm text-gray-500">Toggle sections on or off and drag to reorder them on your site.</p>
-                                    <span id="savingIndicator" style="display:none;" class="text-xs px-2 py-1 text-indigo-700 bg-indigo-50 font-bold rounded-full animate-pulse">Saving...</span>
+                                    <span x-show="isSaving" class="text-xs px-2 py-1 text-indigo-700 bg-indigo-50 font-bold rounded-full animate-pulse">Saving...</span>
                                 </div>
+
                                 <div class="flex-1 w-full" id="blocks-list">
-                                    <p class="text-sm text-gray-400 text-center py-8">Loading...</p>
+                                    <template x-for="(item, index) in availableTypes" :key="item.type">
+                                        <div class="p-4 mb-2 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center justify-between group hover:border-indigo-400 cursor-move" :data-type="item.type">
+
+                                            <div class="flex items-center flex-1">
+                                                <span class="text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition" title="Drag to reorder">↕</span>
+                                                <div class="flex-1 cursor-pointer" @click="toggleBlock(item.type)">
+                                                    <span class="font-bold text-gray-900 block text-sm" x-text="item.label"></span>
+                                                    <span class="text-xs text-gray-500" x-text="item.desc"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="ml-4 flex items-center gap-3">
+                                                <a x-show="isBlockActive(item.type)" :href="'<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?? 0 ?>&block_type=' + item.type" class="text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-1.5 rounded transition">Edit Content</a>
+
+                                                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                                    <input type="checkbox" class="sr-only peer" :checked="isBlockActive(item.type)" @change="toggleBlock(item.type)">
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Structure Modal JS (vanilla) -->
+            <!-- Alpine.js editorApp -->
             <script>
-            (function() {
-                var SITE_ID = <?= (int)$currentSite['id'] ?>;
-                var PAGE_ID = <?= (int)($page['id'] ?? 0) ?>;
-                var BASE    = '<?= BASE_URL ?>';
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('editorApp', (siteId, pageId) => ({
+                    siteId: siteId,
+                    pageId: pageId,
+                    blocks: [],
+                    availableTypes: [
+                        { type: 'header',       label: 'Header (Navigation)',    desc: 'Top navigation bar with logo.' },
+                        { type: 'hero',         label: 'Hero / Main Banner',     desc: 'Full-width banner with headline.' },
+                        { type: 'about',        label: 'About Us',               desc: 'Text description with side image.' },
+                        { type: 'services',     label: 'Services',               desc: 'Grid of service highlights.' },
+                        { type: 'products',     label: 'Products',               desc: 'Product showcase cards.' },
+                        { type: 'gallery',      label: 'Photo Gallery',          desc: 'Drag-and-drop photo grid.' },
+                        { type: 'videos',       label: 'Videos',                 desc: 'Embedded YouTube videos.' },
+                        { type: 'testimonials', label: 'Testimonials',           desc: 'Quotes and social proof.' },
+                        { type: 'contact',      label: 'Contact',                desc: 'Email form and contact details.' },
+                        { type: 'footer',       label: 'Footer',                 desc: 'Bottom closing section.' }
+                    ],
+                    isSaving: false,
+                    sortableInstance: null,
 
-                var blocks = [];
-                var availableTypes = [
-                    { type: 'header',       label: 'Header (Navigation)',  desc: 'Top navigation bar with logo.' },
-                    { type: 'hero',         label: 'Hero / Main Banner',   desc: 'Full-width banner with headline.' },
-                    { type: 'about',        label: 'About Us',             desc: 'Text description with side image.' },
-                    { type: 'services',     label: 'Services',             desc: 'Grid of service highlights.' },
-                    { type: 'products',     label: 'Products',             desc: 'Product showcase cards.' },
-                    { type: 'gallery',      label: 'Photo Gallery',        desc: 'Drag-and-drop photo grid.' },
-                    { type: 'videos',       label: 'Videos',               desc: 'Embedded YouTube videos.' },
-                    { type: 'testimonials', label: 'Testimonials',         desc: 'Quotes and social proof.' },
-                    { type: 'contact',      label: 'Contact',              desc: 'Email form and contact details.' },
-                    { type: 'footer',       label: 'Footer',               desc: 'Bottom closing section.' }
-                ];
-                var sortableInstance = null;
-                var initialized = false;
-                var dndReady = false;
-                var dragSrc = null;
+                    init() {
+                        if (this.pageId) this.fetchBlocks();
+                    },
 
-                function setSaving(v) {
-                    var el = document.getElementById('savingIndicator');
-                    if (el) el.style.display = v ? '' : 'none';
-                }
-
-                function isBlockActive(type) {
-                    return blocks.some(function(b) {
-                        return b.type === type && !(b.config && b.config.is_active === false);
-                    });
-                }
-
-                function renderBlocks() {
-                    var list = document.getElementById('blocks-list');
-                    if (!list) return;
-                    list.innerHTML = '';
-                    availableTypes.forEach(function(item) {
-                        var active = isBlockActive(item.type);
-                        var div = document.createElement('div');
-                        div.className = 'p-4 mb-2 bg-white border border-gray-200 shadow-sm rounded-lg flex items-center justify-between group hover:border-indigo-400 cursor-move';
-                        div.setAttribute('data-type', item.type);
-                        var editHref = BASE + '/dashboard/content?site_id=' + SITE_ID + '&block_type=' + item.type;
-                        div.innerHTML =
-                            '<div class="flex items-center flex-1">' +
-                                '<span class="cursor-move text-gray-300 mr-4 text-xl group-hover:text-indigo-400 transition select-none" title="Drag to reorder">\u2195</span>' +
-                                '<div class="flex-1 cursor-pointer" data-block-label>' +
-                                    '<span class="font-bold text-gray-900 block text-sm">' + item.label + '</span>' +
-                                    '<span class="text-xs text-gray-500">' + item.desc + '</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="ml-4 flex items-center gap-3">' +
-                                '<a href="' + editHref + '" class="text-xs font-bold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-1.5 rounded transition"' + (active ? '' : ' style="display:none"') + '>Edit Content</a>' +
-                                '<label class="relative inline-flex items-center cursor-pointer shrink-0">' +
-                                    '<input type="checkbox" class="sr-only peer"' + (active ? ' checked' : '') + '>' +
-                                    '<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>' +
-                                '</label>' +
-                            '</div>';
-                        div.querySelector('[data-block-label]').addEventListener('click', function() { toggleBlock(item.type); });
-                        div.querySelector('input[type=checkbox]').addEventListener('change', function() { toggleBlock(item.type); });
-                        div.setAttribute('draggable', 'true');
-                        list.appendChild(div);
-                    });
-                    initSortable();
-                }
-
-                async function fetchBlocks() {
-                    if (!PAGE_ID) {
-                        document.getElementById('blocks-list').innerHTML = '<p class="text-sm text-gray-400 text-center py-8">No published page found for this site.</p>';
-                        return;
-                    }
-                    try {
-                        var res = await fetch(BASE + '/api/blocks?page_id=' + PAGE_ID);
-                        if (!res.ok) throw new Error('Failed to load blocks');
-                        var json = await res.json();
-                        blocks = json.data || [];
-                        if (blocks.length > 0) {
-                            var orderedTypes = [];
-                            blocks.forEach(function(b) {
-                                var match = availableTypes.find(function(t) { return t.type === b.type; });
-                                if (match) orderedTypes.push(match);
-                            });
-                            availableTypes.forEach(function(t) {
-                                if (!orderedTypes.find(function(o) { return o.type === t.type; })) orderedTypes.push(t);
-                            });
-                            availableTypes = orderedTypes;
-                        }
-                        renderBlocks();
-                    } catch(e) {
-                        alert(e.message);
-                    }
-                }
-
-                async function toggleBlock(type) {
-                    var existing = blocks.find(function(b) { return b.type === type; });
-                    setSaving(true);
-                    try {
-                        if (existing && !(existing.config && existing.config.is_active === false)) {
-                            var res = await fetch(BASE + '/api/blocks', {
-                                method: 'DELETE',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({block_id: existing.id})
-                            });
-                            if (res.ok) {
-                                existing.config = existing.config || {};
-                                existing.config.is_active = false;
-                                await evaluateFullReorder();
-                                renderBlocks();
-                            }
-                        } else if (existing && existing.config && existing.config.is_active === false) {
-                            existing.config.is_active = true;
-                            var res = await fetch(BASE + '/api/blocks', {
-                                method: 'PUT',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({block_id: existing.id, config: existing.config})
-                            });
-                            if (res.ok) {
-                                await evaluateFullReorder();
-                                renderBlocks();
-                            } else {
-                                existing.config.is_active = false;
-                                alert('Error reactivating block');
-                                renderBlocks();
-                            }
-                        } else {
-                            var res = await fetch(BASE + '/api/blocks', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({action: 'add', page_id: PAGE_ID, type: type})
-                            });
-                            var data = await res.json();
-                            if (data.success) { await fetchBlocks(); }
-                            else { alert(data.error); }
-                        }
-                    } catch(e) { console.error(e); }
-                    setSaving(false);
-                }
-
-                function initSortable() {
-                    var el = document.getElementById('blocks-list');
-                    if (!el || dndReady) return;
-                    dndReady = true;
-
-                    el.addEventListener('dragstart', function(e) {
-                        dragSrc = e.target.closest('[data-type]');
-                        if (!dragSrc) return;
-                        e.dataTransfer.effectAllowed = 'move';
-                        e.dataTransfer.setData('text/plain', dragSrc.getAttribute('data-type'));
-                        setTimeout(function() { if (dragSrc) dragSrc.style.opacity = '0.4'; }, 0);
-                    });
-
-                    el.addEventListener('dragover', function(e) {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'move';
-                        var target = e.target.closest('[data-type]');
-                        if (!target || !dragSrc || target === dragSrc) return;
-                        var rect = target.getBoundingClientRect();
-                        if (e.clientY < rect.top + rect.height / 2) {
-                            el.insertBefore(dragSrc, target);
-                        } else {
-                            el.insertBefore(dragSrc, target.nextSibling);
-                        }
-                    });
-
-                    el.addEventListener('dragend', function() {
-                        if (dragSrc) { dragSrc.style.opacity = ''; dragSrc = null; }
-                        evaluateFullReorder();
-                    });
-                }
-
-                async function evaluateFullReorder() {
-                    var el = document.getElementById('blocks-list');
-                    if (!el) return;
-                    var newOrder = [];
-                    var idx = 0;
-                    Array.from(el.children).forEach(function(item) {
-                        var domType = item.getAttribute('data-type');
-                        var mb = blocks.find(function(b) { return b.type === domType; });
-                        if (mb) { newOrder.push({id: mb.id, sort_order: idx}); idx++; }
-                    });
-                    if (newOrder.length > 0) {
-                        setSaving(true);
+                    async fetchBlocks() {
                         try {
-                            await fetch(BASE + '/api/blocks', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({action: 'reorder', page_id: PAGE_ID, blocks: newOrder})
+                            const res = await fetch(`<?= BASE_URL ?>/api/blocks?page_id=${this.pageId}`);
+                            if (!res.ok) throw new Error('Failed to load blocks');
+                            const json = await res.json();
+                            this.blocks = json.data || [];
+
+                            if (this.blocks.length > 0) {
+                                const orderedTypes = [];
+                                this.blocks.forEach(b => {
+                                    const match = this.availableTypes.find(t => t.type === b.type);
+                                    if(match) orderedTypes.push(match);
+                                });
+                                this.availableTypes.forEach(t => {
+                                    if(!orderedTypes.find(o => o.type === t.type)) {
+                                        orderedTypes.push(t);
+                                    }
+                                });
+                                this.availableTypes = orderedTypes;
+                            }
+
+                            this.$nextTick(() => {
+                                this.initSortable();
                             });
-                        } catch(e) { console.error('Reorder error', e); }
-                        setSaving(false);
-                    }
-                }
+                        } catch (e) {
+                            alert(e.message);
+                        }
+                    },
 
-                // Override openStructureModal to load blocks on first open
-                var _origOpen = window.openStructureModal;
-                window.openStructureModal = function() {
-                    var m = document.getElementById('structureModal');
-                    if (m) m.style.display = 'block';
-                    if (!initialized) { initialized = true; fetchBlocks(); }
-                };
-            })();
-            </script>
+                    isBlockActive(type) {
+                        return this.blocks.some(b => b.type === type && b.config?.is_active !== false);
+                    },
 
-            <!-- Design Modal Live Preview JS -->
-            <script>
-            (function() {
-                var colorPicker  = document.getElementById('colorPicker');
-                var colorSwatch  = document.getElementById('colorSwatch');
-                var colorHexLbl  = document.getElementById('colorHexLabel');
-                var btnStyleSel  = document.getElementById('btnStyleSelect');
-                var titleFontSel = document.getElementById('titleFontSelect');
-                var textFontSel  = document.getElementById('textFontSelect');
-                var prevHeading  = document.getElementById('previewHeading');
-                var prevText     = document.getElementById('previewText');
-                var prevBtn      = document.getElementById('previewBtn');
+                    async toggleBlock(type) {
+                        const existingBlock = this.blocks.find(b => b.type === type);
+                        this.isSaving = true;
 
-                function getBorderRadius(s) {
-                    if (s === 'rounded-full') return '9999px';
-                    if (s === 'rounded') return '8px';
-                    return '2px';
-                }
-                function loadFont(font) {
-                    if (!font) return;
-                    var id = 'gf-' + font.replace(/\s+/g, '-');
-                    if (!document.getElementById(id)) {
-                        var link = document.createElement('link');
-                        link.id = id; link.rel = 'stylesheet';
-                        link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
-                        document.head.appendChild(link);
+                        try {
+                            if (existingBlock && existingBlock.config?.is_active !== false) {
+                                const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
+                                    method: 'DELETE',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ block_id: existingBlock.id })
+                                });
+                                if (res.ok) {
+                                    existingBlock.config = existingBlock.config || {};
+                                    existingBlock.config.is_active = false;
+                                    this.evaluateFullReorder();
+                                }
+                            } else if (existingBlock && existingBlock.config?.is_active === false) {
+                                existingBlock.config.is_active = true;
+                                const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ block_id: existingBlock.id, config: existingBlock.config })
+                                });
+                                if (res.ok) {
+                                    this.evaluateFullReorder();
+                                } else {
+                                    existingBlock.config.is_active = false;
+                                    alert('Error reactivating block');
+                                }
+                            } else {
+                                const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'add', page_id: this.pageId, type: type })
+                                });
+                                const json = await res.json();
+                                if (json.success) {
+                                    await this.fetchBlocks();
+                                } else {
+                                    alert(json.error);
+                                }
+                            }
+                        } catch (e) {
+                            console.error(e);
+                        }
+                        this.isSaving = false;
+                    },
+
+                    initSortable() {
+                        if (this.sortableInstance) {
+                            this.sortableInstance.destroy();
+                        }
+
+                        const el = document.getElementById('blocks-list');
+                        if (el) {
+                            this.sortableInstance = new Sortable(el, {
+                                animation: 150,
+                                ghostClass: 'bg-indigo-50',
+                                handle: '.cursor-move',
+                                onEnd: (evt) => {
+                                    this.evaluateFullReorder();
+                                }
+                            });
+                        }
+                    },
+
+                    async evaluateFullReorder() {
+                        const el = document.getElementById('blocks-list');
+                        if(!el) return;
+
+                        const listItems = Array.from(el.children);
+                        const newOrder = [];
+                        let virtualIndex = 0;
+
+                        listItems.forEach((item) => {
+                            const domType = item.getAttribute('data-type');
+                            const memBlock = this.blocks.find(b => b.type === domType);
+                            if (memBlock) {
+                                newOrder.push({ id: memBlock.id, sort_order: virtualIndex });
+                                virtualIndex++;
+                            }
+                        });
+
+                        if(newOrder.length > 0) {
+                            await this.saveReorder(newOrder);
+                        }
+                    },
+
+                    async saveReorder(newOrderArray) {
+                        this.isSaving = true;
+                        try {
+                            const res = await fetch(`<?= BASE_URL ?>/api/blocks`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ action: 'reorder', page_id: this.pageId, blocks: newOrderArray })
+                            });
+                        } catch (e) {
+                            console.error('Reorder error', e);
+                        }
+                        this.isSaving = false;
                     }
-                }
-                function updatePreview() {
-                    var color     = colorPicker  ? colorPicker.value  : '';
-                    var btnStyle  = btnStyleSel  ? btnStyleSel.value  : 'rounded';
-                    var titleFont = titleFontSel ? titleFontSel.value : 'Inter';
-                    var textFont  = textFontSel  ? textFontSel.value  : 'Inter';
-                    if (colorSwatch) colorSwatch.style.background = color;
-                    if (colorHexLbl) colorHexLbl.textContent = color;
-                    if (prevHeading) prevHeading.style.fontFamily = titleFont;
-                    if (prevText)    prevText.style.fontFamily = textFont;
-                    if (prevBtn) {
-                        prevBtn.style.background    = color;
-                        prevBtn.style.borderRadius  = getBorderRadius(btnStyle);
-                        prevBtn.style.fontFamily    = titleFont;
-                    }
-                }
-                if (colorPicker)  colorPicker.addEventListener('input', updatePreview);
-                if (btnStyleSel)  btnStyleSel.addEventListener('change', updatePreview);
-                if (titleFontSel) titleFontSel.addEventListener('change', function() { loadFont(this.value); updatePreview(); });
-                if (textFontSel)  textFontSel.addEventListener('change',  function() { loadFont(this.value); updatePreview(); });
-            })();
+                }));
+            });
             </script>
         <?php endif; ?>
 </body>
