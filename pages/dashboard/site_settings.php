@@ -153,6 +153,71 @@ render_dashboard_header("Site Settings – $siteName");
                     <p class="text-xs text-slate-500">Requires a CNAME or A record pointing to our servers via your DNS provider.</p>
                 </div>
 
+                <!-- How to connect a domain -->
+                <div class="bg-[#0d0d1a] rounded-xl border border-white/5 p-5 space-y-4">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">help</span>
+                        <span class="text-sm font-bold text-white">How to connect your domain</span>
+                    </div>
+
+                    <div class="space-y-3 text-sm text-slate-400">
+                        <p>Log in to your domain registrar (e.g. GoDaddy, Namecheap, Cloudflare) and go to the <strong class="text-slate-300">DNS settings</strong> for your domain. Add one of the following records:</p>
+
+                        <!-- Option A: CNAME -->
+                        <div class="bg-[#121220] rounded-lg p-4 space-y-2">
+                            <p class="text-xs font-black uppercase tracking-widest text-[#a9a4ff]">Option A — CNAME (recommended for www)</p>
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr class="text-slate-500 border-b border-white/5">
+                                        <th class="text-left pb-2 font-semibold">Type</th>
+                                        <th class="text-left pb-2 font-semibold">Name / Host</th>
+                                        <th class="text-left pb-2 font-semibold">Value / Points to</th>
+                                        <th class="text-left pb-2 font-semibold">TTL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="text-slate-300">
+                                        <td class="pt-2 font-mono">CNAME</td>
+                                        <td class="pt-2 font-mono">www</td>
+                                        <td class="pt-2 font-mono">superpage.co.uk</td>
+                                        <td class="pt-2 font-mono">Auto</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-slate-500 text-xs">Then enter <code class="bg-white/5 px-1 rounded">www.yourdomain.com</code> in the field above.</p>
+                        </div>
+
+                        <!-- Option B: A record -->
+                        <div class="bg-[#121220] rounded-lg p-4 space-y-2">
+                            <p class="text-xs font-black uppercase tracking-widest text-[#914feb]">Option B — A Record (for root domain)</p>
+                            <table class="w-full text-xs">
+                                <thead>
+                                    <tr class="text-slate-500 border-b border-white/5">
+                                        <th class="text-left pb-2 font-semibold">Type</th>
+                                        <th class="text-left pb-2 font-semibold">Name / Host</th>
+                                        <th class="text-left pb-2 font-semibold">Value / IP Address</th>
+                                        <th class="text-left pb-2 font-semibold">TTL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="text-slate-300">
+                                        <td class="pt-2 font-mono">A</td>
+                                        <td class="pt-2 font-mono">@ (or blank)</td>
+                                        <td class="pt-2 font-mono">72.61.145.172</td>
+                                        <td class="pt-2 font-mono">Auto</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="text-slate-500 text-xs">Then enter <code class="bg-white/5 px-1 rounded">yourdomain.com</code> in the field above.</p>
+                        </div>
+
+                        <div class="flex items-start gap-2 text-xs text-slate-500 pt-1">
+                            <span class="material-symbols-outlined flex-shrink-0" style="font-size:15px">schedule</span>
+                            <span>DNS changes can take up to <strong class="text-slate-400">24–48 hours</strong> to propagate worldwide, although most providers update within a few minutes.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex justify-end pt-2">
                     <button type="submit"
                             class="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm shadow-lg shadow-[#685ef7]/20 hover:brightness-110 transition-all">
