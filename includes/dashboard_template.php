@@ -367,6 +367,15 @@ function render_dashboard_footer() {
                      titleFont: '<?= $titleFont ?>',
                      textFont: '<?= $textFont ?>',
                      buttonStyle: '<?= $buttonStyle ?>',
+                     suggestedBodyFont: '',
+                     fontPairs: {
+                         'Plus Jakarta Sans': 'Inter',
+                         'Montserrat': 'Roboto',
+                         'Playfair Display': 'Open Sans',
+                         'Inter': 'Manrope',
+                         'Poppins': 'Open Sans',
+                         'Raleway': 'Roboto'
+                     },
                      loadFont(font) {
                          if (!font) return;
                          const id = 'gf-' + font.replace(/\s+/g, '-');
@@ -377,9 +386,19 @@ function render_dashboard_footer() {
                              link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;500;600;700;800&display=swap';
                              document.head.appendChild(link);
                          }
+                     },
+                     applyFontPair(headingFont) {
+                         const suggested = this.fontPairs[headingFont];
+                         if (suggested) {
+                             this.textFont = suggested;
+                             this.suggestedBodyFont = suggested;
+                             this.loadFont(suggested);
+                         } else {
+                             this.suggestedBodyFont = '';
+                         }
                      }
                  }"
-                 x-init="loadFont(titleFont); loadFont(textFont); $watch('titleFont', v => loadFont(v)); $watch('textFont', v => loadFont(v))"
+                 x-init="loadFont(titleFont); loadFont(textFont); suggestedBodyFont = fontPairs[titleFont] || ''; $watch('titleFont', v => { loadFont(v); applyFontPair(v); }); $watch('textFont', v => loadFont(v))"
                  @open-design-modal.window="isModalOpen = true">
                 <div x-show="isModalOpen" style="display: none;" class="fixed z-[70] inset-0 flex items-center justify-center p-4 bg-[#0d0d1a]/70 backdrop-blur-sm" role="dialog" aria-modal="true">
                     <div x-show="isModalOpen" class="fixed inset-0" @click="isModalOpen = false"></div>
@@ -415,14 +434,26 @@ function render_dashboard_footer() {
                                     </div>
                                     <div class="space-y-2">
                                         <label class="block text-sm font-bold text-[#121220]">Button Style</label>
-                                        <div class="relative">
-                                            <select name="button_style" x-model="buttonStyle"
-                                                    class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
-                                                <option value="square">Square</option>
-                                                <option value="rounded">Slightly Rounded</option>
-                                                <option value="rounded-full">Pill (Fully Rounded)</option>
-                                            </select>
-                                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
+                                        <input type="hidden" name="button_style" :value="buttonStyle">
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <label class="cursor-pointer" @click="buttonStyle = 'square'">
+                                                <div class="border-2 rounded-xl p-3 text-center transition-all" :class="buttonStyle === 'square' ? 'border-[#5B4FE9] bg-[#5B4FE9]/5' : 'border-gray-200 bg-white'">
+                                                    <div class="px-3 py-1 text-white text-xs font-bold mx-auto inline-block mb-2" :style="'background:' + primaryColor" style="border-radius:2px">Button</div>
+                                                    <p class="text-xs text-gray-500 font-medium">Square</p>
+                                                </div>
+                                            </label>
+                                            <label class="cursor-pointer" @click="buttonStyle = 'rounded'">
+                                                <div class="border-2 rounded-xl p-3 text-center transition-all" :class="buttonStyle === 'rounded' ? 'border-[#5B4FE9] bg-[#5B4FE9]/5' : 'border-gray-200 bg-white'">
+                                                    <div class="px-3 py-1 text-white text-xs font-bold mx-auto inline-block mb-2" :style="'background:' + primaryColor" style="border-radius:6px">Button</div>
+                                                    <p class="text-xs text-gray-500 font-medium">Rounded</p>
+                                                </div>
+                                            </label>
+                                            <label class="cursor-pointer" @click="buttonStyle = 'rounded-full'">
+                                                <div class="border-2 rounded-xl p-3 text-center transition-all" :class="buttonStyle === 'rounded-full' ? 'border-[#5B4FE9] bg-[#5B4FE9]/5' : 'border-gray-200 bg-white'">
+                                                    <div class="px-3 py-1 text-white text-xs font-bold mx-auto inline-block mb-2 rounded-full" :style="'background:' + primaryColor">Button</div>
+                                                    <p class="text-xs text-gray-500 font-medium">Pill</p>
+                                                </div>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -437,13 +468,23 @@ function render_dashboard_footer() {
                                                 <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
                                                 <option value="Montserrat">Montserrat</option>
                                                 <option value="Playfair Display">Playfair Display</option>
+                                                <option value="Poppins">Poppins</option>
+                                                <option value="Raleway">Raleway</option>
                                                 <option value="Inter">Inter</option>
                                             </select>
                                             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
                                         </div>
+                                        <p class="text-base font-bold text-gray-700 pl-1" :style="'font-family:' + titleFont" x-text="titleFont + ' — The quick brown fox'"></p>
                                     </div>
                                     <div class="space-y-2">
-                                        <label class="block text-sm font-bold text-[#121220]">Body Font</label>
+                                        <div class="flex items-center justify-between">
+                                            <label class="block text-sm font-bold text-[#121220]">Body Font</label>
+                                            <span x-show="suggestedBodyFont && textFont === suggestedBodyFont"
+                                                  class="flex items-center gap-1 text-[10px] font-bold text-[#5B4FE9] bg-[#5B4FE9]/8 px-2 py-0.5 rounded-full">
+                                                <span class="material-symbols-outlined" style="font-size:12px">auto_awesome</span>
+                                                Suggested pairing
+                                            </span>
+                                        </div>
                                         <div class="relative">
                                             <select name="text_font" x-model="textFont"
                                                     class="w-full appearance-none bg-white px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:ring-2 focus:ring-[#5B4FE9]/30 focus:border-[#5B4FE9] outline-none cursor-pointer">
@@ -451,21 +492,30 @@ function render_dashboard_footer() {
                                                 <option value="Roboto">Roboto</option>
                                                 <option value="Open Sans">Open Sans</option>
                                                 <option value="Manrope">Manrope</option>
+                                                <option value="Lato">Lato</option>
                                             </select>
                                             <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" style="font-size:20px">expand_more</span>
                                         </div>
+                                        <p class="text-sm text-gray-500 pl-1" :style="'font-family:' + textFont" x-text="textFont + ' — The quick brown fox jumps over the lazy dog'"></p>
                                     </div>
                                 </div>
 
                                 <!-- Live Preview -->
-                                <div class="bg-white/60 backdrop-blur-md p-6 rounded-xl border border-white/70 space-y-3">
-                                    <span class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Preview</span>
-                                    <h4 class="text-xl font-extrabold text-[#121220]" :style="'font-family:' + titleFont">Sample Headline</h4>
-                                    <p class="text-sm text-gray-500 leading-relaxed" :style="'font-family:' + textFont">This is how your site's typography and colour scheme will look to visitors. Premium and professional.</p>
-                                    <button type="button" class="px-6 py-2 font-bold text-sm text-white shadow-lg transition-transform active:scale-95"
-                                            :style="'background:' + primaryColor + '; border-radius:' + (buttonStyle === 'rounded-full' ? '9999px' : buttonStyle === 'rounded' ? '8px' : '2px') + '; font-family:' + titleFont">
-                                        Action Button
-                                    </button>
+                                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                    <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-300"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-300"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-green-300"></span>
+                                        <span class="text-[10px] text-gray-400 ml-2 uppercase tracking-widest font-bold">Live Preview</span>
+                                    </div>
+                                    <div class="p-6 space-y-3">
+                                        <h4 class="text-xl font-extrabold text-[#121220]" :style="'font-family:' + titleFont">Your Site Headline</h4>
+                                        <p class="text-sm text-gray-500 leading-relaxed" :style="'font-family:' + textFont">This is how your body text will look to visitors. Clear and easy to read.</p>
+                                        <button type="button" class="px-6 py-2 font-bold text-sm text-white shadow transition-transform active:scale-95"
+                                                :style="'background:' + primaryColor + '; border-radius:' + (buttonStyle === 'rounded-full' ? '9999px' : buttonStyle === 'rounded' ? '8px' : '2px') + '; font-family:' + titleFont">
+                                            Call to Action
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
