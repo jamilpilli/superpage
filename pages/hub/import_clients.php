@@ -165,7 +165,7 @@ render_hub_header("Import Clients");
         class="px-5 py-2 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm disabled:opacity-40"
         :disabled="selected.length === 0"
         @click="
-          fetch('<?= BASE_URL ?>/api/endpoints/prospect_send', {
+          fetch('<?= BASE_URL ?>/api/prospect_send', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ site_ids: selected, csrf_token: '<?= $csrf_token ?>' })
