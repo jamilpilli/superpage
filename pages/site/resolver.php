@@ -393,9 +393,10 @@ else: ?>
                     $navLinks .= "<a href='#{$nslug}' class='text-gray-600 transition nav-link'>" . htmlspecialchars($ntitle) . "</a>";
                 }
 
+                $logoText   = !empty($cfg['logo_text']) ? htmlspecialchars($cfg['logo_text']) : $blockTitle;
                 $headerLogo = !empty($cfg['image'])
-                    ? "<img src='" . htmlspecialchars($cfg['image']) . "' alt='{$blockTitle}' title='{$blockTitle}' class='h-10 object-contain max-w-[200px]'>"
-                    : "<h1 class='font-bold text-xl' style='color: var(--color-primary);'>{$blockTitle}</h1>";
+                    ? "<img src='" . htmlspecialchars($cfg['image']) . "' alt='{$logoText}' title='{$logoText}' class='h-10 object-contain max-w-[200px]'>"
+                    : "<h1 class='font-bold text-xl' style='color: var(--color-primary);'>{$logoText}</h1>";
 
                 $topPhoneHtml       = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "hidden md:flex items-center text-gray-700 font-bold nav-link ml-6 pl-6 border-l border-gray-200 transition");
                 $mobilePhoneHtml    = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "flex items-center text-gray-700 font-bold px-4 py-3 rounded-xl hover:bg-gray-50 transition");
