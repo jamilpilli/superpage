@@ -761,10 +761,10 @@ else: ?>
 }
 .sp-footer-bottom {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: .75rem;
+    text-align: center;
 }
 .sp-footer-copy {
     font-size: .72rem;
