@@ -20,19 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
     } elseif ($_FILES['csv']['error'] !== UPLOAD_ERR_OK) {
         $error = "Failed to upload file.";
     } else {
-        $handle = fopen($_FILES['csv']['tmp_name'], 'r');
+        $handle  = fopen($_FILES['csv']['tmp_name'], 'r');
         $headers = array_map('trim', fgetcsv($handle));
-        $rows = [];
+        $rows    = [];
         while (($row = fgetcsv($handle)) !== false) {
             if (count($row) < 2) continue;
-            $data = array_combine(array_slice($headers, 0, count($row)), $row);
-            // Validar campos obrigatórios
+            $data     = array_combine(array_slice($headers, 0, count($row)), $row);
             $rowError = '';
-            if (empty($data['name'])) $rowError = 'Missing name';
-            elseif (empty($data['slug'])) $rowError = 'Missing slug';
-            elseif (empty($data['email']) && empty($data['phone'])) $rowError = 'Need email or phone';
+            if (empty($data['name']))                                          $rowError = 'Missing name';
+            elseif (empty($data['slug']))                                      $rowError = 'Missing slug';
+            elseif (empty($data['email']) && empty($data['phone']))            $rowError = 'Need email or phone';
             elseif (db_fetch_one("SELECT id FROM sites WHERE slug = :s", [':s' => trim($data['slug'])])) $rowError = 'Slug already taken';
-
             $rows[] = ['data' => $data, 'error' => $rowError];
         }
         fclose($handle);
@@ -40,12 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
     }
 }
 
-// Gerar drafts a partir de rows válidos
+// Gerar sites activos a partir de rows válidos
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_drafts'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = "Invalid session token.";
     } else {
-        $rows = json_decode($_POST['rows_json'] ?? '[]', true);
+        $rows    = json_decode($_POST['rows_json'] ?? '[]', true);
         $created = 0;
         foreach ($rows as $row) {
             if (!empty($row['error'])) continue;
@@ -53,18 +51,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_drafts'])) {
             create_prospect_site($row['data'], (int)$admin['id']);
             $created++;
         }
-        $msg = "{$created} draft site(s) created. Select them below to send.";
+        $msg = "{$created} site(s) created and live. Notify clients below.";
     }
 }
 
 $csrf_token = generate_csrf_token();
 
-// Carregar fila de drafts
-$drafts = db_fetch_all(
-    "SELECT s.id, s.slug, s.created_at, u.name, u.email, u.phone
-     FROM sites s
+// Carregar fila de prospecção — todos os sites criados via hub (audit log),
+// com estado de notificação via prospect_log
+$prospects = db_fetch_all(
+    "SELECT s.id, s.slug, s.status, s.created_at, u.name, u.email, u.phone,
+            pl.notified_via, pl.notified_at
+     FROM hub_audit_logs hal
+     JOIN sites s ON s.id = hal.entity_id
      JOIN users u ON u.id = s.user_id
-     WHERE s.status = 'draft'
+     LEFT JOIN prospect_log pl ON pl.site_id = s.id
+     WHERE hal.action_type = 'prospect_site_created'
+       AND hal.entity_type = 'sites'
+     GROUP BY s.id
      ORDER BY s.created_at DESC"
 );
 
@@ -148,7 +152,7 @@ render_hub_header("Import Clients");
         <input type="hidden" name="generate_drafts" value="1">
         <input type="hidden" name="rows_json" value="<?= htmlspecialchars(json_encode($parsed)) ?>">
         <button type="submit" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm">
-          ⚡ Generate <?= $validCount ?> Draft(s)
+          ⚡ Create <?= $validCount ?> Site(s)
         </button>
       </form>
     </div>
@@ -156,11 +160,17 @@ render_hub_header("Import Clients");
   </div>
   <?php endif; ?>
 
-  <!-- Draft Queue -->
-  <?php if (!empty($drafts)): ?>
+  <!-- Prospect Queue -->
+  <?php if (!empty($prospects)): ?>
+  <?php
+    $unnotifiedIds = array_column(array_filter($prospects, fn($p) => empty($p['notified_at'])), 'id');
+  ?>
   <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden" x-data="{ selected: [] }">
     <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-      <h3 class="text-base font-bold text-white font-headline">Prospect Queue — <?= count($drafts) ?> draft(s)</h3>
+      <h3 class="text-base font-bold text-white font-headline">
+        Prospect Queue — <?= count($prospects) ?> site(s)
+        <span class="text-slate-500 font-normal text-sm ml-2"><?= count($unnotifiedIds) ?> not yet notified</span>
+      </h3>
       <button
         class="px-5 py-2 rounded-full bg-gradient-to-r from-[#685ef7] to-[#914feb] text-white font-bold text-sm disabled:opacity-40"
         :disabled="selected.length === 0"
@@ -171,25 +181,43 @@ render_hub_header("Import Clients");
             body: JSON.stringify({ site_ids: selected, csrf_token: '<?= $csrf_token ?>' })
           }).then(r => r.json()).then(d => { if(d.success) window.location.reload(); else alert(d.error || 'Error'); })
         ">
-        🚀 Send Selected (<span x-text="selected.length"></span>)
+        🚀 Notify Selected (<span x-text="selected.length"></span>)
       </button>
     </div>
     <table class="w-full text-sm">
       <thead><tr class="border-b border-white/5 text-xs text-slate-500">
-        <th class="px-4 py-3 w-10"><input type="checkbox" @change="e => selected = e.target.checked ? <?= json_encode(array_column($drafts, 'id')) ?> : []" class="accent-[#685ef7]"></th>
+        <th class="px-4 py-3 w-10"><input type="checkbox" @change="e => selected = e.target.checked ? <?= json_encode($unnotifiedIds) ?> : []" class="accent-[#685ef7]"></th>
         <th class="px-4 py-3 text-left">Business</th>
         <th class="px-4 py-3 text-left">URL</th>
         <th class="px-4 py-3 text-left">Contact</th>
+        <th class="px-4 py-3 text-left">Notification</th>
         <th class="px-4 py-3 text-left">Created</th>
       </tr></thead>
       <tbody>
-        <?php foreach ($drafts as $d): ?>
+        <?php foreach ($prospects as $p): ?>
         <tr class="border-b border-white/5">
-          <td class="px-4 py-3"><input type="checkbox" :value="<?= $d['id'] ?>" x-model="selected" class="accent-[#685ef7]"></td>
-          <td class="px-4 py-3 text-white font-medium"><?= htmlspecialchars($d['name']) ?></td>
-          <td class="px-4 py-3"><a href="https://superpage.co.uk/<?= htmlspecialchars($d['slug']) ?>" target="_blank" class="text-[#a9a4ff] hover:underline text-xs"><?= htmlspecialchars($d['slug']) ?></a></td>
-          <td class="px-4 py-3 text-slate-400 text-xs"><?= htmlspecialchars($d['email'] . ' ' . $d['phone']) ?></td>
-          <td class="px-4 py-3 text-slate-500 text-xs"><?= date('d M Y', strtotime($d['created_at'])) ?></td>
+          <td class="px-4 py-3">
+            <?php if (empty($p['notified_at'])): ?>
+              <input type="checkbox" :value="<?= $p['id'] ?>" x-model="selected" class="accent-[#685ef7]">
+            <?php else: ?>
+              <span class="material-symbols-outlined text-emerald-500/40" style="font-size:18px">check</span>
+            <?php endif; ?>
+          </td>
+          <td class="px-4 py-3 text-white font-medium"><?= htmlspecialchars($p['name']) ?></td>
+          <td class="px-4 py-3"><a href="https://superpage.co.uk/<?= htmlspecialchars($p['slug']) ?>" target="_blank" class="text-[#a9a4ff] hover:underline text-xs"><?= htmlspecialchars($p['slug']) ?></a></td>
+          <td class="px-4 py-3 text-slate-400 text-xs"><?= htmlspecialchars(trim($p['email'] . ' ' . $p['phone'])) ?></td>
+          <td class="px-4 py-3">
+            <?php if (!empty($p['notified_at'])): ?>
+              <span class="bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full text-xs">
+                ✓ Notified · <?= htmlspecialchars(ucfirst($p['notified_via'])) ?>
+              </span>
+            <?php else: ?>
+              <span class="bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full text-xs">
+                Not notified
+              </span>
+            <?php endif; ?>
+          </td>
+          <td class="px-4 py-3 text-slate-500 text-xs"><?= date('d M Y', strtotime($p['created_at'])) ?></td>
         </tr>
         <?php endforeach; ?>
       </tbody>

@@ -36,9 +36,9 @@ $sent    = 0;
 $errors  = [];
 
 foreach ($siteIds as $siteId) {
-    $site = db_fetch_one("SELECT s.*, u.name, u.email, u.phone FROM sites s JOIN users u ON u.id = s.user_id WHERE s.id = :id AND s.status = 'draft'", [':id' => $siteId]);
+    $site = db_fetch_one("SELECT s.*, u.name, u.email, u.phone FROM sites s JOIN users u ON u.id = s.user_id WHERE s.id = :id", [':id' => $siteId]);
     if (!$site) {
-        $errors[] = "Site {$siteId} not found or not a draft";
+        $errors[] = "Site {$siteId} not found";
         continue;
     }
 
