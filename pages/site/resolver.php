@@ -661,9 +661,60 @@ else: ?>
                 <div class='text-center md:text-left'><button type='submit' class='inline-block w-auto text-white font-bold py-3 px-10 {$btnRadiusClass} shadow focus:outline-none transition hover:opacity-90' style='background-color: var(--color-primary);'>" . $btnText . "</button></div></form></div></div></section>";
                 break;
             case 'footer':
-                $footerPhoneHtml = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "flex items-center justify-center text-white opacity-90 font-medium hover:opacity-100 transition mt-4");
-                $footerCopy = !empty($text) ? $text : ('&copy; ' . date('Y') . ' ' . $blockTitle . '. All rights reserved.');
-                echo "<footer id='{$blockSlug}' class='text-white py-12 text-center mt-auto' style='background-color: var(--color-primary);'><div class='max-w-7xl mx-auto px-4'><p class='text-white opacity-80'>{$footerCopy}</p>{$footerPhoneHtml}</div></footer>";
+                // Obter nome do negócio a partir do bloco header
+                $footerBizName = '';
+                foreach ($blocks as $hb) {
+                    if ($hb['type'] === 'header') {
+                        $hcfg = json_decode($hb['config'], true) ?? [];
+                        $footerBizName = htmlspecialchars($hcfg['logo_text'] ?? '');
+                        break;
+                    }
+                }
+
+                // Links de navegação para o footer
+                $footerNavLinks = "<a href='#inicio' style='color:rgba(255,255,255,0.55); transition:color .2s;' onmouseover=\"this.style.color='#fff'\" onmouseout=\"this.style.color='rgba(255,255,255,0.55)'\">Home</a>";
+                foreach ($blocks as $nb) {
+                    if (in_array($nb['type'], ['header', 'hero', 'footer'])) continue;
+                    $ncfg   = json_decode($nb['config'], true) ?? [];
+                    $ntitle = !empty($ncfg['title']) ? htmlspecialchars($ncfg['title']) : ucfirst($nb['type']);
+                    $nslug  = generate_slug($ntitle);
+                    $footerNavLinks .= "<a href='#{$nslug}' style='color:rgba(255,255,255,0.55); transition:color .2s;' onmouseover=\"this.style.color='#fff'\" onmouseout=\"this.style.color='rgba(255,255,255,0.55)'\">{$ntitle}</a>";
+                }
+
+                $footerCopy  = !empty($text) ? htmlspecialchars(html_entity_decode($text)) : ('© ' . date('Y') . ' ' . ($footerBizName ?: 'All') . '. All rights reserved.');
+                $footerPhone = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "inline-flex items-center gap-2 font-semibold transition-opacity hover:opacity-100");
+
+                echo "
+<footer id='{$blockSlug}' style='background:#0d0d14; position:relative; overflow:hidden;'>
+  <!-- accent line top -->
+  <div style='height:3px; background:var(--color-primary); width:100%;'></div>
+
+  <div style='max-width:1280px; margin:0 auto; padding:4rem 1.5rem 2rem;'>
+
+    <!-- top row: brand + nav -->
+    <div style='display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:2rem; margin-bottom:3rem;'>
+      <!-- brand -->
+      <div>
+        <p class='font-title' style='font-size:1.75rem; font-weight:800; color:#fff; letter-spacing:-0.02em; line-height:1;'>{$footerBizName}</p>
+        <p style='margin-top:.5rem; font-size:.85rem; color:rgba(255,255,255,0.4); letter-spacing:.08em; text-transform:uppercase;'>Est. " . date('Y') . "</p>
+      </div>
+      <!-- nav -->
+      <nav style='display:flex; flex-wrap:wrap; gap:2rem; align-items:center; padding-top:.25rem;'>
+        {$footerNavLinks}
+      </nav>
+    </div>
+
+    <!-- divider -->
+    <div style='height:1px; background:rgba(255,255,255,0.08); margin-bottom:2rem;'></div>
+
+    <!-- bottom row: copyright + phone -->
+    <div style='display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;'>
+      <p style='font-size:.8rem; color:rgba(255,255,255,0.35); letter-spacing:.02em;'>{$footerCopy}</p>
+      " . ($footerPhone ? "<div style='font-size:.85rem; color:rgba(255,255,255,0.55);'>{$footerPhone}</div>" : "") . "
+    </div>
+
+  </div>
+</footer>";
                 break;
             case 'gallery':
                 echo "<section id='{$blockSlug}' class='py-20 px-4 bg-white'><div class='max-w-7xl mx-auto'><div class='text-center mb-16'><h2 class='text-3xl font-bold font-title mb-4' style='color: var(--color-primary);'>" . $blockTitle . "</h2>" . ($desc ? "<p class='text-gray-500 text-lg'>{$desc}</p>" : "") . "</div>";
