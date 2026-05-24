@@ -772,6 +772,32 @@ else: ?>
     letter-spacing: .03em;
     margin: 0;
 }
+.sp-footer-powered {
+    border-top: 1px solid rgba(255,255,255,.04);
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+.sp-footer-powered p {
+    font-size: .65rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.15);
+    margin: 0;
+}
+.sp-footer-powered a {
+    font-size: .65rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.25);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color .2s;
+}
+.sp-footer-powered a:hover { color: rgba(255,255,255,.55); }
 .sp-ft-contact-link {
     font-size: .78rem;
     font-weight: 600;
@@ -797,6 +823,11 @@ else: ?>
     <div class='sp-footer-bottom'>
       <p class='sp-footer-copy'>{$footerCopy}</p>
       " . ($footerPhone ? $footerPhone : "") . "
+    </div>
+    <div class='sp-footer-powered'>
+      <p>Created with</p>
+      <a href='https://superpage.co.uk' target='_blank' rel='noopener'>Superpage</a>
+      <p>&middot; " . date('Y') . " &middot; All rights reserved" . ($footerBizName ? " &middot; {$footerBizName}" : "") . "</p>
     </div>
   </div>
 </footer>";
