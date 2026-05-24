@@ -69,7 +69,7 @@ function create_prospect_site(array $data, int $adminId): array {
     ]);
 
     // --- 4. Blocos ---
-    $heroText  = !empty($data['hero'])  ? $data['hero']  : $data['name'] . ' — ' . $tpl['hero'];
+    $heroText  = !empty($data['hero'])  ? $data['hero']  : $tpl['hero'];
     $aboutText = !empty($data['about']) ? $data['about'] : $tpl['about'];
 
     // Serviços: usar os fornecidos, completar com genéricos
