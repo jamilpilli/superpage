@@ -355,7 +355,7 @@ function get_prospect_template(string $category): array {
             ],
         ],
         'food' => [
-            'color'          => '#b45309',
+            'color'          => '#c2410c',
             'title_font'     => 'Playfair Display',
             'text_font'      => 'Lato',
             'button_style'   => 'rounded',
@@ -405,7 +405,7 @@ function get_prospect_template(string $category): array {
             ],
         ],
         'travel' => [
-            'color'          => '#0891b2',
+            'color'          => '#0e7490',
             'title_font'     => 'Raleway',
             'text_font'      => 'Open Sans',
             'button_style'   => 'pill',
@@ -430,7 +430,7 @@ function get_prospect_template(string $category): array {
             ],
         ],
         'marketing' => [
-            'color'          => '#7c3aed',
+            'color'          => '#6d28d9',
             'title_font'     => 'Poppins',
             'text_font'      => 'Inter',
             'button_style'   => 'rounded',
@@ -455,7 +455,7 @@ function get_prospect_template(string $category): array {
             ],
         ],
         'professional' => [
-            'color'          => '#1e40af',
+            'color'          => '#1e3a8a',
             'title_font'     => 'Playfair Display',
             'text_font'      => 'Open Sans',
             'button_style'   => 'square',
