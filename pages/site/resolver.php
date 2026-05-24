@@ -761,10 +761,10 @@ else: ?>
 }
 .sp-footer-bottom {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: .75rem;
-    text-align: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 .sp-footer-copy {
     font-size: .72rem;
@@ -816,14 +816,12 @@ else: ?>
       <div>
         <p class='sp-footer-brand-name'>{$footerBizName}</p>
         <hr class='sp-footer-rule'>
+        <p class='sp-footer-copy' style='margin-top:1.5rem;'>{$footerCopy}</p>
+        " . ($footerPhone ? "<div style='margin-top:.5rem;'>{$footerPhone}</div>" : "") . "
       </div>
       <nav class='sp-footer-nav'>{$footerNavHtml}</nav>
     </div>
     <div class='sp-footer-divider'></div>
-    <div class='sp-footer-bottom'>
-      <p class='sp-footer-copy'>{$footerCopy}</p>
-      " . ($footerPhone ? $footerPhone : "") . "
-    </div>
     <div class='sp-footer-powered'>
       <p>Created with</p>
       <a href='https://superpage.co.uk' target='_blank' rel='noopener'>Superpage</a>
