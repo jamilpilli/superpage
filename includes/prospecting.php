@@ -139,6 +139,9 @@ function create_prospect_site(array $data, int $adminId): array {
  * Regista em prospect_log e activa o site draft.
  */
 function fire_prospect_webhook(int $siteId, int $adminId, array $payload): bool {
+    // Activar site draft sempre — independente do webhook
+    db_update('sites', ['status' => 'active'], 'id = :id', [':id' => $siteId]);
+
     $webhookUrl = defined('N8N_PROSPECT_WEBHOOK_URL') ? N8N_PROSPECT_WEBHOOK_URL : '';
     if (empty($webhookUrl)) {
         return false;
@@ -163,9 +166,6 @@ function fire_prospect_webhook(int $siteId, int $adminId, array $payload): bool 
         'admin_id'     => $adminId,
         'notified_via' => $via,
     ]);
-
-    // Activar site draft após envio
-    db_update('sites', ['status' => 'active'], 'id = :id', [':id' => $siteId]);
 
     return $httpCode >= 200 && $httpCode < 300;
 }
