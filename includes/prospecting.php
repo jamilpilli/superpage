@@ -92,7 +92,7 @@ function create_prospect_site(array $data, int $adminId): array {
     $blocks = [
         ['type' => 'header',   'sort' => 0, 'config' => ['logo_text' => $data['name'], 'menu_items' => []]],
         ['type' => 'hero',     'sort' => 1, 'config' => ['title' => $data['name'], 'subtitle' => $heroText, 'image' => $tpl['hero_img'], 'cta_text' => 'Get In Touch', 'cta_link' => '#contact']],
-        ['type' => 'about',    'sort' => 2, 'config' => ['title' => 'About Us', 'text' => $aboutText, 'image' => '']],
+        ['type' => 'about',    'sort' => 2, 'config' => ['title' => 'About Us', 'text' => $aboutText, 'image' => $tpl['about_img'] ?? '']],
         ['type' => 'services', 'sort' => 3, 'config' => ['title' => 'Our Services', 'items' => $serviceItems]],
         ['type' => 'gallery',  'sort' => 4, 'config' => ['title' => 'Our Work', 'description' => '', 'gallery_images' => $tpl['gallery_images']]],
         ['type' => 'contact',  'sort' => 5, 'config' => ['title' => 'Contact Us', 'email' => $data['email'] ?? '', 'phone' => $data['phone'] ?? '', 'text' => 'We would love to hear from you.']],

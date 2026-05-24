@@ -11,6 +11,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'quality craftsmanship you can trust, built to last.',
             'about'          => 'With years of experience in the construction and trades industry, we deliver high-quality builds, renovations and repairs on time and within budget. Your vision, our expertise.',
+            'about_img'      => 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
             'services'       => ['Renovation & Refurbishment', 'New Build', 'Repairs & Maintenance', 'Surveying & Planning'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1574936145840-28808d77a0b6?w=800&q=80',
@@ -35,6 +36,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'professional business solutions tailored to your needs.',
             'about'          => 'We provide reliable business and office services designed to help companies operate more efficiently. From administration to logistics, our team is here to support your growth.',
+            'about_img'      => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
             'services'       => ['Business Consultancy', 'Office Support', 'Administration', 'Virtual Assistant'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
@@ -59,6 +61,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'keeping your property in perfect condition, all year round.',
             'about'          => 'We offer a comprehensive range of property and maintenance services for homeowners and landlords. From routine upkeep to emergency repairs, we have got you covered.',
+            'about_img'      => 'https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=800&q=80',
             'services'       => ['Property Management', 'Maintenance & Repairs', 'Cleaning Services', 'Garden & Outdoor'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
@@ -83,6 +86,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'your health and beauty are our top priority.',
             'about'          => 'We provide compassionate, professional health and beauty services tailored to your individual needs. Our experienced team is dedicated to helping you look and feel your best.',
+            'about_img'      => 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&q=80',
             'services'       => ['Consultations', 'Treatments', 'Beauty Services', 'Wellness Plans'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
@@ -107,6 +111,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'making your special day truly unforgettable.',
             'about'          => 'We specialise in creating beautiful, personalised wedding experiences. From planning to execution, our passionate team takes care of every detail so you can enjoy every moment.',
+            'about_img'      => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=800&q=80',
             'services'       => ['Wedding Planning', 'Venue Styling', 'Catering & Cakes', 'Photography & Video'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80',
@@ -131,6 +136,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'expert tuition and classes to help you reach your potential.',
             'about'          => 'We offer high-quality tuition and training classes for learners of all ages and levels. Our experienced tutors are passionate about education and committed to your success.',
+            'about_img'      => 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80',
             'services'       => ['One-to-One Tuition', 'Group Classes', 'Online Sessions', 'Exam Preparation'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
@@ -155,6 +161,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'reliable technology solutions for homes and businesses.',
             'about'          => 'We provide expert computer and telecoms support for individuals and businesses. Whether it is a quick repair or a full network setup, our team delivers fast and reliable results.',
+            'about_img'      => 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
             'services'       => ['Computer Repair', 'Network Setup', 'Phone & Device Support', 'IT Consultancy'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
@@ -179,6 +186,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'safe, reliable transport whenever you need it.',
             'about'          => 'We offer professional transport services for individuals and businesses across the area. Our experienced drivers and well-maintained vehicles ensure every journey is smooth and on time.',
+            'about_img'      => 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80',
             'services'       => ['Local Transfers', 'Airport Runs', 'Van Hire', 'Courier & Delivery'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80',
@@ -203,6 +211,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'bringing fun and unforgettable experiences to every occasion.',
             'about'          => 'We provide top-quality entertainment services for events of all sizes. From private parties to corporate functions, our team delivers performances and experiences your guests will never forget.',
+            'about_img'      => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
             'services'       => ['Live Performances', 'Event DJ', 'Party Planning', 'Kids Entertainment'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
@@ -227,6 +236,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'discover products you will love, every single day.',
             'about'          => 'We offer a carefully selected range of products to suit every taste and budget. Whether you shop in-store or online, we are committed to making your experience effortless and enjoyable.',
+            'about_img'      => 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&q=80',
             'services'       => ['In-Store Shopping', 'Online Orders', 'Gift Cards', 'Easy Returns'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80',
@@ -251,6 +261,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'trusted financial and legal advice you can count on.',
             'about'          => 'We offer professional financial and legal services to individuals and businesses. Our experienced advisors provide clear, practical guidance to help you make the right decisions with confidence.',
+            'about_img'      => 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80',
             'services'       => ['Financial Planning', 'Legal Advice', 'Tax & Accounting', 'Business Support'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
@@ -275,6 +286,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'caring for your pets as if they were our own.',
             'about'          => 'We are passionate animal lovers dedicated to providing the best care for your pets. Whether it is grooming, walking or boarding, your furry family members are in safe hands with us.',
+            'about_img'      => 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80',
             'services'       => ['Dog Walking', 'Pet Grooming', 'Pet Sitting & Boarding', 'Veterinary Referrals'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&q=80',
@@ -299,6 +311,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'keeping your vehicle running smoothly, always.',
             'about'          => 'We provide expert motoring services for all makes and models. Our qualified mechanics and technicians deliver honest, reliable work at competitive prices — keeping you safe on the road.',
+            'about_img'      => 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=800&q=80',
             'services'       => ['MOT & Servicing', 'Repairs & Diagnostics', 'Tyres & Brakes', 'Valeting'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=800&q=80',
@@ -323,6 +336,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'style that speaks for itself.',
             'about'          => 'We offer a curated selection of clothing and fashion for every occasion. From everyday essentials to special occasion pieces, our collection is designed to make you look and feel great.',
+            'about_img'      => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80',
             'services'       => ['Womenswear', 'Menswear', 'Alterations & Tailoring', 'Personal Styling'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80',
@@ -347,6 +361,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'delicious food and drink, made with passion.',
             'about'          => 'We are passionate about bringing people together over great food and drink. Using fresh, quality ingredients, everything we make is crafted with care and served with a smile.',
+            'about_img'      => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
             'services'       => ['Dine In', 'Takeaway & Delivery', 'Catering', 'Private Events'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
@@ -371,6 +386,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'caring for your children with love, patience and dedication.',
             'about'          => 'We provide a safe, nurturing and stimulating environment for children of all ages. Our experienced and caring team treats every child as an individual, supporting their growth and happiness every day.',
+            'about_img'      => 'https://images.unsplash.com/photo-1565843248736-8c8d2ed8aff5?w=800&q=80',
             'services'       => ['Childminding', 'After-School Care', 'Babysitting', 'Holiday Club'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&q=80',
@@ -395,6 +411,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'pill',
             'hero'           => 'your next adventure starts here.',
             'about'          => 'We help individuals and families plan and book unforgettable travel experiences. From weekend breaks to long-haul adventures, our knowledgeable team is here to make every journey special.',
+            'about_img'      => 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80',
             'services'       => ['Holiday Packages', 'Flight & Hotel Booking', 'Group Travel', 'Travel Insurance'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
@@ -419,6 +436,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'award-winning marketing that helps your brand grow.',
             'about'          => 'We are a results-driven marketing agency specialising in digital growth. From social media to paid advertising, our team delivers strategies that generate real results for our clients.',
+            'about_img'      => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
             'services'       => ['Social Media Management', 'Brand Design', 'Paid Ads', 'SEO'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
@@ -443,6 +461,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'square',
             'hero'           => 'expert advice and professional services you can rely on.',
             'about'          => 'We are a team of experienced professionals committed to delivering practical solutions for our clients. We combine deep expertise with a personal approach to achieve outstanding outcomes.',
+            'about_img'      => 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
             'services'       => ['Consultation', 'Advisory Services', 'Ongoing Support', 'Training'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80',
@@ -467,6 +486,7 @@ function get_prospect_template(string $category): array {
             'button_style'   => 'rounded',
             'hero'           => 'welcome — we are here to help you succeed.',
             'about'          => 'We are a dedicated team passionate about what we do. Our goal is to provide outstanding service and create lasting value for every client we work with.',
+            'about_img'      => 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
             'services'       => ['Our Services', 'What We Offer', 'How We Work', 'Get In Touch'],
             'service_images' => [
                 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
