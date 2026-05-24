@@ -47,6 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Acções que requerem um targetId específico
         if ($action === 'create_admin') {
             // já tratado acima — não cair no bloco seguinte
+        } elseif ($action === 'change_password') {
+            $newPass = trim($_POST['new_password'] ?? '');
+            if ($targetId === (int)$currentAdmin['id']) {
+                $error = "Use your profile settings to change your own password.";
+            } elseif (strlen($newPass) < 6) {
+                $error = "Password must be at least 6 characters.";
+            } else {
+                db_update('users', ['password_hash' => password_hash($newPass, PASSWORD_DEFAULT, ['cost' => HASH_COST])], 'id = :id', [':id' => $targetId]);
+                db_insert('hub_audit_logs', ['admin_id' => $currentAdmin['id'], 'action_type' => 'user_change_password', 'entity_type' => 'users', 'entity_id' => $targetId, 'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '']);
+                $msg = "Password updated successfully.";
+            }
         } elseif ($targetId === (int)$currentAdmin['id']) {
             $error = "You cannot modify your own account here.";
         } elseif ($action === 'delete') {
@@ -343,6 +354,16 @@ render_hub_header("Users");
 
                                 <div class="border-t border-white/5 my-1"></div>
 
+                                <!-- Change Password -->
+                                <button type="button"
+                                        onclick="openChangePassword(<?= $u['id'] ?>, '<?= htmlspecialchars(addslashes($u['name'])) ?>')"
+                                        class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined text-slate-400" style="font-size:16px">key</span>
+                                    Change Password
+                                </button>
+
+                                <div class="border-t border-white/5 my-1"></div>
+
                                 <!-- Suspend / Activate -->
                                 <?php if ($isSuspended): ?>
                                 <form method="POST">
@@ -464,7 +485,58 @@ render_hub_header("Users");
 </div>
 
 
+<!-- Change Password Modal -->
+<div id="changePasswordModal" style="display:none"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+     onclick="if(event.target===this) this.style.display='none'">
+    <div class="w-full max-w-sm bg-[#121220] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-[#685ef7]/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">key</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white font-headline">Change Password</h3>
+                    <p id="cpModalName" class="text-xs text-on-surface-variant"></p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('changePasswordModal').style.display='none'"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined" style="font-size:18px">close</span>
+            </button>
+        </div>
+        <form method="POST" class="px-6 py-5 flex flex-col gap-4">
+            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+            <input type="hidden" name="action" value="change_password">
+            <input type="hidden" name="user_id" id="cpUserId" value="">
+            <div>
+                <label class="block text-xs text-on-surface-variant font-bold uppercase tracking-widest mb-2">New Password</label>
+                <input type="password" name="new_password" id="cpPassword" required placeholder="Min. 6 characters"
+                       class="w-full bg-[#0d0d1a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[#a9a4ff]/50 transition-colors">
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="button" onclick="document.getElementById('changePasswordModal').style.display='none'"
+                        class="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-sm font-bold rounded-xl transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 py-2.5 bg-[#685ef7] hover:bg-[#685ef7]/80 text-white text-sm font-bold rounded-xl transition-colors shadow-lg shadow-[#685ef7]/20">
+                    Update Password
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+function openChangePassword(userId, userName) {
+    document.getElementById('cpUserId').value = userId;
+    document.getElementById('cpModalName').textContent = userName;
+    document.getElementById('cpPassword').value = '';
+    document.querySelectorAll('[id^="um"]').forEach(m => m.style.display = 'none');
+    document.getElementById('changePasswordModal').style.display = 'flex';
+}
+
 function hubToggleMenu(id) {
     const el = document.getElementById(id);
     const isOpen = el.style.display !== 'none';
