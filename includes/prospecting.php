@@ -45,12 +45,12 @@ function create_prospect_site(array $data, int $adminId): array {
     }
 
     // --- 2. Site ---
-    $color  = !empty($data['color']) ? $data['color'] : '#685ef7';
+    $color  = !empty($data['color']) ? $data['color'] : $tpl['color'];
     $design = json_encode([
         'primary_color' => $color,
-        'title_font'    => 'Plus Jakarta Sans',
-        'text_font'     => 'Inter',
-        'button_style'  => 'rounded',
+        'title_font'    => $tpl['title_font'],
+        'text_font'     => $tpl['text_font'],
+        'button_style'  => $tpl['button_style'],
     ]);
 
     $siteId = db_insert('sites', [
