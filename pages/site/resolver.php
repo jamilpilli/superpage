@@ -557,15 +557,18 @@ else: ?>
                     }
                 }
                 else {
-                    // Fallback sem itens
+                    // Fallback sem itens — campos do Content Editor
+                    $heroSubtitle = !empty(trim($cfg['subtitle'] ?? '')) ? htmlspecialchars($cfg['subtitle']) : $desc;
+                    $heroCtaText  = !empty(trim($cfg['cta_text'] ?? '')) ? htmlspecialchars($cfg['cta_text']) : (!empty(trim($cfg['button_text'] ?? '')) ? htmlspecialchars($cfg['button_text']) : '');
+                    $heroCtaLink  = !empty(trim($cfg['cta_link'] ?? '')) ? htmlspecialchars($cfg['cta_link']) : (!empty(trim($cfg['button_link'] ?? '')) ? htmlspecialchars($cfg['button_link']) : '#contact');
                     $bgImg = $img ?: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1920&q=80';
                     echo "<div class='absolute inset-0 bg-cover bg-center' style='background-image: url(\"{$bgImg}\");'></div>";
                     echo "<div class='absolute inset-0 bg-black bg-opacity-60 z-0'></div>";
                     echo "<div class='relative z-10 flex flex-col items-center justify-center text-center px-4 max-w-4xl mx-auto h-full'>";
                     echo "<h2 class='text-4xl md:text-6xl font-extrabold text-white font-title mb-6'>" . $blockTitle . "</h2>";
-                    echo "<p class='text-xl md:text-2xl text-gray-200 mb-10'>" . $desc . "</p>";
-                    if (!empty($btnText) && !empty($btnLink) && $btnLink !== '#') {
-                        echo "<a href='" . $btnLink . "' class='inline-block px-10 py-4 {$btnRadiusClass} text-white font-bold transition hover:opacity-90 shadow-lg text-lg' style='background-color: var(--color-primary);'>" . $btnText . "</a>";
+                    if (!empty($heroSubtitle)) echo "<p class='text-xl md:text-2xl text-gray-200 mb-10'>" . $heroSubtitle . "</p>";
+                    if (!empty($heroCtaText)) {
+                        echo "<a href='" . $heroCtaLink . "' class='inline-block px-10 py-4 {$btnRadiusClass} text-white font-bold transition hover:opacity-90 shadow-lg text-lg' style='background-color: var(--color-primary);'>" . $heroCtaText . "</a>";
                     }
                     echo "</div>";
                 }
