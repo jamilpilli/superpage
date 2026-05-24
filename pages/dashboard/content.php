@@ -123,34 +123,90 @@ $page = db_fetch_one("SELECT id FROM pages WHERE site_id = :sid AND status = 'pu
                 <!-- Fields -->
                 <form @submit.prevent="saveContent" class="p-6 space-y-6">
 
-                    <!-- Main Title (all except hero) -->
-                    <div x-show="activeBlock && activeBlock.type !== 'hero'" class="space-y-1.5">
+                    <!-- Main Title (services, products, gallery, videos, testimonials, about, contact) -->
+                    <div x-show="activeBlock && ['services', 'products', 'gallery', 'videos', 'testimonials', 'about', 'contact'].includes(activeBlock.type)" class="space-y-1.5">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Section Title</label>
                         <input type="text" x-model="formData.title"
                                class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
                                placeholder="Enter a clear, compelling title…">
                     </div>
 
-                    <!-- Logo (header) -->
-                    <div x-show="activeBlock && activeBlock.type === 'header'" class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Logo Image</label>
-                        <div class="flex items-center gap-4">
-                            <template x-if="formData.image">
-                                <div class="relative p-3 bg-[#0d0d1a] rounded-xl border border-white/8 flex-shrink-0 group overflow-hidden">
-                                    <img :src="formData.image" class="object-contain h-10 max-w-[120px]">
-                                    <button type="button" @click="formData.image = ''"
-                                            class="absolute inset-0 bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-xs font-bold">
-                                        Remove
-                                    </button>
-                                </div>
-                            </template>
-                            <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0d0d1a] border border-dashed border-white/10 hover:border-[#a9a4ff]/30 rounded-xl cursor-pointer transition-all text-sm text-slate-500 hover:text-slate-300">
-                                <span class="material-symbols-outlined" style="font-size:18px">add_photo_alternate</span>
-                                <span>Upload logo</span>
-                                <input type="file" accept="image/*" @change="uploadImage($event, formData, 'image')" class="hidden">
-                            </label>
+                    <!-- Header block -->
+                    <div x-show="activeBlock && activeBlock.type === 'header'" class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Business Name</label>
+                            <input type="text" x-model="formData.logo_text"
+                                   class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                                   placeholder="e.g. Upper Class Services">
+                            <p class="text-[11px] text-slate-600">Shown as text if no logo image is uploaded.</p>
                         </div>
-                        <p class="text-[11px] text-slate-600">PNG or WebP with transparent background recommended.</p>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Logo Image</label>
+                            <div class="flex items-center gap-4">
+                                <template x-if="formData.image">
+                                    <div class="relative p-3 bg-[#0d0d1a] rounded-xl border border-white/8 flex-shrink-0 group overflow-hidden">
+                                        <img :src="formData.image" class="object-contain h-10 max-w-[120px]">
+                                        <button type="button" @click="formData.image = ''"
+                                                class="absolute inset-0 bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-xs font-bold">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </template>
+                                <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0d0d1a] border border-dashed border-white/10 hover:border-[#a9a4ff]/30 rounded-xl cursor-pointer transition-all text-sm text-slate-500 hover:text-slate-300">
+                                    <span class="material-symbols-outlined" style="font-size:18px">add_photo_alternate</span>
+                                    <span>Upload logo</span>
+                                    <input type="file" accept="image/*" @change="uploadImage($event, formData, 'image')" class="hidden">
+                                </label>
+                            </div>
+                            <p class="text-[11px] text-slate-600">PNG or WebP with transparent background recommended.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hero block -->
+                    <div x-show="activeBlock && activeBlock.type === 'hero'" class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Headline</label>
+                            <input type="text" x-model="formData.title"
+                                   class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                                   placeholder="e.g. Trusted Builders in London">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Tagline</label>
+                            <input type="text" x-model="formData.subtitle"
+                                   class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                                   placeholder="e.g. Over 15 years of quality craftsmanship">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Background Image</label>
+                            <div class="flex items-center gap-3">
+                                <template x-if="formData.image">
+                                    <div class="relative w-20 h-14 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 group">
+                                        <img :src="formData.image" class="object-cover w-full h-full">
+                                        <button type="button" @click="formData.image = ''"
+                                                class="absolute inset-0 bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-xs font-bold">✕</button>
+                                    </div>
+                                </template>
+                                <label class="flex-1 flex items-center gap-2 px-4 py-3 bg-[#0d0d1a] border border-dashed border-white/10 hover:border-[#a9a4ff]/30 rounded-xl cursor-pointer transition-all text-sm text-slate-500 hover:text-slate-300">
+                                    <span class="material-symbols-outlined" style="font-size:18px">add_photo_alternate</span>
+                                    Upload background
+                                    <input type="file" accept="image/*" @change="uploadImage($event, formData, 'image')" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">CTA Button Text</label>
+                                <input type="text" x-model="formData.cta_text"
+                                       class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                                       placeholder="e.g. Get a Free Quote">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">CTA Button URL</label>
+                                <input type="text" x-model="formData.cta_link"
+                                       class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                                       placeholder="#contact">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Description (services, gallery, videos) -->
@@ -294,8 +350,17 @@ $page = db_fetch_one("SELECT id FROM pages WHERE site_id = :sid AND status = 'pu
                            class="text-sm text-slate-500 text-center py-6 bg-[#0d0d1a] border border-dashed border-white/5 rounded-xl">No videos added yet.</p>
                     </div>
 
-                    <!-- Repeatable items (hero, services, products, testimonials) -->
-                    <div x-show="activeBlock && ['hero', 'services', 'products', 'testimonials'].includes(activeBlock.type)" class="space-y-3">
+                    <!-- Footer block -->
+                    <div x-show="activeBlock && activeBlock.type === 'footer'" class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Copyright Text</label>
+                        <input type="text" x-model="formData.text"
+                               class="w-full bg-[#0d0d1a] border border-white/8 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:ring-2 focus:ring-[#685ef7]/40 focus:border-[#685ef7]/40 outline-none transition-all text-sm"
+                               placeholder="e.g. Serving London since 2010">
+                        <p class="text-[11px] text-slate-600">Optional tagline shown in the footer. Leave blank to hide.</p>
+                    </div>
+
+                    <!-- Repeatable items (services, products, testimonials) -->
+                    <div x-show="activeBlock && ['services', 'products', 'testimonials'].includes(activeBlock.type)" class="space-y-3">
                         <div class="flex items-center justify-between">
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">Items</label>
                             <button type="button"
@@ -417,18 +482,22 @@ document.addEventListener('alpine:init', () => {
         selectBlock(block) {
             this.activeBlock = block;
             this.formData = {
-                title: block.config.title || '',
+                title:       block.config.title       || '',
+                logo_text:   block.config.logo_text   || '',
                 description: block.config.description || '',
-                text: block.config.text || '',
-                image: block.config.image || '',
+                text:        block.config.text        || '',
+                image:       block.config.image       || '',
+                subtitle:    block.config.subtitle    || '',
+                cta_text:    block.config.cta_text    || '',
+                cta_link:    block.config.cta_link    || '',
                 button_text: block.config.button_text || '',
                 button_link: block.config.button_link || '',
-                email: block.config.email || '',
-                phone: block.config.phone || '',
+                email:       block.config.email       || '',
+                phone:       block.config.phone       || '',
                 is_whatsapp: block.config.is_whatsapp || false,
-                items: JSON.parse(JSON.stringify(block.config.items || [])),
-                gallery_images: JSON.parse(JSON.stringify(block.config.gallery_images || [])),
-                videos: JSON.parse(JSON.stringify(block.config.videos || []))
+                items:         JSON.parse(JSON.stringify(block.config.items         || [])),
+                gallery_images:JSON.parse(JSON.stringify(block.config.gallery_images|| [])),
+                videos:        JSON.parse(JSON.stringify(block.config.videos        || []))
             };
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
