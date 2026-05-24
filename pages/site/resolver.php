@@ -661,7 +661,7 @@ else: ?>
                 <div class='text-center md:text-left'><button type='submit' class='inline-block w-auto text-white font-bold py-3 px-10 {$btnRadiusClass} shadow focus:outline-none transition hover:opacity-90' style='background-color: var(--color-primary);'>" . $btnText . "</button></div></form></div></div></section>";
                 break;
             case 'footer':
-                // Obter nome do negócio a partir do bloco header
+                // Nome do negócio a partir do header
                 $footerBizName = '';
                 foreach ($blocks as $hb) {
                     if ($hb['type'] === 'header') {
@@ -671,48 +671,133 @@ else: ?>
                     }
                 }
 
-                // Links de navegação para o footer
-                $footerNavLinks = "<a href='#inicio' style='color:rgba(255,255,255,0.55); transition:color .2s;' onmouseover=\"this.style.color='#fff'\" onmouseout=\"this.style.color='rgba(255,255,255,0.55)'\">Home</a>";
+                // Links de navegação
+                $footerNavItems = [['href' => '#inicio', 'label' => 'Home']];
                 foreach ($blocks as $nb) {
                     if (in_array($nb['type'], ['header', 'hero', 'footer'])) continue;
-                    $ncfg   = json_decode($nb['config'], true) ?? [];
+                    $ncfg  = json_decode($nb['config'], true) ?? [];
                     $ntitle = !empty($ncfg['title']) ? htmlspecialchars($ncfg['title']) : ucfirst($nb['type']);
-                    $nslug  = generate_slug($ntitle);
-                    $footerNavLinks .= "<a href='#{$nslug}' style='color:rgba(255,255,255,0.55); transition:color .2s;' onmouseover=\"this.style.color='#fff'\" onmouseout=\"this.style.color='rgba(255,255,255,0.55)'\">{$ntitle}</a>";
+                    $footerNavItems[] = ['href' => '#' . generate_slug($ntitle), 'label' => $ntitle];
+                }
+                $footerNavHtml = '';
+                foreach ($footerNavItems as $ni) {
+                    $footerNavHtml .= "<a href='{$ni['href']}' class='sp-ft-link'>{$ni['label']}</a>";
                 }
 
-                $footerCopy  = !empty($text) ? htmlspecialchars(html_entity_decode($text)) : ('© ' . date('Y') . ' ' . ($footerBizName ?: 'All') . '. All rights reserved.');
-                $footerPhone = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "inline-flex items-center gap-2 font-semibold transition-opacity hover:opacity-100");
+                $footerCopy  = !empty($text) ? htmlspecialchars(html_entity_decode($text)) : ('© ' . date('Y') . ' ' . ($footerBizName ?: '') . '. All rights reserved.');
+                $footerPhone = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "sp-ft-contact-link");
 
                 echo "
-<footer id='{$blockSlug}' style='background:#0d0d14; position:relative; overflow:hidden;'>
-  <!-- accent line top -->
-  <div style='height:3px; background:var(--color-primary); width:100%;'></div>
-
-  <div style='max-width:1280px; margin:0 auto; padding:4rem 1.5rem 2rem;'>
-
-    <!-- top row: brand + nav -->
-    <div style='display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:2rem; margin-bottom:3rem;'>
-      <!-- brand -->
+<footer id='{$blockSlug}' class='sp-footer'>
+<style>
+.sp-footer {
+    background: #0c0c13;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-text);
+}
+.sp-footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 0% 0%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%);
+    pointer-events: none;
+}
+.sp-footer-inner {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 5rem 2rem 2.5rem;
+}
+.sp-footer-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: start;
+    margin-bottom: 4rem;
+}
+@media (max-width: 640px) {
+    .sp-footer-top { grid-template-columns: 1fr; gap: 2.5rem; }
+}
+.sp-footer-brand-name {
+    font-family: var(--font-title);
+    font-size: clamp(1.8rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0 0 1.25rem;
+}
+.sp-footer-rule {
+    width: 2.5rem;
+    height: 2px;
+    background: var(--color-primary);
+    border: none;
+    margin: 0;
+}
+.sp-footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    align-items: flex-end;
+    padding-top: .25rem;
+}
+@media (max-width: 640px) {
+    .sp-footer-nav { align-items: flex-start; flex-direction: row; flex-wrap: wrap; gap: .75rem 1.5rem; }
+}
+.sp-ft-link {
+    font-size: .78rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.4);
+    text-decoration: none;
+    transition: color .2s;
+}
+.sp-ft-link:hover { color: #fff; }
+.sp-footer-divider {
+    height: 1px;
+    background: rgba(255,255,255,.07);
+    margin-bottom: 2rem;
+}
+.sp-footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.sp-footer-copy {
+    font-size: .72rem;
+    color: rgba(255,255,255,.25);
+    letter-spacing: .03em;
+    margin: 0;
+}
+.sp-ft-contact-link {
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,.45);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    transition: color .2s;
+}
+.sp-ft-contact-link:hover { color: #fff; }
+</style>
+  <div class='sp-footer-inner'>
+    <div class='sp-footer-top'>
       <div>
-        <p class='font-title' style='font-size:1.75rem; font-weight:800; color:#fff; letter-spacing:-0.02em; line-height:1;'>{$footerBizName}</p>
-        <p style='margin-top:.5rem; font-size:.85rem; color:rgba(255,255,255,0.4); letter-spacing:.08em; text-transform:uppercase;'>Est. " . date('Y') . "</p>
+        <p class='sp-footer-brand-name'>{$footerBizName}</p>
+        <hr class='sp-footer-rule'>
       </div>
-      <!-- nav -->
-      <nav style='display:flex; flex-wrap:wrap; gap:2rem; align-items:center; padding-top:.25rem;'>
-        {$footerNavLinks}
-      </nav>
+      <nav class='sp-footer-nav'>{$footerNavHtml}</nav>
     </div>
-
-    <!-- divider -->
-    <div style='height:1px; background:rgba(255,255,255,0.08); margin-bottom:2rem;'></div>
-
-    <!-- bottom row: copyright + phone -->
-    <div style='display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1rem;'>
-      <p style='font-size:.8rem; color:rgba(255,255,255,0.35); letter-spacing:.02em;'>{$footerCopy}</p>
-      " . ($footerPhone ? "<div style='font-size:.85rem; color:rgba(255,255,255,0.55);'>{$footerPhone}</div>" : "") . "
+    <div class='sp-footer-divider'></div>
+    <div class='sp-footer-bottom'>
+      <p class='sp-footer-copy'>{$footerCopy}</p>
+      " . ($footerPhone ? $footerPhone : "") . "
     </div>
-
   </div>
 </footer>";
                 break;
