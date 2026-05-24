@@ -18,11 +18,16 @@ $user = get_logged_user();
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Helper para validar ownership da página/site
+// Admins têm acesso a qualquer página
 function verify_page_ownership($pageId, $userId) {
     global $pdo;
+    $role = $pdo->prepare("SELECT role FROM users WHERE id = :uid");
+    $role->execute([':uid' => $userId]);
+    if ($role->fetchColumn() === 'admin') return true;
+
     $stmt = $pdo->prepare("
-        SELECT p.id FROM pages p 
-        JOIN sites s ON p.site_id = s.id 
+        SELECT p.id FROM pages p
+        JOIN sites s ON p.site_id = s.id
         WHERE p.id = :pid AND s.user_id = :uid
     ");
     $stmt->execute([':pid' => $pageId, ':uid' => $userId]);
