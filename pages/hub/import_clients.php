@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_drafts'])) {
         $created = 0;
         foreach ($rows as $row) {
             if (!empty($row['error'])) continue;
-            $row['data']['status'] = 'draft';
+            $row['data']['status'] = 'active';
             create_prospect_site($row['data'], (int)$admin['id']);
             $created++;
         }
