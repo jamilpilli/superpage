@@ -576,7 +576,7 @@ else: ?>
                 echo "<section id='{$blockSlug}' class='py-20 px-4 bg-white'><div class='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center'><div><h2 class='text-3xl font-bold font-title mb-6' style='color: var(--color-primary);'>" . $blockTitle . "</h2><p class='text-gray-600 text-lg leading-relaxed mb-6'>" . nl2br($text) . "</p>{$aboutBtn}</div><div><img src='" . $img . "' alt='" . $blockTitle . "' class='rounded-lg shadow-xl w-full h-auto object-cover max-h-96'></div></div></section>";
                 break;
             case 'services':
-                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-gray-50'><div class='max-w-7xl mx-auto'><div class='text-center max-w-3xl mx-auto mb-16'><h2 class='text-3xl font-bold font-title mb-4' style='color: var(--color-primary);'>" . $blockTitle . "</h2><p class='text-gray-500 text-lg'>" . $desc . "</p></div>";
+                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-gray-50'><div class='max-w-7xl mx-auto'><div class='text-center max-w-3xl mx-auto mb-16'><h2 class='text-3xl font-bold font-title mb-4' style='color: var(--color-primary);'>" . $blockTitle . "</h2>" . ($desc ? "<p class='text-gray-500 text-lg'>{$desc}</p>" : "") . "</div>";
                 if (!empty($items)) {
                     echo "<div class='grid grid-cols-1 md:grid-cols-3 gap-8'>";
                     foreach ($items as $item) {
@@ -595,7 +595,7 @@ else: ?>
                     echo "</div>";
                 }
                 else {
-                    echo "<p class='text-center text-gray-400'>Adicione serviços através do painel de controle.</p>";
+                    echo "<p class='text-center text-gray-400'>No services added yet.</p>";
                 }
                 echo "</div></section>";
                 break;
@@ -621,7 +621,7 @@ else: ?>
                     echo "</div>";
                 }
                 else {
-                    echo "<p class='text-center text-gray-400'>Adicione produtos através do painel de controle.</p>";
+                    echo "<p class='text-center text-gray-400'>No products added yet.</p>";
                 }
                 echo "</div></section>";
                 break;
@@ -638,7 +638,7 @@ else: ?>
                     echo "</div>";
                 }
                 else {
-                    echo "<p class='text-indigo-200'>Nenhum depoimento adicionado.</p>";
+                    echo "<p class='text-indigo-200'>No testimonials added yet.</p>";
                 }
                 echo "</div></section>";
                 break;
@@ -662,10 +662,11 @@ else: ?>
                 break;
             case 'footer':
                 $footerPhoneHtml = $renderPhoneLink($globalContactPhone, $globalIsWhatsapp, "flex items-center justify-center text-white opacity-90 font-medium hover:opacity-100 transition mt-4");
-                echo "<footer id='{$blockSlug}' class='text-white py-12 text-center mt-auto' style='background-color: var(--color-primary);'><div class='max-w-7xl mx-auto px-4'><h3 class='text-2xl font-bold mb-4 font-title'>{$blockTitle}</h3><p class='text-white opacity-80'>&copy; " . date('Y') . " All rights reserved.</p>{$footerPhoneHtml}</div></footer>";
+                $footerCopy = !empty($text) ? $text : ('&copy; ' . date('Y') . ' ' . $blockTitle . '. All rights reserved.');
+                echo "<footer id='{$blockSlug}' class='text-white py-12 text-center mt-auto' style='background-color: var(--color-primary);'><div class='max-w-7xl mx-auto px-4'><p class='text-white opacity-80'>{$footerCopy}</p>{$footerPhoneHtml}</div></footer>";
                 break;
             case 'gallery':
-                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-white'><div class='max-w-7xl mx-auto'><div class='text-center mb-16'><h2 class='text-3xl font-bold font-title mb-4' style='color: var(--color-primary);'>" . $blockTitle . "</h2><p class='text-gray-500 text-lg'>" . $desc . "</p></div>";
+                echo "<section id='{$blockSlug}' class='py-20 px-4 bg-white'><div class='max-w-7xl mx-auto'><div class='text-center mb-16'><h2 class='text-3xl font-bold font-title mb-4' style='color: var(--color-primary);'>" . $blockTitle . "</h2>" . ($desc ? "<p class='text-gray-500 text-lg'>{$desc}</p>" : "") . "</div>";
                 $images = $cfg['gallery_images'] ?? [];
                 if (!empty($images)) {
                     echo "<div class='grid grid-cols-1 md:grid-cols-3 gap-6'>";
@@ -676,7 +677,7 @@ else: ?>
                     echo "</div>";
                 }
                 else {
-                    echo "<p class='text-center text-gray-400'>Nenhuma foto adicionada à galeria.</p>";
+                    echo "<p class='text-center text-gray-400'>No photos added yet.</p>";
                 }
                 echo "</div></section>";
                 break;
@@ -703,7 +704,7 @@ else: ?>
                     echo "</div>";
                 }
                 else {
-                    echo "<p class='text-center text-gray-400'>Nenhum vídeo adicionado ou ativo.</p>";
+                    echo "<p class='text-center text-gray-400'>No videos added yet.</p>";
                 }
                 echo "</div></section>";
                 break;
