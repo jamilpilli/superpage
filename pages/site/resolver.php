@@ -669,10 +669,14 @@ else: ?>
                 foreach ($blocks as $hb) {
                     if ($hb['type'] === 'header') {
                         $hcfg = json_decode($hb['config'], true) ?? [];
-                        $footerBizName = htmlspecialchars($hcfg['logo_text'] ?? '');
+                        $footerBizName = htmlspecialchars(
+                            !empty($hcfg['logo_text']) ? $hcfg['logo_text'] :
+                            (!empty($hcfg['title'])    ? $hcfg['title']     : $site['name'] ?? $site['slug'])
+                        );
                         break;
                     }
                 }
+                if (empty($footerBizName)) $footerBizName = htmlspecialchars($site['name'] ?? $site['slug']);
 
                 // Links de navegação
                 $footerNavItems = [['href' => '#inicio', 'label' => 'Home']];
