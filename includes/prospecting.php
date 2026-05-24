@@ -85,7 +85,7 @@ function create_prospect_site(array $data, int $adminId): array {
         $serviceItems[] = [
             'title'       => $svcName,
             'description' => 'Get in touch to learn more about this service.',
-            'image'       => '',
+            'image'       => $tpl['service_images'][$idx] ?? '',
         ];
     }
 
@@ -94,8 +94,9 @@ function create_prospect_site(array $data, int $adminId): array {
         ['type' => 'hero',     'sort' => 1, 'config' => ['title' => $data['name'], 'subtitle' => $heroText, 'image' => $tpl['hero_img'], 'cta_text' => 'Get In Touch', 'cta_link' => '#contact']],
         ['type' => 'about',    'sort' => 2, 'config' => ['title' => 'About Us', 'text' => $aboutText, 'image' => '']],
         ['type' => 'services', 'sort' => 3, 'config' => ['title' => 'Our Services', 'items' => $serviceItems]],
-        ['type' => 'contact',  'sort' => 4, 'config' => ['title' => 'Contact Us', 'email' => $data['email'] ?? '', 'phone' => $data['phone'] ?? '', 'text' => 'We would love to hear from you.']],
-        ['type' => 'footer',   'sort' => 5, 'config' => ['text' => '© ' . $year . ' ' . $data['name'] . '. All rights reserved.']],
+        ['type' => 'gallery',  'sort' => 4, 'config' => ['title' => 'Our Work', 'description' => '', 'gallery_images' => $tpl['gallery_images']]],
+        ['type' => 'contact',  'sort' => 5, 'config' => ['title' => 'Contact Us', 'email' => $data['email'] ?? '', 'phone' => $data['phone'] ?? '', 'text' => 'We would love to hear from you.']],
+        ['type' => 'footer',   'sort' => 6, 'config' => ['text' => '© ' . $year . ' ' . $data['name'] . '. All rights reserved.']],
     ];
 
     foreach ($blocks as $block) {
