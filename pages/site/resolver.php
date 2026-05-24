@@ -372,10 +372,10 @@ else: ?>
         $blockSlug = generate_slug(isset($cfg['title']) && !empty(trim($cfg['title'])) ? $cfg['title'] : ucfirst($type));
 
         // Lendo campos customizados comuns
-        $desc = isset($cfg['description']) && !empty(trim($cfg['description'])) ? htmlspecialchars($cfg['description']) : "Personalize os blocos e adicione conteúdo diretamente pelo seu painel administrativo.";
-        $btnText = isset($cfg['button_text']) && !empty(trim($cfg['button_text'])) ? htmlspecialchars($cfg['button_text']) : "Call to Action";
-        $btnLink = isset($cfg['button_link']) && !empty(trim($cfg['button_link'])) ? htmlspecialchars($cfg['button_link']) : "#";
-        $text = isset($cfg['text']) && !empty(trim($cfg['text'])) ? htmlspecialchars($cfg['text']) : "Texto de exemplo do bloco sobre. Escreva sua história aqui.";
+        $desc = isset($cfg['description']) && !empty(trim($cfg['description'])) ? htmlspecialchars($cfg['description']) : "";
+        $btnText = isset($cfg['button_text']) && !empty(trim($cfg['button_text'])) ? htmlspecialchars($cfg['button_text']) : "Get In Touch";
+        $btnLink = isset($cfg['button_link']) && !empty(trim($cfg['button_link'])) ? htmlspecialchars($cfg['button_link']) : "#contact";
+        $text = isset($cfg['text']) && !empty(trim($cfg['text'])) ? htmlspecialchars($cfg['text']) : "";
         $img = isset($cfg['image']) && !empty(trim($cfg['image'])) ? htmlspecialchars($cfg['image']) : "https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
 
         $items = $cfg['items'] ?? [];
