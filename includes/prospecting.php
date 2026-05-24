@@ -78,10 +78,16 @@ function create_prospect_site(array $data, int $adminId): array {
         $key = 'service' . $i;
         $serviceNames[] = !empty($data[$key]) ? $data[$key] : ($tpl['services'][$i - 1] ?? null);
     }
-    $serviceNames = array_filter($serviceNames);
+    $serviceNames = array_values(array_filter($serviceNames));
+
+    // Truncar para múltiplo de 3 (3 ou 6) para o grid ficar completo
+    $svcCount = count($serviceNames);
+    $svcCount = $svcCount - ($svcCount % 3);
+    if ($svcCount < 3) $svcCount = min(3, count($serviceNames));
+    $serviceNames = array_slice($serviceNames, 0, $svcCount);
 
     $serviceItems = [];
-    foreach (array_values($serviceNames) as $idx => $svcName) {
+    foreach ($serviceNames as $idx => $svcName) {
         $serviceItems[] = [
             'title'       => $svcName,
             'description' => 'Get in touch to learn more about this service.',
