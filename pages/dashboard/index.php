@@ -441,9 +441,14 @@ render_dashboard_header("Dashboard");
 
                         <!-- Acções -->
                         <div class="flex gap-2 mt-auto">
-                            <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $s['id'] ?>"
+                            <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $s['id'] ?>"
                                class="flex-1 text-center py-2 bg-[#5B4FE9]/20 hover:bg-[#5B4FE9]/30 text-[#a9a4ff] font-bold text-sm rounded-full transition-all border border-[#5B4FE9]/20">
-                                Manage
+                                Edit Content
+                            </a>
+                            <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $s['id'] ?>"
+                               class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-bold text-sm rounded-full transition-all"
+                               title="Settings">
+                                <span class="material-symbols-outlined text-base" style="font-size:18px">settings</span>
                             </a>
                             <a href="<?= $previewUrl ?>?preview=true" target="_blank"
                                class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-bold text-sm rounded-full transition-all"
