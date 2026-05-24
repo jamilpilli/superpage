@@ -773,26 +773,24 @@ else: ?>
     margin: 0;
 }
 .sp-footer-powered {
-    border-top: 1px solid rgba(255,255,255,.04);
-    margin-top: 2rem;
-    padding-top: 1.25rem;
+    background: #07070d;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 1rem 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: .5rem;
+    margin: 0 -2rem -2.5rem;
 }
 .sp-footer-powered p {
     font-size: .65rem;
-    letter-spacing: .08em;
+    letter-spacing: .07em;
     text-transform: uppercase;
     color: rgba(255,255,255,.15);
     margin: 0;
 }
 .sp-footer-powered a {
-    font-size: .65rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.25);
+    color: rgba(255,255,255,.28);
     text-decoration: none;
     font-weight: 600;
     transition: color .2s;
@@ -823,9 +821,7 @@ else: ?>
     </div>
     <div class='sp-footer-divider'></div>
     <div class='sp-footer-powered'>
-      <p>Created with</p>
-      <a href='https://superpage.co.uk' target='_blank' rel='noopener'>Superpage</a>
-      <p>&middot; " . date('Y') . " &middot; All rights reserved" . ($footerBizName ? " &middot; {$footerBizName}" : "") . "</p>
+      <p>Created with <a href='https://superpage.co.uk' target='_blank' rel='noopener'>Superpage</a> &middot; &copy; " . date('Y') . " All rights reserved</p>
     </div>
   </div>
 </footer>";
