@@ -34,6 +34,24 @@ function verify_page_ownership($pageId, $userId) {
     return $stmt->fetchColumn() !== false;
 }
 
+// Helper para validar ownership de um bloco
+// Admins têm acesso a qualquer bloco
+function verify_block_ownership($blockId, $userId) {
+    global $pdo;
+    $role = $pdo->prepare("SELECT role FROM users WHERE id = :uid");
+    $role->execute([':uid' => $userId]);
+    if ($role->fetchColumn() === 'admin') return true;
+
+    $stmt = $pdo->prepare("
+        SELECT b.id FROM blocks b
+        JOIN pages p ON b.page_id = p.id
+        JOIN sites s ON p.site_id = s.id
+        WHERE b.id = :bid AND s.user_id = :uid
+    ");
+    $stmt->execute([':bid' => $blockId, ':uid' => $userId]);
+    return $stmt->fetchColumn() !== false;
+}
+
 if ($method === 'GET') {
     // Listar blocos de uma página
     $pageId = $_GET['page_id'] ?? 0;
@@ -140,21 +158,13 @@ if ($method === 'PUT') {
     
     $blockId = $data['block_id'] ?? 0;
     $config = $data['config'] ?? null;
-    
-    // Validar ownership através de JOIN indireto
-    $blockOwner = db_fetch_one("
-        SELECT b.id FROM blocks b 
-        JOIN pages p ON b.page_id = p.id 
-        JOIN sites s ON p.site_id = s.id 
-        WHERE b.id = :bid AND s.user_id = :uid
-    ", [':bid' => $blockId, ':uid' => $user['id']]);
-    
-    if (!$blockOwner) {
+
+    if (!$blockId || !verify_block_ownership($blockId, $user['id'])) {
         http_response_code(403);
         echo json_encode(['error' => 'Bloco inválido.']);
         exit;
     }
-    
+
     db_update('blocks', ['config' => json_encode($config)], 'id = :id', [':id' => $blockId]);
     echo json_encode(['success' => true]);
     exit;
@@ -163,15 +173,8 @@ if ($method === 'PUT') {
 if ($method === 'DELETE') {
     $data = json_decode(file_get_contents('php://input'), true);
     $blockId = $data['block_id'] ?? 0;
-    
-    $blockOwner = db_fetch_one("
-        SELECT b.id FROM blocks b 
-        JOIN pages p ON b.page_id = p.id 
-        JOIN sites s ON p.site_id = s.id 
-        WHERE b.id = :bid AND s.user_id = :uid
-    ", [':bid' => $blockId, ':uid' => $user['id']]);
-    
-    if (!$blockOwner) {
+
+    if (!$blockId || !verify_block_ownership($blockId, $user['id'])) {
         http_response_code(403);
         echo json_encode(['error' => 'Bloco inválido.']);
         exit;
