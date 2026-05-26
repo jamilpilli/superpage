@@ -155,6 +155,21 @@ Nunca pular CSRF em endpoints de API que recebem POST — `api/endpoints/blocks.
 
 ## Design System — Kinetic
 
+### Ficheiro de tokens CSS
+`assets/design-tokens.css` — CSS custom properties completas do design system (cores, tipografia, espaçamentos, sombras, animações). Incluir em qualquer página nova que precise dos tokens.
+
+### Design System completo (claude.ai/design)
+Bundle exportado em 2026-05-25. URL de acesso: `https://api.anthropic.com/v1/design/h/giW1h3cA7vurAK2_TbSxXw`
+Extraído localmente em: `C:/tmp/superpage-design-system/`
+
+Ficheiros chave do bundle:
+- `project/README.md` — fundamentos visuais completos (cores, tipografia, motion, iconografia, voz)
+- `project/colors_and_type.css` — tokens CSS (copiado para `assets/design-tokens.css`)
+- `project/ui_kits/web/LandingPage.jsx` — referência da landing page
+- `project/ui_kits/web/DashboardOverview.jsx` — referência do dashboard overview
+- `project/ui_kits/web/index.html` — protótipo interactivo completo
+
+### Layouts de referência (pasta `layouts/`)
 A pasta `layouts/` contém os layouts de referência do redesign visual do sistema (design system "Kinetic"). Cada subpasta tem `code.html` (markup final) e `screen.png` (screenshot de referência).
 
 | Layout | Página alvo |
