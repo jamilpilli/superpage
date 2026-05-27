@@ -214,6 +214,11 @@ function render_dashboard_header($title = "Dashboard") {
         html.light main .text-white     { color: #1a1830 !important; }
         html.light main .text-slate-300 { color: #5a5680 !important; }
 
+        /* Excepção: botões com gradient mantêm texto branco (design system: btnPrimary color #fff) */
+        html.light main [class*="from-[#685ef7]"],
+        html.light main [class*="from-[#685ef7]"] span,
+        html.light main [class*="from-[#685ef7]"] .material-symbols-outlined { color: #ffffff !important; }
+
         /* ── Main: superfícies escuras → equivalentes light (shared.jsx)
            dark #181828 (surface-container)         → light #ffffff  (bg)
            dark #121220 (surface-container-low)     → light #f5f4ff  (surface)
