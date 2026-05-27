@@ -40,7 +40,7 @@ function render_dashboard_header($title = "Dashboard") {
     $navInactive = 'flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-white rounded-full transition-all';
 ?>
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="/fav.ico">
@@ -133,12 +133,70 @@ function render_dashboard_header($title = "Dashboard") {
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+
+        /* ── Light Theme ── */
+        html.light body {
+            background-color: #f5f4fe;
+            color: #1a1729;
+        }
+        html.light #sp-sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid rgba(91,79,233,0.12);
+        }
+        html.light #sp-user-card {
+            background-color: #ede9ff;
+        }
+        html.light #sp-user-card .text-white {
+            color: #1a1729 !important;
+        }
+        html.light #sp-topbar {
+            background-color: rgba(245,244,255,0.95) !important;
+            border-bottom-color: rgba(91,79,233,0.12) !important;
+            box-shadow: 0 4px 30px rgba(91,79,233,0.06) !important;
+        }
+        html.light #sp-topbar .font-black {
+            color: #1a1729 !important;
+        }
+        html.light #sp-site-selector-btn {
+            background-color: #edeafb !important;
+            color: #3d3a55 !important;
+            border-color: rgba(91,79,233,0.2) !important;
+        }
+        html.light #sp-site-selector-dropdown {
+            background-color: #ffffff !important;
+            border-color: rgba(91,79,233,0.12) !important;
+            box-shadow: 0 8px 32px rgba(91,79,233,0.12) !important;
+        }
+        html.light #sp-site-selector-dropdown a {
+            color: #3d3a55;
+        }
+        html.light #sp-site-selector-dropdown a:hover {
+            background-color: #f0eeff !important;
+        }
+        html.light #sp-bottom-nav {
+            background-color: rgba(255,255,255,0.97) !important;
+            border-top-color: rgba(91,79,233,0.1) !important;
+        }
+        html.light .glass-panel {
+            background: rgba(255,255,255,0.7);
+        }
     </style>
+    <!-- Anti-FOUC: apply saved theme before first paint -->
+    <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
 </head>
-<body class="dark overflow-x-hidden" x-data="{ siteMenuOpen: false }">
+<body class="overflow-x-hidden" x-data="{
+    siteMenuOpen: false,
+    darkMode: true,
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        document.documentElement.classList.toggle('dark', this.darkMode);
+        document.documentElement.classList.toggle('light', !this.darkMode);
+        localStorage.setItem('sp-theme', this.darkMode ? 'dark' : 'light');
+    }
+}" x-init="darkMode = (localStorage.getItem('sp-theme') || 'dark') === 'dark'">
 
     <!-- Sidebar fixa — visível apenas em desktop -->
-    <nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
+    <nav id="sp-sidebar" class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
         <div class="mb-8 px-4">
             <a href="<?= BASE_URL ?>/dashboard" class="block">
                 <h1 class="text-lg font-bold text-[#a9a4ff] font-headline"><?= APP_NAME ?></h1>
@@ -207,7 +265,7 @@ function render_dashboard_header($title = "Dashboard") {
 
         <!-- Perfil + links de sistema no rodapé da sidebar -->
         <div class="mt-auto px-4 space-y-2">
-            <div class="flex items-center gap-3 p-3 bg-[#181828] rounded-xl">
+            <div id="sp-user-card" class="flex items-center gap-3 p-3 bg-[#181828] rounded-xl">
                 <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/30 flex items-center justify-center text-[#a9a4ff] font-bold text-sm flex-shrink-0">
                     <?= strtoupper(substr($user['name'], 0, 1)) ?>
                 </div>
@@ -230,7 +288,7 @@ function render_dashboard_header($title = "Dashboard") {
     </nav>
 
     <!-- Topbar sticky com backdrop-blur -->
-    <header class="flex justify-between items-center w-full px-4 sm:px-6 h-16 sticky top-0 z-50 backdrop-blur-xl bg-[#0d0d1a]/80 shadow-[0_4px_30px_rgba(169,164,255,0.06)] border-b border-white/5">
+    <header id="sp-topbar" class="flex justify-between items-center w-full px-4 sm:px-6 h-16 sticky top-0 z-50 backdrop-blur-xl bg-[#0d0d1a]/80 shadow-[0_4px_30px_rgba(169,164,255,0.06)] border-b border-white/5">
         <div class="flex items-center gap-3">
             <!-- Logo -->
             <a href="<?= BASE_URL ?>/dashboard" class="flex-shrink-0">
@@ -241,7 +299,7 @@ function render_dashboard_header($title = "Dashboard") {
 
             <!-- Site selector dropdown -->
             <div class="relative" @click.outside="siteMenuOpen = false">
-                <button @click="siteMenuOpen = !siteMenuOpen"
+                <button id="sp-site-selector-btn" @click="siteMenuOpen = !siteMenuOpen"
                         class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
                     <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
@@ -252,7 +310,7 @@ function render_dashboard_header($title = "Dashboard") {
                     </svg>
                 </button>
 
-                <div x-show="siteMenuOpen" style="display: none;"
+                <div id="sp-site-selector-dropdown" x-show="siteMenuOpen" style="display: none;"
                      class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
                     <a href="<?= BASE_URL ?>/dashboard/create_site"
                        class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
@@ -275,6 +333,12 @@ function render_dashboard_header($title = "Dashboard") {
         </div>
 
         <div class="flex items-center gap-1 sm:gap-2">
+            <!-- Theme toggle -->
+            <button @click="toggleTheme()"
+                    class="p-2 hover:bg-white/10 rounded-full transition-all"
+                    :title="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+                <span class="material-symbols-outlined text-[#a9a4ff]" x-text="darkMode ? 'light_mode' : 'dark_mode'">light_mode</span>
+            </button>
             <!-- Badge de notificações -->
             <?php if ($currentSiteId): ?>
                 <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>"
@@ -318,7 +382,7 @@ function render_dashboard_footer() {
     </main>
 
     <!-- Bottom nav mobile -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-[#121220]/95 backdrop-blur-xl border-t border-white/10 z-50 flex justify-around items-center h-16">
+    <nav id="sp-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 bg-[#121220]/95 backdrop-blur-xl border-t border-white/10 z-50 flex justify-around items-center h-16">
         <?php if ($currentSite): ?>
             <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSite['id'] ?>" class="<?= $isHome ? $bnActive : $bnInactive ?>">
                 <span class="material-symbols-outlined text-2xl">home</span>
