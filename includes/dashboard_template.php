@@ -241,15 +241,21 @@ function render_dashboard_header($title = "Dashboard") {
         html.light main [class*="hover:bg-white/"]:not([class*="from-["]):hover { background-color: rgba(104,94,247,0.08) !important; }
         html.light main [class*="hover:bg-[#"]:not([class*="from-["]):hover     { background-color: rgba(104,94,247,0.08) !important; }
 
-        /* ── Main: inputs (shared.jsx: splSharedStyles.input) ── */
-        html.light main input:not([type="color"]),
+        /* ── Main: inputs (shared.jsx: splSharedStyles.input)
+         *  Nota: inputs usam `border-none` no dark mode — precisa de `border`
+         *  completo (não só border-color) para o outline aparecer em light mode.
+         *  border-radius: 12px, box-shadow e bg #fff per spec. */
+        html.light main input:not([type="color"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
         html.light main select,
         html.light main textarea {
             background-color: #ffffff !important;
             color: #1a1830 !important;
-            border-color: rgba(104,94,247,0.15) !important;
+            border: 1px solid rgba(104,94,247,0.15) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 4px rgba(104,94,247,0.05) !important;
         }
-        html.light main input::placeholder { color: #8885a8 !important; }
+        html.light main input::placeholder,
+        html.light main textarea::placeholder { color: #b8b5d0 !important; }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
