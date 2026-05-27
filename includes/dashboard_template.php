@@ -242,6 +242,22 @@ function render_dashboard_header($title = "Dashboard") {
             border-color: rgba(104,94,247,0.15) !important;
         }
         html.light main input::placeholder { color: #8885a8 !important; }
+
+        /* ── Accent colour: #a9a4ff (dark primary) → #685ef7 (light primary, shared.jsx)
+           #a9a4ff é lavanda clara — excelente em fundo escuro, baixo contraste em fundo claro.
+           Em light mode todos os elementos com essa cor usam #685ef7 (primary do web-light). ── */
+        html.light main [class*="text-[#a9a4ff]"]         { color: #685ef7 !important; }
+        html.light main [class*="hover:text-[#a9a4ff]"]:hover { color: #685ef7 !important; }
+        html.light main [class*="bg-[#a9a4ff]"]           { background-color: #685ef7 !important; }
+        html.light main [class*="border-[#a9a4ff]"]       { border-color: rgba(104,94,247,0.4) !important; }
+        /* Opacidades do accent (ex: bg-[#a9a4ff]/10, bg-[#a9a4ff]/20) já ficam ok pois #685ef7 a low opacity */
+        html.light main [class*="bg-[#a9a4ff]/"]          { --tw-bg-opacity: 1; background-color: rgba(104,94,247,0.10) !important; }
+        html.light main [class*="hover:bg-[#a9a4ff]/"]:hover { background-color: rgba(104,94,247,0.15) !important; }
+
+        /* Sidebar: logo/accent também troca */
+        html.light #sp-sidebar [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
+        html.light #sp-topbar  [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
+        html.light #sp-bottom-nav [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
