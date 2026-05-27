@@ -136,28 +136,36 @@ function render_dashboard_header($title = "Dashboard") {
 
         /*
          * ── Light Theme ─────────────────────────────────
-         * Fonte: design system Kinetic — ui_kits/web-light/shared.jsx
-         *   bg          : #ffffff
-         *   surfaceLow  : #faf9ff   (body background)
-         *   surface     : #f5f4ff   (sidebar user card, site selector)
-         *   surfaceHigh : #f0eeff
-         *   surfaceTop  : #ebe8ff
-         *   onSurface   : #1a1830   (main text)
-         *   onSurfaceVar: #5a5680   (secondary text)
-         *   muted       : #8885a8   (inactive nav)
-         *   primary     : #685ef7   (active/hover color)
-         *   outline     : rgba(104,94,247,0.08–0.18)
+         * Fonte: design system Kinetic — ui_kits/web-light/
+         *   shared.jsx SPL.colors:
+         *     bg          : #ffffff
+         *     surfaceLow  : #faf9ff  ← body bg
+         *     surface     : #f5f4ff
+         *     surfaceHigh : #f0eeff
+         *     surfaceTop  : #ebe8ff
+         *     onSurface   : #1a1830  ← texto principal
+         *     onSurfaceVar: #5a5680  ← texto secundário
+         *     muted       : #8885a8  ← inactivo/placeholder
+         *     primary     : #685ef7  ← accent (active, hover, ícones)
+         *     outline     : rgba(104,94,247,0.12)
          * ────────────────────────────────────────────── */
 
         /* Body */
         html.light body { background-color: #faf9ff; color: #1a1830; }
 
-        /* Sidebar — Sidebar.jsx: background #fff, border rgba(104,94,247,0.08) */
+        /* ── Accent global: #a9a4ff (lavanda dark) → #685ef7 (primary light)
+           Uma única regra para toda a página — sidebar, topbar, main, bottom-nav ── */
+        html.light [class*="text-[#a9a4ff]"]              { color: #685ef7 !important; }
+        html.light [class*="hover:text-[#a9a4ff]"]:hover  { color: #685ef7 !important; }
+        html.light [class*="bg-[#a9a4ff]/"]               { background-color: rgba(104,94,247,0.10) !important; }
+        html.light [class*="hover:bg-[#a9a4ff]/"]:hover   { background-color: rgba(104,94,247,0.15) !important; }
+        html.light [class*="border-[#5B4FE9]"]            { border-color: #685ef7 !important; }
+
+        /* ── Sidebar ── (Sidebar.jsx) */
         html.light #sp-sidebar {
             background-color: #ffffff;
             border-right: 1px solid rgba(104,94,247,0.08);
         }
-        /* Nav hover — Sidebar.jsx: active bg rgba(104,94,247,0.10), color #685ef7 */
         html.light #sp-sidebar a:hover,
         html.light #sp-sidebar button:hover {
             background-color: rgba(104,94,247,0.08) !important;
@@ -166,25 +174,24 @@ function render_dashboard_header($title = "Dashboard") {
         html.light #sp-sidebar .text-white     { color: #1a1830 !important; }
         html.light #sp-sidebar .text-slate-400 { color: #8885a8; }
 
-        /* User card — Sidebar.jsx: userRow bg #f5f4ff, border rgba(104,94,247,0.08) */
+        /* User card (Sidebar.jsx: userRow bg #f5f4ff) */
         html.light #sp-user-card {
             background-color: #f5f4ff;
             border-color: rgba(104,94,247,0.08);
         }
         html.light #sp-user-card .text-white { color: #1a1830 !important; }
 
-        /* Topbar — Topbar.jsx: bg rgba(255,255,255,0.90), blur 20px
-           shadow: 0 1px 0 rgba(104,94,247,0.08), 0 4px 16px rgba(104,94,247,0.06) */
+        /* ── Topbar ── (Topbar.jsx) */
         html.light #sp-topbar {
             background-color: rgba(255,255,255,0.90) !important;
             border-bottom: 1px solid rgba(104,94,247,0.06) !important;
             box-shadow: 0 1px 0 rgba(104,94,247,0.08), 0 4px 16px rgba(104,94,247,0.06) !important;
         }
-        html.light #sp-topbar .font-black { color: #1a1830 !important; }
+        html.light #sp-topbar .font-black    { color: #1a1830 !important; }
         html.light #sp-topbar button:hover,
-        html.light #sp-topbar a:hover { background-color: rgba(104,94,247,0.06) !important; }
+        html.light #sp-topbar a:hover        { background-color: rgba(104,94,247,0.06) !important; }
 
-        /* Site selector — Topbar.jsx: siteBtn bg #f5f4ff, border rgba(104,94,247,0.12), color #1a1830 */
+        /* Site selector (Topbar.jsx: siteBtn) */
         html.light #sp-site-selector-btn {
             background-color: #f5f4ff !important;
             color: #1a1830 !important;
@@ -196,12 +203,10 @@ function render_dashboard_header($title = "Dashboard") {
             border-color: rgba(104,94,247,0.12) !important;
             box-shadow: 0 8px 32px rgba(104,94,247,0.10) !important;
         }
-        html.light #sp-site-selector-dropdown a { color: #5a5680; }
-        html.light #sp-site-selector-dropdown a:hover {
-            background-color: rgba(104,94,247,0.06) !important;
-        }
+        html.light #sp-site-selector-dropdown a       { color: #5a5680; }
+        html.light #sp-site-selector-dropdown a:hover { background-color: rgba(104,94,247,0.06) !important; }
 
-        /* Bottom nav mobile */
+        /* ── Bottom nav mobile ── */
         html.light #sp-bottom-nav {
             background-color: rgba(255,255,255,0.97) !important;
             border-top-color: rgba(104,94,247,0.08) !important;
@@ -210,35 +215,33 @@ function render_dashboard_header($title = "Dashboard") {
         /* Glass panel */
         html.light .glass-panel { background: rgba(255,255,255,0.7); }
 
-        /* ── Main: texto ── */
-        html.light main .text-white     { color: #1a1830 !important; }
-        html.light main .text-slate-300 { color: #5a5680 !important; }
+        /* ── Main: texto ──
+           text-white → #1a1830, EXCEPTO em botões gradient (btnPrimary: color #fff).
+           :not([class*="from-["]) exclui elementos com gradient start class. */
+        html.light main .text-white:not([class*="from-["])                     { color: #1a1830 !important; }
+        html.light main .text-slate-300                                        { color: #5a5680 !important; }
+        html.light main [class*="hover:text-white"]:not([class*="from-["]):hover { color: #1a1830 !important; }
 
-        /* Excepção: botões com gradient mantêm texto branco (design system: btnPrimary color #fff) */
-        html.light main [class*="from-[#685ef7]"],
-        html.light main [class*="from-[#685ef7]"] span,
-        html.light main [class*="from-[#685ef7]"] .material-symbols-outlined { color: #ffffff !important; }
+        /* ── Main: superfícies (shared.jsx mapeamento directo)
+           dark #181828 surface-container      → light #ffffff  bg
+           dark #121220 surface-container-low  → light #f5f4ff  surface
+           dark #1e1e2f surface-container-high → light #f0eeff  surfaceHigh
+           dark #242437 surface-highest        → light #ebe8ff  surfaceTop ── */
+        html.light main [class*="bg-[#181828]"] { background-color: #ffffff !important; }
+        html.light main [class*="bg-[#121220]"] { background-color: #f5f4ff !important; }
+        html.light main [class*="bg-[#1e1e2f]"] { background-color: #f0eeff !important; }
+        html.light main [class*="bg-[#242437]"] { background-color: #ebe8ff !important; }
 
-        /* ── Main: superfícies escuras → equivalentes light (shared.jsx)
-           dark #181828 (surface-container)         → light #ffffff  (bg)
-           dark #121220 (surface-container-low)     → light #f5f4ff  (surface)
-           dark #1e1e2f (surface-container-high)    → light #f0eeff  (surfaceHigh)
-           dark #242437 (surface-container-highest) → light #ebe8ff  (surfaceTop) */
-        html.light main [class*="bg-[#181828]"] { background-color: #ffffff  !important; }
-        html.light main [class*="bg-[#121220]"] { background-color: #f5f4ff  !important; }
-        html.light main [class*="bg-[#1e1e2f]"] { background-color: #f0eeff  !important; }
-        html.light main [class*="bg-[#242437]"] { background-color: #ebe8ff  !important; }
-
-        /* ── Main: bordas — shared.jsx: outline rgba(104,94,247,0.08–0.18) ── */
+        /* ── Main: bordas (shared.jsx: outline rgba(104,94,247,0.12)) ── */
         html.light main [class*="border-white/5"]  { border-color: rgba(104,94,247,0.08) !important; }
         html.light main [class*="border-white/10"] { border-color: rgba(104,94,247,0.12) !important; }
 
-        /* ── Main: hover — shared.jsx: primary #685ef7 ── */
-        html.light main [class*="hover:bg-white/"]:hover  { background-color: rgba(104,94,247,0.08) !important; }
-        html.light main [class*="hover:bg-[#"]:hover      { background-color: rgba(104,94,247,0.08) !important; }
-        html.light main [class*="hover:text-white"]:hover { color: #1a1830 !important; }
+        /* ── Main: hover backgrounds
+           Excepção gradient CTAs: :not([class*="from-["]) ── */
+        html.light main [class*="hover:bg-white/"]:not([class*="from-["]):hover { background-color: rgba(104,94,247,0.08) !important; }
+        html.light main [class*="hover:bg-[#"]:not([class*="from-["]):hover     { background-color: rgba(104,94,247,0.08) !important; }
 
-        /* ── Main: inputs — shared.jsx: input bg #fff, border rgba(104,94,247,0.15) ── */
+        /* ── Main: inputs (shared.jsx: splSharedStyles.input) ── */
         html.light main input:not([type="color"]),
         html.light main select,
         html.light main textarea {
@@ -247,22 +250,6 @@ function render_dashboard_header($title = "Dashboard") {
             border-color: rgba(104,94,247,0.15) !important;
         }
         html.light main input::placeholder { color: #8885a8 !important; }
-
-        /* ── Accent colour: #a9a4ff (dark primary) → #685ef7 (light primary, shared.jsx)
-           #a9a4ff é lavanda clara — excelente em fundo escuro, baixo contraste em fundo claro.
-           Em light mode todos os elementos com essa cor usam #685ef7 (primary do web-light). ── */
-        html.light main [class*="text-[#a9a4ff]"]         { color: #685ef7 !important; }
-        html.light main [class*="hover:text-[#a9a4ff]"]:hover { color: #685ef7 !important; }
-        html.light main [class*="bg-[#a9a4ff]"]           { background-color: #685ef7 !important; }
-        html.light main [class*="border-[#a9a4ff]"]       { border-color: rgba(104,94,247,0.4) !important; }
-        /* Opacidades do accent (ex: bg-[#a9a4ff]/10, bg-[#a9a4ff]/20) já ficam ok pois #685ef7 a low opacity */
-        html.light main [class*="bg-[#a9a4ff]/"]          { --tw-bg-opacity: 1; background-color: rgba(104,94,247,0.10) !important; }
-        html.light main [class*="hover:bg-[#a9a4ff]/"]:hover { background-color: rgba(104,94,247,0.15) !important; }
-
-        /* Sidebar: logo/accent também troca */
-        html.light #sp-sidebar [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
-        html.light #sp-topbar  [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
-        html.light #sp-bottom-nav [class*="text-[#a9a4ff]"] { color: #685ef7 !important; }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
