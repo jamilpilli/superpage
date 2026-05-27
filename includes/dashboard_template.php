@@ -242,20 +242,35 @@ function render_dashboard_header($title = "Dashboard") {
         html.light main [class*="hover:bg-[#"]:not([class*="from-["]):hover     { background-color: rgba(104,94,247,0.08) !important; }
 
         /* ── Main: inputs (shared.jsx: splSharedStyles.input)
-         *  Nota: inputs usam `border-none` no dark mode — precisa de `border`
-         *  completo (não só border-color) para o outline aparecer em light mode.
-         *  border-radius: 12px, box-shadow e bg #fff per spec. */
+         *  bg #fff, border 1px rgba(104,94,247,0.15), box-shadow subtil.
+         *  border-radius NÃO sobrescrito — cada página mantém o seu (rounded-xl vs rounded-2xl).
+         *  Inputs com border-none no dark: border shorthand override cobre o caso.
+         *  Inputs com border border-white/5 no dark: border shorthand sobrescreve cor + opacity. */
         html.light main input:not([type="color"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
         html.light main select,
         html.light main textarea {
             background-color: #ffffff !important;
             color: #1a1830 !important;
             border: 1px solid rgba(104,94,247,0.15) !important;
-            border-radius: 12px !important;
             box-shadow: 0 1px 4px rgba(104,94,247,0.05) !important;
         }
         html.light main input::placeholder,
         html.light main textarea::placeholder { color: #b8b5d0 !important; }
+
+        /* ── Labels (settings.php, site_settings.php usam text-[#9a94ff])
+         *  #9a94ff é lavanda — baixo contraste em fundo branco.
+         *  Design system label: color onSurfaceVar = #5a5680, weight 500. */
+        html.light main label { color: #5a5680 !important; }
+        html.light main [class*="text-[#9a94ff]"] { color: #5a5680 !important; }
+
+        /* ── Focus ring: #a9a4ff/40 em light → invisível em fundo branco.
+         *  Sobrescrever com --tw-ring-color para usar primary #685ef7. */
+        html.light main input:focus,
+        html.light main select:focus,
+        html.light main textarea:focus {
+            --tw-ring-color: rgba(104,94,247,0.40) !important;
+            outline: none !important;
+        }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
