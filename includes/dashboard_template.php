@@ -134,52 +134,114 @@ function render_dashboard_header($title = "Dashboard") {
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* ── Light Theme ── */
-        html.light body {
-            background-color: #f5f4fe;
-            color: #1a1729;
-        }
+        /*
+         * ── Light Theme ─────────────────────────────────
+         * Fonte: design system Kinetic — ui_kits/web-light/shared.jsx
+         *   bg          : #ffffff
+         *   surfaceLow  : #faf9ff   (body background)
+         *   surface     : #f5f4ff   (sidebar user card, site selector)
+         *   surfaceHigh : #f0eeff
+         *   surfaceTop  : #ebe8ff
+         *   onSurface   : #1a1830   (main text)
+         *   onSurfaceVar: #5a5680   (secondary text)
+         *   muted       : #8885a8   (inactive nav)
+         *   primary     : #685ef7   (active/hover color)
+         *   outline     : rgba(104,94,247,0.08–0.18)
+         * ────────────────────────────────────────────── */
+
+        /* Body */
+        html.light body { background-color: #faf9ff; color: #1a1830; }
+
+        /* Sidebar — Sidebar.jsx: background #fff, border rgba(104,94,247,0.08) */
         html.light #sp-sidebar {
             background-color: #ffffff;
-            border-right: 1px solid rgba(91,79,233,0.12);
+            border-right: 1px solid rgba(104,94,247,0.08);
         }
+        /* Nav hover — Sidebar.jsx: active bg rgba(104,94,247,0.10), color #685ef7 */
+        html.light #sp-sidebar a:hover,
+        html.light #sp-sidebar button:hover {
+            background-color: rgba(104,94,247,0.08) !important;
+            color: #685ef7 !important;
+        }
+        html.light #sp-sidebar .text-white     { color: #1a1830 !important; }
+        html.light #sp-sidebar .text-slate-400 { color: #8885a8; }
+
+        /* User card — Sidebar.jsx: userRow bg #f5f4ff, border rgba(104,94,247,0.08) */
         html.light #sp-user-card {
-            background-color: #ede9ff;
+            background-color: #f5f4ff;
+            border-color: rgba(104,94,247,0.08);
         }
-        html.light #sp-user-card .text-white {
-            color: #1a1729 !important;
-        }
+        html.light #sp-user-card .text-white { color: #1a1830 !important; }
+
+        /* Topbar — Topbar.jsx: bg rgba(255,255,255,0.90), blur 20px
+           shadow: 0 1px 0 rgba(104,94,247,0.08), 0 4px 16px rgba(104,94,247,0.06) */
         html.light #sp-topbar {
-            background-color: rgba(245,244,255,0.95) !important;
-            border-bottom-color: rgba(91,79,233,0.12) !important;
-            box-shadow: 0 4px 30px rgba(91,79,233,0.06) !important;
+            background-color: rgba(255,255,255,0.90) !important;
+            border-bottom: 1px solid rgba(104,94,247,0.06) !important;
+            box-shadow: 0 1px 0 rgba(104,94,247,0.08), 0 4px 16px rgba(104,94,247,0.06) !important;
         }
-        html.light #sp-topbar .font-black {
-            color: #1a1729 !important;
-        }
+        html.light #sp-topbar .font-black { color: #1a1830 !important; }
+        html.light #sp-topbar button:hover,
+        html.light #sp-topbar a:hover { background-color: rgba(104,94,247,0.06) !important; }
+
+        /* Site selector — Topbar.jsx: siteBtn bg #f5f4ff, border rgba(104,94,247,0.12), color #1a1830 */
         html.light #sp-site-selector-btn {
-            background-color: #edeafb !important;
-            color: #3d3a55 !important;
-            border-color: rgba(91,79,233,0.2) !important;
+            background-color: #f5f4ff !important;
+            color: #1a1830 !important;
+            border-color: rgba(104,94,247,0.12) !important;
         }
+        html.light #sp-site-selector-btn .text-slate-300 { color: #5a5680 !important; }
         html.light #sp-site-selector-dropdown {
             background-color: #ffffff !important;
-            border-color: rgba(91,79,233,0.12) !important;
-            box-shadow: 0 8px 32px rgba(91,79,233,0.12) !important;
+            border-color: rgba(104,94,247,0.12) !important;
+            box-shadow: 0 8px 32px rgba(104,94,247,0.10) !important;
         }
-        html.light #sp-site-selector-dropdown a {
-            color: #3d3a55;
-        }
+        html.light #sp-site-selector-dropdown a { color: #5a5680; }
         html.light #sp-site-selector-dropdown a:hover {
-            background-color: #f0eeff !important;
+            background-color: rgba(104,94,247,0.06) !important;
         }
+
+        /* Bottom nav mobile */
         html.light #sp-bottom-nav {
             background-color: rgba(255,255,255,0.97) !important;
-            border-top-color: rgba(91,79,233,0.1) !important;
+            border-top-color: rgba(104,94,247,0.08) !important;
         }
-        html.light .glass-panel {
-            background: rgba(255,255,255,0.7);
+
+        /* Glass panel */
+        html.light .glass-panel { background: rgba(255,255,255,0.7); }
+
+        /* ── Main: texto ── */
+        html.light main .text-white     { color: #1a1830 !important; }
+        html.light main .text-slate-300 { color: #5a5680 !important; }
+
+        /* ── Main: superfícies escuras → equivalentes light (shared.jsx)
+           dark #181828 (surface-container)         → light #ffffff  (bg)
+           dark #121220 (surface-container-low)     → light #f5f4ff  (surface)
+           dark #1e1e2f (surface-container-high)    → light #f0eeff  (surfaceHigh)
+           dark #242437 (surface-container-highest) → light #ebe8ff  (surfaceTop) */
+        html.light main [class*="bg-[#181828]"] { background-color: #ffffff  !important; }
+        html.light main [class*="bg-[#121220]"] { background-color: #f5f4ff  !important; }
+        html.light main [class*="bg-[#1e1e2f]"] { background-color: #f0eeff  !important; }
+        html.light main [class*="bg-[#242437]"] { background-color: #ebe8ff  !important; }
+
+        /* ── Main: bordas — shared.jsx: outline rgba(104,94,247,0.08–0.18) ── */
+        html.light main [class*="border-white/5"]  { border-color: rgba(104,94,247,0.08) !important; }
+        html.light main [class*="border-white/10"] { border-color: rgba(104,94,247,0.12) !important; }
+
+        /* ── Main: hover — shared.jsx: primary #685ef7 ── */
+        html.light main [class*="hover:bg-white/"]:hover  { background-color: rgba(104,94,247,0.08) !important; }
+        html.light main [class*="hover:bg-[#"]:hover      { background-color: rgba(104,94,247,0.08) !important; }
+        html.light main [class*="hover:text-white"]:hover { color: #1a1830 !important; }
+
+        /* ── Main: inputs — shared.jsx: input bg #fff, border rgba(104,94,247,0.15) ── */
+        html.light main input:not([type="color"]),
+        html.light main select,
+        html.light main textarea {
+            background-color: #ffffff !important;
+            color: #1a1830 !important;
+            border-color: rgba(104,94,247,0.15) !important;
         }
+        html.light main input::placeholder { color: #8885a8 !important; }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
