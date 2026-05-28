@@ -94,10 +94,10 @@ render_dashboard_header("Site Settings – $siteName");
     <!-- Page header -->
     <div>
         <div class="flex items-center gap-3 mb-2">
-            <span class="px-3 py-1 bg-[#a9a4ff]/10 text-[#a9a4ff] text-xs font-black rounded-full tracking-widest uppercase">Site Settings</span>
+            <span class="px-3 py-1 bg-[#a9a4ff]/10 sp-primary text-xs font-black rounded-full tracking-widest uppercase">Site Settings</span>
         </div>
-        <h1 class="text-3xl font-black font-headline text-white">Site Settings</h1>
-        <p class="text-slate-400 text-sm mt-1">Manage your domain, URL and site configuration.</p>
+        <h1 class="text-3xl font-black font-headline sp-text">Site Settings</h1>
+        <p class="sp-text-muted text-sm mt-1">Manage your domain, URL and site configuration.</p>
     </div>
 
     <?php if ($error): ?>
@@ -114,14 +114,14 @@ render_dashboard_header("Site Settings – $siteName");
     <?php endif; ?>
 
     <!-- Web Addresses -->
-    <div class="bg-[#181828] rounded-xl border border-white/5 overflow-hidden">
-        <div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+    <div class="sp-surface rounded-xl border sp-border overflow-hidden">
+        <div class="px-6 py-4 border-b sp-border flex items-center gap-3">
             <div class="w-9 h-9 rounded-full bg-[#a9a4ff]/10 flex items-center justify-center flex-shrink-0">
-                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">language</span>
+                <span class="material-symbols-outlined sp-primary" style="font-size:18px">language</span>
             </div>
             <div>
-                <h3 class="text-base font-bold text-white font-headline">Web Addresses</h3>
-                <p class="text-xs text-slate-500">Change your free SuperPage link or connect a custom domain.</p>
+                <h3 class="text-base font-bold sp-text font-headline">Web Addresses</h3>
+                <p class="text-xs sp-text-faint">Change your free SuperPage link or connect a custom domain.</p>
             </div>
         </div>
         <div class="p-6">
@@ -130,45 +130,45 @@ render_dashboard_header("Site Settings – $siteName");
                 <input type="hidden" name="action" value="update_general">
 
                 <div class="space-y-1.5">
-                    <label for="slug" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">Free Subdomain (Slug)</label>
+                    <label for="slug" class="text-xs font-bold uppercase tracking-widest sp-primary">Free Subdomain (Slug)</label>
                     <div class="flex rounded-xl overflow-hidden">
-                        <span class="inline-flex items-center px-4 bg-[#0d0d1a] text-slate-500 text-sm font-medium border-r border-white/5 flex-shrink-0">
+                        <span class="inline-flex items-center px-4 sp-bg sp-text-faint text-sm font-medium border-r sp-border flex-shrink-0">
                             superpage.com/
                         </span>
                         <input type="text" name="slug" id="slug" value="<?= htmlspecialchars($site['slug']) ?>" required
-                               class="flex-1 bg-[#121220] px-4 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#685ef7]/50">
+                               class="flex-1 px-4 py-4 text-sm sp-input" style="border-radius:0">
                     </div>
                 </div>
 
                 <div class="space-y-1.5">
-                    <label for="domain" class="text-xs font-bold uppercase tracking-widest text-[#9a94ff]">Custom Domain</label>
+                    <label for="domain" class="text-xs font-bold uppercase tracking-widest sp-primary">Custom Domain</label>
                     <div class="flex rounded-xl overflow-hidden">
-                        <span class="inline-flex items-center px-4 bg-[#0d0d1a] text-slate-500 text-sm font-medium border-r border-white/5 flex-shrink-0">
+                        <span class="inline-flex items-center px-4 sp-bg sp-text-faint text-sm font-medium border-r sp-border flex-shrink-0">
                             https://
                         </span>
                         <input type="text" name="domain" id="domain" value="<?= htmlspecialchars($site['domain'] ?? '') ?>"
                                placeholder="www.yourbusiness.co.uk"
-                               class="flex-1 bg-[#121220] px-4 py-4 text-white text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-[#685ef7]/50">
+                               class="flex-1 px-4 py-4 text-sm sp-input" style="border-radius:0">
                     </div>
-                    <p class="text-xs text-slate-500">Requires a CNAME or A record pointing to our servers via your DNS provider.</p>
+                    <p class="text-xs sp-text-faint">Requires a CNAME or A record pointing to our servers via your DNS provider.</p>
                 </div>
 
                 <!-- How to connect a domain -->
-                <div class="bg-[#0d0d1a] rounded-xl border border-white/5 p-5 space-y-4">
+                <div class="sp-bg rounded-xl border sp-border p-5 space-y-4">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:18px">help</span>
-                        <span class="text-sm font-bold text-white">How to connect your domain</span>
+                        <span class="material-symbols-outlined sp-primary" style="font-size:18px">help</span>
+                        <span class="text-sm font-bold sp-text">How to connect your domain</span>
                     </div>
 
-                    <div class="space-y-3 text-sm text-slate-400">
-                        <p>Log in to your domain registrar (e.g. GoDaddy, Namecheap, Cloudflare) and go to the <strong class="text-slate-300">DNS settings</strong> for your domain. Add one of the following records:</p>
+                    <div class="space-y-3 text-sm sp-text-muted">
+                        <p>Log in to your domain registrar (e.g. GoDaddy, Namecheap, Cloudflare) and go to the <strong class="sp-text-muted">DNS settings</strong> for your domain. Add one of the following records:</p>
 
                         <!-- Option A: CNAME -->
-                        <div class="bg-[#121220] rounded-lg p-4 space-y-2">
-                            <p class="text-xs font-black uppercase tracking-widest text-[#a9a4ff]">Option A — CNAME (recommended for www)</p>
+                        <div class="sp-surface-low rounded-lg p-4 space-y-2">
+                            <p class="text-xs font-black uppercase tracking-widest sp-primary">Option A — CNAME (recommended for www)</p>
                             <table class="w-full text-xs">
                                 <thead>
-                                    <tr class="text-slate-500 border-b border-white/5">
+                                    <tr class="sp-text-faint border-b sp-border">
                                         <th class="text-left pb-2 font-semibold">Type</th>
                                         <th class="text-left pb-2 font-semibold">Name / Host</th>
                                         <th class="text-left pb-2 font-semibold">Value / Points to</th>
@@ -176,7 +176,7 @@ render_dashboard_header("Site Settings – $siteName");
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="text-slate-300">
+                                    <tr class="sp-text-muted">
                                         <td class="pt-2 font-mono">CNAME</td>
                                         <td class="pt-2 font-mono">www</td>
                                         <td class="pt-2 font-mono">superpage.co.uk</td>
@@ -184,15 +184,15 @@ render_dashboard_header("Site Settings – $siteName");
                                     </tr>
                                 </tbody>
                             </table>
-                            <p class="text-slate-500 text-xs">Then enter <code class="bg-white/5 px-1 rounded">www.yourdomain.com</code> in the field above.</p>
+                            <p class="sp-text-faint text-xs">Then enter <code class="bg-white/5 px-1 rounded">www.yourdomain.com</code> in the field above.</p>
                         </div>
 
                         <!-- Option B: A record -->
-                        <div class="bg-[#121220] rounded-lg p-4 space-y-2">
+                        <div class="sp-surface-low rounded-lg p-4 space-y-2">
                             <p class="text-xs font-black uppercase tracking-widest text-[#914feb]">Option B — A Record (for root domain)</p>
                             <table class="w-full text-xs">
                                 <thead>
-                                    <tr class="text-slate-500 border-b border-white/5">
+                                    <tr class="sp-text-faint border-b sp-border">
                                         <th class="text-left pb-2 font-semibold">Type</th>
                                         <th class="text-left pb-2 font-semibold">Name / Host</th>
                                         <th class="text-left pb-2 font-semibold">Value / IP Address</th>
@@ -200,7 +200,7 @@ render_dashboard_header("Site Settings – $siteName");
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="text-slate-300">
+                                    <tr class="sp-text-muted">
                                         <td class="pt-2 font-mono">A</td>
                                         <td class="pt-2 font-mono">@ (or blank)</td>
                                         <td class="pt-2 font-mono">72.61.145.172</td>
@@ -208,12 +208,12 @@ render_dashboard_header("Site Settings – $siteName");
                                     </tr>
                                 </tbody>
                             </table>
-                            <p class="text-slate-500 text-xs">Then enter <code class="bg-white/5 px-1 rounded">yourdomain.com</code> in the field above.</p>
+                            <p class="sp-text-faint text-xs">Then enter <code class="bg-white/5 px-1 rounded">yourdomain.com</code> in the field above.</p>
                         </div>
 
-                        <div class="flex items-start gap-2 text-xs text-slate-500 pt-1">
+                        <div class="flex items-start gap-2 text-xs sp-text-faint pt-1">
                             <span class="material-symbols-outlined flex-shrink-0" style="font-size:15px">schedule</span>
-                            <span>DNS changes can take up to <strong class="text-slate-400">24–48 hours</strong> to propagate worldwide, although most providers update within a few minutes.</span>
+                            <span>DNS changes can take up to <strong class="sp-text-muted">24–48 hours</strong> to propagate worldwide, although most providers update within a few minutes.</span>
                         </div>
                     </div>
                 </div>
@@ -229,20 +229,20 @@ render_dashboard_header("Site Settings – $siteName");
     </div>
 
     <!-- Danger Zone -->
-    <div class="bg-[#181828] rounded-xl border border-red-500/20 overflow-hidden">
+    <div class="sp-surface rounded-xl border border-red-500/20 overflow-hidden">
         <div class="px-6 py-4 border-b border-red-500/10 flex items-center gap-3">
             <div class="w-9 h-9 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
                 <span class="material-symbols-outlined text-red-400" style="font-size:18px">warning</span>
             </div>
             <div>
                 <h3 class="text-base font-bold text-red-400 font-headline">Danger Zone</h3>
-                <p class="text-xs text-slate-500">Irreversible and destructive actions.</p>
+                <p class="text-xs sp-text-faint">Irreversible and destructive actions.</p>
             </div>
         </div>
         <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <p class="text-sm font-bold text-white mb-1">Delete this site</p>
-                <p class="text-sm text-slate-400 max-w-sm">Once deleted, linked subscriptions will be cancelled and domain traffic stopped permanently. This cannot be undone.</p>
+                <p class="text-sm font-bold sp-text mb-1">Delete this site</p>
+                <p class="text-sm sp-text-muted max-w-sm">Once deleted, linked subscriptions will be cancelled and domain traffic stopped permanently. This cannot be undone.</p>
             </div>
             <form method="POST" action="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $site['id'] ?>"
                   onsubmit="return confirm('Are you sure? This will deactivate the site and take it offline. You can request restoration via support if needed.');"

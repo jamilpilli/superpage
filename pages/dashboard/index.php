@@ -119,59 +119,59 @@ render_dashboard_header("Dashboard");
 
         <!-- Título -->
         <div>
-            <h2 class="text-3xl lg:text-4xl font-extrabold font-headline tracking-tight text-white mb-1">
-                Overview: <span class="text-[#a9a4ff]"><?= $siteName ?></span>
+            <h2 class="text-3xl lg:text-4xl font-extrabold font-headline tracking-tight sp-text mb-1">
+                Overview: <span class="sp-primary"><?= $siteName ?></span>
             </h2>
-            <p class="text-sm text-slate-400">Here's what's happening with your site.</p>
+            <p class="text-sm sp-text-muted">Here's what's happening with your site.</p>
         </div>
 
         <!-- 4 KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
             <!-- Visitors Today -->
-            <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="relative overflow-hidden sp-surface rounded-xl p-6 border sp-border group">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <span class="material-symbols-outlined text-6xl">visibility</span>
                 </div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Visitors Today</p>
-                <p class="text-3xl font-bold text-white"><?= number_format($visitsToday, 0, '.', ',') ?></p>
+                <p class="text-xs font-bold sp-text-muted uppercase tracking-widest mb-2">Visitors Today</p>
+                <p class="text-3xl font-bold sp-text"><?= number_format($visitsToday, 0, '.', ',') ?></p>
             </div>
 
             <!-- Monthly Traffic -->
-            <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="relative overflow-hidden sp-surface rounded-xl p-6 border sp-border group">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <span class="material-symbols-outlined text-6xl">analytics</span>
                 </div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Monthly Traffic</p>
-                <p class="text-3xl font-bold text-white"><?= number_format($visitsMonth, 0, '.', ',') ?></p>
+                <p class="text-xs font-bold sp-text-muted uppercase tracking-widest mb-2">Monthly Traffic</p>
+                <p class="text-3xl font-bold sp-text"><?= number_format($visitsMonth, 0, '.', ',') ?></p>
             </div>
 
             <!-- Contacts Received -->
-            <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="relative overflow-hidden sp-surface rounded-xl p-6 border sp-border group">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <span class="material-symbols-outlined text-6xl">mail</span>
                 </div>
                 <div class="flex items-center gap-2 mb-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Contacts Received</p>
+                    <p class="text-xs font-bold sp-text-muted uppercase tracking-widest">Contacts Received</p>
                     <?php if ($newContacts > 0): ?>
                         <span class="bg-[#a9a4ff] text-[#20009e] text-[9px] px-1.5 py-0.5 rounded-full font-black">NEW</span>
                     <?php endif; ?>
                 </div>
                 <div class="flex items-baseline gap-2">
-                    <p class="text-3xl font-bold text-white"><?= number_format($totalContacts, 0, '.', ',') ?></p>
+                    <p class="text-3xl font-bold sp-text"><?= number_format($totalContacts, 0, '.', ',') ?></p>
                     <?php if ($newContacts > 0): ?>
-                        <span class="text-xs font-semibold text-[#a9a4ff]">+<?= $newContacts ?> unread</span>
+                        <span class="text-xs font-semibold sp-primary">+<?= $newContacts ?> unread</span>
                     <?php endif; ?>
                 </div>
             </div>
 
             <!-- Avg. Time on Page -->
-            <div class="relative overflow-hidden bg-[#181828] rounded-xl p-6 border border-white/5 group">
+            <div class="relative overflow-hidden sp-surface rounded-xl p-6 border sp-border group">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <span class="material-symbols-outlined text-6xl">timer</span>
                 </div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Avg. Time on Page</p>
-                <p class="text-3xl font-bold text-white">N/A</p>
+                <p class="text-xs font-bold sp-text-muted uppercase tracking-widest mb-2">Avg. Time on Page</p>
+                <p class="text-3xl font-bold sp-text">N/A</p>
             </div>
 
         </div>
@@ -180,10 +180,10 @@ render_dashboard_header("Dashboard");
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- Gráfico de barras diário -->
-            <div class="lg:col-span-2 bg-[#181828] rounded-xl p-6 lg:p-8">
+            <div class="lg:col-span-2 sp-surface rounded-xl p-6 lg:p-8">
                 <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-lg font-bold font-headline text-white">Monthly Traffic</h4>
-                    <span class="text-xs text-slate-500 font-medium">Daily breakdown</span>
+                    <h4 class="text-lg font-bold font-headline sp-text">Monthly Traffic</h4>
+                    <span class="text-xs sp-text-faint font-medium">Daily breakdown</span>
                 </div>
                 <div class="flex items-end justify-between gap-[2px] h-48 pb-2 relative">
                     <!-- Linhas guia -->
@@ -198,17 +198,17 @@ render_dashboard_header("Dashboard");
                         $h   = $qty > 0 ? max(4, round(($qty / $maxDaily) * 100)) : 0;
                         $isToday = ($d == date('j'));
                     ?>
-                        <div class="w-full <?= $isToday ? 'bg-[#a9a4ff]' : 'bg-[#1e1e2f] hover:bg-[#685ef7]' ?> transition-colors rounded-t cursor-pointer relative z-10 group/bar"
+                        <div class="w-full <?= $isToday ? 'bg-[#a9a4ff]' : 'sp-surface-hi hover:bg-[#685ef7]' ?> transition-colors rounded-t cursor-pointer relative z-10 group/bar"
                              style="height: <?= max($h, 2) ?>%;">
                             <?php if ($qty > 0): ?>
-                                <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-[#242437] text-white text-xs py-1 px-2 rounded pointer-events-none whitespace-nowrap z-20">
+                                <div class="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 sp-surface-top sp-text text-xs py-1 px-2 rounded pointer-events-none whitespace-nowrap z-20">
                                     <?= $qty ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                     <?php endfor; ?>
                 </div>
-                <div class="flex justify-between text-xs text-slate-600 mt-2 font-medium">
+                <div class="flex justify-between text-xs sp-text-faint mt-2 font-medium">
                     <span>Day 1</span>
                     <span>Day 15</span>
                     <span>Day <?= date('t') ?></span>
@@ -216,25 +216,25 @@ render_dashboard_header("Dashboard");
             </div>
 
             <!-- Tips & Notices -->
-            <div class="bg-[#1e1e2f] rounded-xl p-6 lg:p-8 border border-[#a9a4ff]/10 flex flex-col justify-between">
+            <div class="sp-surface-hi rounded-xl p-6 lg:p-8 border border-[#a9a4ff]/10 flex flex-col justify-between">
                 <div>
                     <div class="w-11 h-11 bg-[#a9a4ff]/20 rounded-xl flex items-center justify-center mb-5">
-                        <span class="material-symbols-outlined text-[#a9a4ff]">lightbulb</span>
+                        <span class="material-symbols-outlined sp-primary">lightbulb</span>
                     </div>
-                    <h4 class="text-lg font-bold font-headline text-white mb-4">Tips & Notices</h4>
+                    <h4 class="text-lg font-bold font-headline sp-text mb-4">Tips & Notices</h4>
                     <div class="space-y-3">
                         <div class="flex gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
                             <div class="w-2 h-2 rounded-full bg-[#a9a4ff] mt-1.5 shrink-0"></div>
-                            <p class="text-sm text-slate-400 leading-relaxed">Your analytics are being tracked in real time. Visit your site to generate data.</p>
+                            <p class="text-sm sp-text-muted leading-relaxed">Your analytics are being tracked in real time. Visit your site to generate data.</p>
                         </div>
                         <div class="flex gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
                             <div class="w-2 h-2 rounded-full bg-[#b785ff] mt-1.5 shrink-0"></div>
-                            <p class="text-sm text-slate-400 leading-relaxed">Use <strong class="text-white">Edit Structure</strong> to add or remove sections from your page.</p>
+                            <p class="text-sm sp-text-muted leading-relaxed">Use <strong class="sp-text">Edit Structure</strong> to add or remove sections from your page.</p>
                         </div>
                     </div>
                 </div>
                 <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $currentSite['id'] ?>"
-                   class="mt-6 w-full py-2.5 bg-white/5 hover:bg-white/10 text-[#a9a4ff] font-bold text-sm rounded-full transition-all border border-[#a9a4ff]/20 text-center block">
+                   class="mt-6 w-full py-2.5 bg-white/5 hover:bg-white/10 sp-primary font-bold text-sm rounded-full transition-all border border-[#a9a4ff]/20 text-center block">
                     Edit Your Content
                 </a>
             </div>
@@ -245,16 +245,16 @@ render_dashboard_header("Dashboard");
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- Recent Contacts -->
-            <div class="bg-[#181828] rounded-xl p-6 flex flex-col">
+            <div class="sp-surface rounded-xl p-6 flex flex-col">
                 <div class="flex justify-between items-center mb-5">
-                    <h4 class="text-lg font-bold font-headline text-white">Recent Contacts</h4>
-                    <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSite['id'] ?>" class="text-xs text-[#a9a4ff] hover:underline">View All</a>
+                    <h4 class="text-lg font-bold font-headline sp-text">Recent Contacts</h4>
+                    <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSite['id'] ?>" class="text-xs sp-primary hover:underline">View All</a>
                 </div>
 
                 <?php if (empty($recentContacts)): ?>
                     <div class="flex-1 flex flex-col items-center justify-center py-8 text-center">
-                        <span class="material-symbols-outlined text-4xl text-slate-700 mb-3">inbox</span>
-                        <p class="text-sm text-slate-500">No contact form submissions yet.</p>
+                        <span class="material-symbols-outlined text-4xl sp-text-faint mb-3">inbox</span>
+                        <p class="text-sm sp-text-muted">No contact form submissions yet.</p>
                     </div>
                 <?php else: ?>
                     <div class="space-y-2 flex-1">
@@ -262,18 +262,18 @@ render_dashboard_header("Dashboard");
                             $dateStr = date('d M, H:i', strtotime($lead['created_at']));
                             $isNew   = $lead['status'] === 'new';
                         ?>
-                            <div class="flex items-center gap-3 p-3 bg-[#121220] rounded-xl hover:bg-[#1e1e2f] transition-all">
-                                <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/20 flex items-center justify-center text-[#a9a4ff] font-bold text-sm flex-shrink-0">
+                            <div class="flex items-center gap-3 p-3 sp-surface-low rounded-xl hover:sp-surface-hi transition-all">
+                                <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/20 flex items-center justify-center sp-primary font-bold text-sm flex-shrink-0">
                                     <?= strtoupper(substr($lead['name'], 0, 1)) ?>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
-                                        <p class="text-sm font-semibold text-white truncate"><?= htmlspecialchars($lead['name']) ?></p>
+                                        <p class="text-sm font-semibold sp-text truncate"><?= htmlspecialchars($lead['name']) ?></p>
                                         <?php if ($isNew): ?>
                                             <span class="bg-[#a9a4ff] text-[#20009e] text-[8px] px-1.5 py-0.5 rounded-full font-black flex-shrink-0">NEW</span>
                                         <?php endif; ?>
                                     </div>
-                                    <p class="text-xs text-slate-500"><?= $dateStr ?></p>
+                                    <p class="text-xs sp-text-faint"><?= $dateStr ?></p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -282,12 +282,12 @@ render_dashboard_header("Dashboard");
             </div>
 
             <!-- Traffic Source -->
-            <div class="bg-[#181828] rounded-xl p-6">
-                <h4 class="text-lg font-bold font-headline text-white mb-6">Traffic Source</h4>
+            <div class="sp-surface rounded-xl p-6">
+                <h4 class="text-lg font-bold font-headline sp-text mb-6">Traffic Source</h4>
                 <?php if (empty($referrers)): ?>
                     <div class="flex flex-col items-center justify-center py-8 text-center">
-                        <span class="material-symbols-outlined text-4xl text-slate-700 mb-3">bar_chart</span>
-                        <p class="text-sm text-slate-500">Not enough data yet.</p>
+                        <span class="material-symbols-outlined text-4xl sp-text-faint mb-3">bar_chart</span>
+                        <p class="text-sm sp-text-muted">Not enough data yet.</p>
                     </div>
                 <?php else:
                     $srcColors = ['bg-[#a9a4ff]', 'bg-[#b785ff]', 'bg-[#ff98cd]', 'bg-[#474656]'];
@@ -297,10 +297,10 @@ render_dashboard_header("Dashboard");
                 ?>
                     <div class="mb-5">
                         <div class="flex justify-between text-xs mb-1.5">
-                            <span class="text-slate-300 font-medium"><?= htmlspecialchars($sourceName) ?></span>
-                            <span class="text-slate-500"><?= $pct ?>%</span>
+                            <span class="sp-text-muted font-medium"><?= htmlspecialchars($sourceName) ?></span>
+                            <span class="sp-text-faint"><?= $pct ?>%</span>
                         </div>
-                        <div class="w-full bg-[#1e1e2f] rounded-full h-2">
+                        <div class="w-full sp-surface-hi rounded-full h-2">
                             <div class="<?= $srcColors[$i % 4] ?> h-2 rounded-full transition-all" style="width: <?= $pct ?>%"></div>
                         </div>
                     </div>
@@ -308,8 +308,8 @@ render_dashboard_header("Dashboard");
             </div>
 
             <!-- Devices Donut -->
-            <div class="bg-[#181828] rounded-xl p-6 flex flex-col items-center">
-                <h4 class="text-lg font-bold font-headline text-white mb-6 self-start">Devices</h4>
+            <div class="sp-surface rounded-xl p-6 flex flex-col items-center">
+                <h4 class="text-lg font-bold font-headline sp-text mb-6 self-start">Devices</h4>
 
                 <?php if ($visitsMonth > 0): ?>
                     <div class="relative w-36 h-36 flex items-center justify-center mb-6">
@@ -325,24 +325,24 @@ render_dashboard_header("Dashboard");
                                     stroke-dashoffset="-<?= round(201 * $pctMobile / 100) ?>"/>
                         </svg>
                         <div class="absolute flex flex-col items-center">
-                            <span class="text-xl font-black text-white"><?= max($pctMobile, $pctDesktop) ?>%</span>
-                            <span class="text-[9px] uppercase tracking-widest text-slate-500 font-bold"><?= $pctMobile >= $pctDesktop ? 'Mobile' : 'Desktop' ?></span>
+                            <span class="text-xl font-black sp-text"><?= max($pctMobile, $pctDesktop) ?>%</span>
+                            <span class="text-[9px] uppercase tracking-widest sp-text-faint font-bold"><?= $pctMobile >= $pctDesktop ? 'Mobile' : 'Desktop' ?></span>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 w-full">
                         <div class="flex items-center gap-2">
                             <div class="w-3 h-3 rounded-full bg-[#a9a4ff] flex-shrink-0"></div>
-                            <span class="text-xs text-slate-300">Mobile (<?= $pctMobile ?>%)</span>
+                            <span class="text-xs sp-text-muted">Mobile (<?= $pctMobile ?>%)</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <div class="w-3 h-3 rounded-full bg-[#b785ff] flex-shrink-0"></div>
-                            <span class="text-xs text-slate-300">Desktop (<?= $pctDesktop ?>%)</span>
+                            <span class="text-xs sp-text-muted">Desktop (<?= $pctDesktop ?>%)</span>
                         </div>
                     </div>
                 <?php else: ?>
                     <div class="flex-1 flex flex-col items-center justify-center py-8 text-center">
-                        <div class="w-32 h-32 rounded-full bg-[#1e1e2f] flex items-center justify-center mb-4">
-                            <span class="text-sm text-slate-500">No data</span>
+                        <div class="w-32 h-32 rounded-full sp-surface-hi flex items-center justify-center mb-4">
+                            <span class="text-sm sp-text-muted">No data</span>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -377,10 +377,10 @@ render_dashboard_header("Dashboard");
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h2 class="text-3xl lg:text-4xl font-extrabold font-headline tracking-tight text-white mb-1">
-                    My Sites <span class="text-[#a9a4ff]">(<?= count($sitesWithStats) ?>)</span>
+                <h2 class="text-3xl lg:text-4xl font-extrabold font-headline tracking-tight sp-text mb-1">
+                    My Sites <span class="sp-primary">(<?= count($sitesWithStats) ?>)</span>
                 </h2>
-                <p class="text-sm text-slate-400">Select a site to manage it, or create a new one.</p>
+                <p class="text-sm sp-text-muted">Select a site to manage it, or create a new one.</p>
             </div>
 
         </div>
@@ -388,11 +388,11 @@ render_dashboard_header("Dashboard");
         <?php if (empty($sitesWithStats)): ?>
             <!-- Estado vazio -->
             <div class="flex flex-col items-center justify-center py-24 text-center">
-                <div class="w-20 h-20 bg-[#1e1e2f] rounded-2xl flex items-center justify-center mb-6">
-                    <span class="material-symbols-outlined text-4xl text-slate-600">web</span>
+                <div class="w-20 h-20 sp-surface-hi rounded-2xl flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-4xl sp-text-faint">web</span>
                 </div>
-                <h3 class="text-2xl font-bold text-white mb-3">No sites yet</h3>
-                <p class="text-slate-400 max-w-sm mx-auto mb-8">
+                <h3 class="text-2xl font-bold sp-text mb-3">No sites yet</h3>
+                <p class="sp-text-muted max-w-sm mx-auto mb-8">
                     You haven't created any sites yet. Get started and build your digital presence in minutes.
                 </p>
                 <a href="<?= BASE_URL ?>/dashboard/create_site"
@@ -409,13 +409,13 @@ render_dashboard_header("Dashboard");
                     $displayName = htmlspecialchars($s['domain'] ?: $s['slug']);
                     $previewUrl  = $s['domain'] ? 'https://' . $s['domain'] : BASE_URL . '/' . $s['slug'];
                 ?>
-                    <div class="bg-[#181828] rounded-xl p-6 border border-white/5 hover:border-[#a9a4ff]/20 transition-all group flex flex-col gap-5">
+                    <div class="sp-surface rounded-xl p-6 border sp-border hover:border-[#a9a4ff]/20 transition-all group flex flex-col gap-5">
 
                         <!-- Card header -->
                         <div class="flex items-start justify-between">
                             <div class="min-w-0 flex-1">
-                                <h3 class="font-bold text-white truncate text-base"><?= $displayName ?></h3>
-                                <p class="text-xs text-slate-500 mt-0.5">
+                                <h3 class="font-bold sp-text truncate text-base"><?= $displayName ?></h3>
+                                <p class="text-xs sp-text-faint mt-0.5">
                                     <?= $s['domain'] ? htmlspecialchars($s['domain']) : $s['slug'] . '.superpage.com' ?>
                                 </p>
                             </div>
@@ -428,30 +428,30 @@ render_dashboard_header("Dashboard");
                         <!-- Métricas rápidas -->
                         <div class="flex gap-6">
                             <div>
-                                <p class="text-2xl font-bold text-white"><?= number_format($s['visits_today'], 0, '.', ',') ?></p>
-                                <p class="text-xs text-slate-500 mt-0.5">visitors today</p>
+                                <p class="text-2xl font-bold sp-text"><?= number_format($s['visits_today'], 0, '.', ',') ?></p>
+                                <p class="text-xs sp-text-faint mt-0.5">visitors today</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold <?= $s['new_contacts'] > 0 ? 'text-[#a9a4ff]' : 'text-white' ?>">
+                                <p class="text-2xl font-bold <?= $s['new_contacts'] > 0 ? 'sp-primary' : 'sp-text' ?>">
                                     <?= $s['new_contacts'] ?>
                                 </p>
-                                <p class="text-xs text-slate-500 mt-0.5">new contacts</p>
+                                <p class="text-xs sp-text-faint mt-0.5">new contacts</p>
                             </div>
                         </div>
 
                         <!-- Acções -->
                         <div class="flex gap-2 mt-auto">
                             <a href="<?= BASE_URL ?>/dashboard/content?site_id=<?= $s['id'] ?>"
-                               class="flex-1 text-center py-2 bg-[#5B4FE9]/20 hover:bg-[#5B4FE9]/30 text-[#a9a4ff] font-bold text-sm rounded-full transition-all border border-[#5B4FE9]/20">
+                               class="flex-1 text-center py-2 bg-[#5B4FE9]/20 hover:bg-[#5B4FE9]/30 sp-primary font-bold text-sm rounded-full transition-all border border-[#5B4FE9]/20">
                                 Edit Content
                             </a>
                             <a href="<?= BASE_URL ?>/dashboard/site_settings?site_id=<?= $s['id'] ?>"
-                               class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-bold text-sm rounded-full transition-all"
+                               class="px-4 py-2 bg-white/5 hover:bg-white/10 sp-text-muted hover:sp-text font-bold text-sm rounded-full transition-all"
                                title="Settings">
                                 <span class="material-symbols-outlined text-base" style="font-size:18px">settings</span>
                             </a>
                             <a href="<?= $previewUrl ?>?preview=true" target="_blank"
-                               class="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-bold text-sm rounded-full transition-all"
+                               class="px-4 py-2 bg-white/5 hover:bg-white/10 sp-text-muted hover:sp-text font-bold text-sm rounded-full transition-all"
                                title="Preview site">
                                 <span class="material-symbols-outlined text-base" style="font-size:18px">open_in_new</span>
                             </a>

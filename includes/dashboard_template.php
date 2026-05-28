@@ -36,8 +36,8 @@ function render_dashboard_header($title = "Dashboard") {
     $isContacts     = strpos($_SERVER['REQUEST_URI'], '/contacts') !== false;
     $isHome         = !$isContent && !$isSiteSettings && !$isContacts;
 
-    $navActive   = 'flex items-center gap-3 bg-[#5B4FE9]/20 text-[#a9a4ff] rounded-full px-4 py-2 border-l-4 border-[#5B4FE9] translate-x-1 transition-all duration-200';
-    $navInactive = 'flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-white rounded-full transition-all';
+    $navActive   = 'flex items-center gap-3 bg-[#5B4FE9]/20 sp-primary rounded-full px-4 py-2 border-l-4 border-[#5B4FE9] translate-x-1 transition-all duration-200';
+    $navInactive = 'flex items-center gap-3 sp-text-muted px-4 py-2 hover:bg-white/5 hover:sp-text rounded-full transition-all';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -124,7 +124,7 @@ function render_dashboard_header($title = "Dashboard") {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         body {
-            background-color: #0d0d1a;
+            background-color: #0d0d1a; /* dark fallback before JS applies class */
             color: #e9e6f9;
             font-family: 'Inter', sans-serif;
         }
@@ -134,143 +134,121 @@ function render_dashboard_header($title = "Dashboard") {
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /*
-         * ── Light Theme ─────────────────────────────────
-         * Fonte: design system Kinetic — ui_kits/web-light/
-         *   shared.jsx SPL.colors:
-         *     bg          : #ffffff
-         *     surfaceLow  : #faf9ff  ← body bg
-         *     surface     : #f5f4ff
-         *     surfaceHigh : #f0eeff
-         *     surfaceTop  : #ebe8ff
-         *     onSurface   : #1a1830  ← texto principal
-         *     onSurfaceVar: #5a5680  ← texto secundário
-         *     muted       : #8885a8  ← inactivo/placeholder
-         *     primary     : #685ef7  ← accent (active, hover, ícones)
-         *     outline     : rgba(104,94,247,0.12)
-         * ────────────────────────────────────────────── */
+        /* ═══════════════════════════════════════════════════════
+           THEME VARIABLES — Kinetic Design System
+           Source: ui_kits/web-light/shared.jsx + colors_and_type.css
+           ═══════════════════════════════════════════════════════ */
 
-        /* Body */
-        html.light body { background-color: #faf9ff; color: #1a1830; }
-
-        /* ── Accent global: #a9a4ff (lavanda dark) → #685ef7 (primary light)
-           Uma única regra para toda a página — sidebar, topbar, main, bottom-nav ── */
-        html.light [class*="text-[#a9a4ff]"]              { color: #685ef7 !important; }
-        html.light [class*="hover:text-[#a9a4ff]"]:hover  { color: #685ef7 !important; }
-        html.light [class*="bg-[#a9a4ff]/"]               { background-color: rgba(104,94,247,0.10) !important; }
-        html.light [class*="hover:bg-[#a9a4ff]/"]:hover   { background-color: rgba(104,94,247,0.15) !important; }
-        html.light [class*="border-[#5B4FE9]"]            { border-color: #685ef7 !important; }
-
-        /* ── Sidebar ── (Sidebar.jsx) */
-        html.light #sp-sidebar {
-            background-color: #ffffff;
-            border-right: 1px solid rgba(104,94,247,0.08);
+        html.dark {
+          --sp-bg:            #0d0d1a;
+          --sp-surface-low:   #121220;
+          --sp-surface:       #181828;
+          --sp-surface-hi:    #1e1e2f;
+          --sp-surface-top:   #242437;
+          --sp-text:          #e9e6f9;
+          --sp-text-muted:    #aba9bb;
+          --sp-text-faint:    #757485;
+          --sp-primary:       #a9a4ff;
+          --sp-primary-dim:   #685ef7;
+          --sp-secondary:     #914feb;
+          --sp-outline:       rgba(255,255,255,0.05);
+          --sp-outline-mid:   rgba(255,255,255,0.10);
+          --sp-gradient:      linear-gradient(135deg, #685ef7 0%, #914feb 100%);
+          --sp-shadow-card:   0 4px 20px rgba(0,0,0,0.30);
+          --sp-shadow-glow:   0 8px 24px rgba(104,94,247,0.18);
         }
-        html.light #sp-sidebar a:hover,
-        html.light #sp-sidebar button:hover {
-            background-color: rgba(104,94,247,0.08) !important;
-            color: #685ef7 !important;
-        }
-        html.light #sp-sidebar .text-white     { color: #1a1830 !important; }
-        html.light #sp-sidebar .text-slate-400 { color: #8885a8; }
 
-        /* User card (Sidebar.jsx: userRow bg #f5f4ff) */
-        html.light #sp-user-card {
-            background-color: #f5f4ff;
-            border-color: rgba(104,94,247,0.08);
+        html.light {
+          --sp-bg:            #faf9ff;
+          --sp-surface-low:   #f5f4ff;
+          --sp-surface:       #ffffff;
+          --sp-surface-hi:    #f0eeff;
+          --sp-surface-top:   #ebe8ff;
+          --sp-text:          #1a1830;
+          --sp-text-muted:    #5a5680;
+          --sp-text-faint:    #8885a8;
+          --sp-primary:       #685ef7;
+          --sp-primary-dim:   #685ef7;
+          --sp-secondary:     #914feb;
+          --sp-outline:       rgba(104,94,247,0.08);
+          --sp-outline-mid:   rgba(104,94,247,0.12);
+          --sp-gradient:      linear-gradient(135deg, #685ef7 0%, #914feb 100%);
+          --sp-shadow-card:   0 2px 12px rgba(104,94,247,0.06);
+          --sp-shadow-glow:   0 8px 24px rgba(104,94,247,0.12);
         }
-        html.light #sp-user-card .text-white { color: #1a1830 !important; }
 
-        /* ── Topbar ── (Topbar.jsx) */
-        html.light #sp-topbar {
-            background-color: rgba(255,255,255,0.90) !important;
-            border-bottom: 1px solid rgba(104,94,247,0.06) !important;
-            box-shadow: 0 1px 0 rgba(104,94,247,0.08), 0 4px 16px rgba(104,94,247,0.06) !important;
-        }
-        html.light #sp-topbar .font-black    { color: #1a1830 !important; }
-        html.light #sp-topbar button:hover,
-        html.light #sp-topbar a:hover        { background-color: rgba(104,94,247,0.06) !important; }
+        /* Body theme */
+        html.light body { background-color: var(--sp-bg); color: var(--sp-text); }
+        html.dark body  { background-color: var(--sp-bg); color: var(--sp-text); }
 
-        /* Site selector (Topbar.jsx: siteBtn) */
-        html.light #sp-site-selector-btn {
-            background-color: #f5f4ff !important;
-            color: #1a1830 !important;
-            border-color: rgba(104,94,247,0.12) !important;
-        }
-        html.light #sp-site-selector-btn .text-slate-300 { color: #5a5680 !important; }
-        html.light #sp-site-selector-dropdown {
-            background-color: #ffffff !important;
-            border-color: rgba(104,94,247,0.12) !important;
-            box-shadow: 0 8px 32px rgba(104,94,247,0.10) !important;
-        }
-        html.light #sp-site-selector-dropdown a       { color: #5a5680; }
-        html.light #sp-site-selector-dropdown a:hover { background-color: rgba(104,94,247,0.06) !important; }
+        /* Semantic utility classes — use these instead of hardcoded Tailwind arbitrary values */
+        .sp-bg           { background-color: var(--sp-bg); }
+        .sp-surface-low  { background-color: var(--sp-surface-low); }
+        .sp-surface      { background-color: var(--sp-surface); }
+        .sp-surface-hi   { background-color: var(--sp-surface-hi); }
+        .sp-surface-top  { background-color: var(--sp-surface-top); }
+        .sp-text         { color: var(--sp-text); }
+        .sp-text-muted   { color: var(--sp-text-muted); }
+        .sp-text-faint   { color: var(--sp-text-faint); }
+        .sp-primary      { color: var(--sp-primary); }
+        .sp-border       { border-color: var(--sp-outline); }
+        .sp-border-mid   { border-color: var(--sp-outline-mid); }
+        .sp-shadow       { box-shadow: var(--sp-shadow-card); }
+        .sp-shadow-glow  { box-shadow: var(--sp-shadow-glow); }
 
-        /* ── Bottom nav mobile ── */
-        html.light #sp-bottom-nav {
-            background-color: rgba(255,255,255,0.97) !important;
-            border-top-color: rgba(104,94,247,0.08) !important;
+        /* Input / form elements */
+        .sp-input {
+          background-color: var(--sp-surface);
+          color: var(--sp-text);
+          border: 1px solid var(--sp-outline-mid);
+          box-shadow: 0 1px 4px rgba(104,94,247,0.05);
+          transition: border-color 200ms, box-shadow 200ms;
+        }
+        .sp-input:focus {
+          outline: none;
+          border-color: var(--sp-primary);
+          box-shadow: 0 0 0 3px rgba(104,94,247,0.15);
+        }
+        .sp-input::placeholder { color: var(--sp-text-faint); }
+
+        /* Label */
+        .sp-label {
+          color: var(--sp-text-muted);
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        /* Sidebar + topbar structural theming */
+        #sp-sidebar {
+          background-color: var(--sp-surface);
+          border-right: 1px solid var(--sp-outline);
+        }
+        #sp-topbar {
+          background-color: color-mix(in srgb, var(--sp-surface) 90%, transparent);
+          border-bottom: 1px solid var(--sp-outline);
+          box-shadow: var(--sp-shadow-glow);
+        }
+        #sp-user-card {
+          background-color: var(--sp-surface-low);
+          border-color: var(--sp-outline);
+        }
+        #sp-site-selector-btn {
+          background-color: var(--sp-surface-low);
+          border-color: var(--sp-outline-mid);
+          color: var(--sp-text);
+        }
+        #sp-site-selector-dropdown {
+          background-color: var(--sp-surface);
+          border-color: var(--sp-outline-mid);
+          box-shadow: var(--sp-shadow-glow);
+        }
+        #sp-bottom-nav {
+          background-color: color-mix(in srgb, var(--sp-surface) 97%, transparent);
+          border-top-color: var(--sp-outline);
         }
 
         /* Glass panel */
         html.light .glass-panel { background: rgba(255,255,255,0.7); }
-
-        /* ── Main: texto ──
-           text-white → #1a1830, EXCEPTO em botões gradient (btnPrimary: color #fff).
-           :not([class*="from-["]) exclui elementos com gradient start class. */
-        html.light main .text-white:not([class*="from-["])                     { color: #1a1830 !important; }
-        html.light main .text-slate-300                                        { color: #5a5680 !important; }
-        html.light main [class*="hover:text-white"]:not([class*="from-["]):hover { color: #1a1830 !important; }
-
-        /* ── Main: superfícies (shared.jsx mapeamento directo)
-           dark #181828 surface-container      → light #ffffff  bg
-           dark #121220 surface-container-low  → light #f5f4ff  surface
-           dark #1e1e2f surface-container-high → light #f0eeff  surfaceHigh
-           dark #242437 surface-highest        → light #ebe8ff  surfaceTop ── */
-        html.light main [class*="bg-[#181828]"] { background-color: #ffffff !important; }
-        html.light main [class*="bg-[#121220]"] { background-color: #f5f4ff !important; }
-        html.light main [class*="bg-[#1e1e2f]"] { background-color: #f0eeff !important; }
-        html.light main [class*="bg-[#242437]"] { background-color: #ebe8ff !important; }
-
-        /* ── Main: bordas (shared.jsx: outline rgba(104,94,247,0.12)) ── */
-        html.light main [class*="border-white/5"]  { border-color: rgba(104,94,247,0.08) !important; }
-        html.light main [class*="border-white/10"] { border-color: rgba(104,94,247,0.12) !important; }
-
-        /* ── Main: hover backgrounds
-           Excepção gradient CTAs: :not([class*="from-["]) ── */
-        html.light main [class*="hover:bg-white/"]:not([class*="from-["]):hover { background-color: rgba(104,94,247,0.08) !important; }
-        html.light main [class*="hover:bg-[#"]:not([class*="from-["]):hover     { background-color: rgba(104,94,247,0.08) !important; }
-
-        /* ── Main: inputs (shared.jsx: splSharedStyles.input)
-         *  bg #fff, border 1px rgba(104,94,247,0.15), box-shadow subtil.
-         *  border-radius NÃO sobrescrito — cada página mantém o seu (rounded-xl vs rounded-2xl).
-         *  Inputs com border-none no dark: border shorthand override cobre o caso.
-         *  Inputs com border border-white/5 no dark: border shorthand sobrescreve cor + opacity. */
-        html.light main input:not([type="color"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-        html.light main select,
-        html.light main textarea {
-            background-color: #ffffff !important;
-            color: #1a1830 !important;
-            border: 1px solid rgba(104,94,247,0.15) !important;
-            box-shadow: 0 1px 4px rgba(104,94,247,0.05) !important;
-        }
-        html.light main input::placeholder,
-        html.light main textarea::placeholder { color: #b8b5d0 !important; }
-
-        /* ── Labels (settings.php, site_settings.php usam text-[#9a94ff])
-         *  #9a94ff é lavanda — baixo contraste em fundo branco.
-         *  Design system label: color onSurfaceVar = #5a5680, weight 500. */
-        html.light main label { color: #5a5680 !important; }
-        html.light main [class*="text-[#9a94ff]"] { color: #5a5680 !important; }
-
-        /* ── Focus ring: #a9a4ff/40 em light → invisível em fundo branco.
-         *  Sobrescrever com --tw-ring-color para usar primary #685ef7. */
-        html.light main input:focus,
-        html.light main select:focus,
-        html.light main textarea:focus {
-            --tw-ring-color: rgba(104,94,247,0.40) !important;
-            outline: none !important;
-        }
     </style>
     <!-- Anti-FOUC: apply saved theme before first paint -->
     <script>(function(){var t=localStorage.getItem('sp-theme')||'dark';document.documentElement.classList.add(t);}());</script>
@@ -287,11 +265,11 @@ function render_dashboard_header($title = "Dashboard") {
 }" x-init="darkMode = (localStorage.getItem('sp-theme') || 'dark') === 'dark'">
 
     <!-- Sidebar fixa — visível apenas em desktop -->
-    <nav id="sp-sidebar" class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 bg-[#121220] w-64 z-40">
+    <nav id="sp-sidebar" class="hidden md:flex flex-col h-screen fixed left-0 top-0 pt-6 pb-8 px-4 w-64 z-40">
         <div class="mb-8 px-4">
             <a href="<?= BASE_URL ?>/dashboard" class="block">
-                <h1 class="text-lg font-bold text-[#a9a4ff] font-headline"><?= APP_NAME ?></h1>
-                <p class="text-xs text-slate-400">Client Panel</p>
+                <h1 class="text-lg font-bold sp-primary font-headline"><?= APP_NAME ?></h1>
+                <p class="text-xs sp-text-muted">Client Panel</p>
             </a>
         </div>
 
@@ -356,22 +334,22 @@ function render_dashboard_header($title = "Dashboard") {
 
         <!-- Perfil + links de sistema no rodapé da sidebar -->
         <div class="mt-auto px-4 space-y-2">
-            <div id="sp-user-card" class="flex items-center gap-3 p-3 bg-[#181828] rounded-xl">
-                <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/30 flex items-center justify-center text-[#a9a4ff] font-bold text-sm flex-shrink-0">
+            <div id="sp-user-card" class="flex items-center gap-3 p-3 rounded-xl border">
+                <div class="w-9 h-9 rounded-full bg-[#5B4FE9]/30 flex items-center justify-center sp-primary font-bold text-sm flex-shrink-0">
                     <?= strtoupper(substr($user['name'], 0, 1)) ?>
                 </div>
                 <div class="min-w-0">
-                    <p class="text-sm font-semibold text-white truncate"><?= htmlspecialchars($user['name']) ?></p>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest"><?= htmlspecialchars($user['role']) ?></p>
+                    <p class="text-sm font-semibold sp-text truncate"><?= htmlspecialchars($user['name']) ?></p>
+                    <p class="text-[10px] sp-text-muted uppercase tracking-widest"><?= htmlspecialchars($user['role']) ?></p>
                 </div>
             </div>
             <?php if ($user['role'] === 'admin'): ?>
-                <a href="<?= BASE_URL ?>/hub" class="flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-[#a9a4ff] rounded-full transition-all">
+                <a href="<?= BASE_URL ?>/hub" class="flex items-center gap-3 sp-text-muted px-4 py-2 hover:bg-white/5 hover:sp-primary rounded-full transition-all">
                     <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
                     <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Hub Admin</span>
                 </a>
             <?php endif; ?>
-            <a href="<?= BASE_URL ?>/auth/logout" class="flex items-center gap-3 text-slate-400 px-4 py-2 hover:bg-white/5 hover:text-white rounded-full transition-all">
+            <a href="<?= BASE_URL ?>/auth/logout" class="flex items-center gap-3 sp-text-muted px-4 py-2 hover:bg-white/5 hover:sp-text rounded-full transition-all">
                 <span class="material-symbols-outlined text-xl">logout</span>
                 <span class="font-['Plus_Jakarta_Sans'] text-sm font-medium">Sign Out</span>
             </a>
@@ -379,11 +357,11 @@ function render_dashboard_header($title = "Dashboard") {
     </nav>
 
     <!-- Topbar sticky com backdrop-blur -->
-    <header id="sp-topbar" class="flex justify-between items-center w-full px-4 sm:px-6 h-16 sticky top-0 z-50 backdrop-blur-xl bg-[#0d0d1a]/80 shadow-[0_4px_30px_rgba(169,164,255,0.06)] border-b border-white/5">
+    <header id="sp-topbar" class="flex justify-between items-center w-full px-4 sm:px-6 h-16 sticky top-0 z-50 backdrop-blur-xl">
         <div class="flex items-center gap-3">
             <!-- Logo -->
             <a href="<?= BASE_URL ?>/dashboard" class="flex-shrink-0">
-                <span class="text-xl font-black text-white tracking-tighter font-headline"><?= APP_NAME ?></span>
+                <span class="text-xl font-black sp-text tracking-tighter font-headline"><?= APP_NAME ?></span>
             </a>
 
             <span class="text-slate-600 font-light select-none hidden sm:inline">|</span>
@@ -391,8 +369,8 @@ function render_dashboard_header($title = "Dashboard") {
             <!-- Site selector dropdown -->
             <div class="relative" @click.outside="siteMenuOpen = false">
                 <button id="sp-site-selector-btn" @click="siteMenuOpen = !siteMenuOpen"
-                        class="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e2f] hover:bg-[#242437] rounded-full text-sm font-medium transition-all text-slate-300 hover:text-white border border-white/10">
-                    <span class="material-symbols-outlined text-base text-[#a9a4ff]" style="font-size:18px">language</span>
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all border">
+                    <span class="material-symbols-outlined text-base sp-primary" style="font-size:18px">language</span>
                     <span class="max-w-[120px] sm:max-w-[180px] truncate">
                         <?= $currentSite ? htmlspecialchars($currentSite['domain'] ?: $currentSite['slug']) : 'Select your page' ?>
                     </span>
@@ -402,17 +380,17 @@ function render_dashboard_header($title = "Dashboard") {
                 </button>
 
                 <div id="sp-site-selector-dropdown" x-show="siteMenuOpen" style="display: none;"
-                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl bg-[#1e1e2f] border border-white/10 py-1 z-50">
+                     class="origin-top-left absolute left-0 mt-2 w-64 rounded-xl shadow-2xl border py-1 z-50">
                     <a href="<?= BASE_URL ?>/dashboard/create_site"
-                       class="flex items-center gap-2 px-4 py-3 text-sm text-[#a9a4ff] font-bold border-b border-white/10 hover:bg-white/5 transition">
+                       class="flex items-center gap-2 px-4 py-3 text-sm sp-primary font-bold border-b sp-border-mid hover:bg-white/5 transition">
                         <span class="material-symbols-outlined text-base" style="font-size:18px">add_circle</span>
                         New Site
                     </a>
                     <?php foreach ($sites as $site): ?>
                         <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $site['id'] ?>"
-                           class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition <?= $currentSiteId == $site['id'] ? 'text-[#a9a4ff] font-semibold' : 'text-slate-300' ?>">
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-white/5 transition <?= $currentSiteId == $site['id'] ? 'sp-primary font-semibold' : 'sp-text-muted' ?>">
                             <?php if ($currentSiteId == $site['id']): ?>
-                                <span class="material-symbols-outlined text-[#a9a4ff]" style="font-size:16px">check_circle</span>
+                                <span class="material-symbols-outlined sp-primary" style="font-size:16px">check_circle</span>
                             <?php else: ?>
                                 <span class="material-symbols-outlined text-slate-600" style="font-size:16px">circle</span>
                             <?php endif; ?>
@@ -428,13 +406,13 @@ function render_dashboard_header($title = "Dashboard") {
             <button @click="toggleTheme()"
                     class="p-2 hover:bg-white/10 rounded-full transition-all"
                     :title="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
-                <span class="material-symbols-outlined text-[#a9a4ff]" x-text="darkMode ? 'light_mode' : 'dark_mode'">light_mode</span>
+                <span class="material-symbols-outlined sp-primary" x-text="darkMode ? 'light_mode' : 'dark_mode'">light_mode</span>
             </button>
             <!-- Badge de notificações -->
             <?php if ($currentSiteId): ?>
                 <a href="<?= BASE_URL ?>/dashboard/contacts?site_id=<?= $currentSiteId ?>"
                    class="relative p-2 hover:bg-white/10 rounded-full transition-all" title="Contacts">
-                    <span class="material-symbols-outlined text-[#a9a4ff]">notifications</span>
+                    <span class="material-symbols-outlined sp-primary">notifications</span>
                     <?php if ($unreadContactsCount > 0): ?>
                         <span class="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 animate-pulse">
                             <?= $unreadContactsCount > 9 ? '9+' : $unreadContactsCount ?>
@@ -467,13 +445,13 @@ function render_dashboard_footer() {
     $isContacts     = strpos($_SERVER['REQUEST_URI'], '/contacts') !== false;
     $isHome         = !$isContent && !$isSiteSettings && !$isContacts;
 
-    $bnActive   = 'flex flex-col items-center gap-0.5 text-[#a9a4ff] text-[10px] font-medium px-3 py-1';
-    $bnInactive = 'flex flex-col items-center gap-0.5 text-slate-500 text-[10px] hover:text-slate-300 transition-colors px-3 py-1';
+    $bnActive   = 'flex flex-col items-center gap-0.5 sp-primary text-[10px] font-medium px-3 py-1';
+    $bnInactive = 'flex flex-col items-center gap-0.5 sp-text-faint text-[10px] hover:sp-text-muted transition-colors px-3 py-1';
 ?>
     </main>
 
     <!-- Bottom nav mobile -->
-    <nav id="sp-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 bg-[#121220]/95 backdrop-blur-xl border-t border-white/10 z-50 flex justify-around items-center h-16">
+    <nav id="sp-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 backdrop-blur-xl border-t z-50 flex justify-around items-center h-16">
         <?php if ($currentSite): ?>
             <a href="<?= BASE_URL ?>/dashboard?site_id=<?= $currentSite['id'] ?>" class="<?= $isHome ? $bnActive : $bnInactive ?>">
                 <span class="material-symbols-outlined text-2xl">home</span>
