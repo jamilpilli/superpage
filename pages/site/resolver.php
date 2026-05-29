@@ -196,9 +196,11 @@ $seoDescription = mb_strimwidth($seoDescription, 0, 160, '...');
 $protocol    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $siteBaseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'];
 
-// Canonical aponta para o domínio custom quando disponível
+// Canonical aponta para: domínio custom > subdomínio > path
 if (!empty($site['domain'])) {
     $canonicalUrl = 'https://' . $site['domain'];
+} elseif (defined('MAIN_DOMAIN')) {
+    $canonicalUrl = 'https://' . $site['slug'] . '.' . MAIN_DOMAIN;
 } else {
     $canonicalUrl = $siteBaseUrl . '/' . $site['slug'];
 }
