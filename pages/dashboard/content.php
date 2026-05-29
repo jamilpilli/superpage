@@ -473,6 +473,8 @@ document.addEventListener('alpine:init', () => {
                 if (blockType) {
                     const found = this.blocks.find(b => b.type === blockType && b.config?.is_active !== false);
                     if (found) this.selectBlock(found);
+                } else if (this.blocks.length > 0) {
+                    this.selectBlock(this.blocks[0]);
                 }
             } catch (e) {
                 this.showToast(e.message, 'error');
